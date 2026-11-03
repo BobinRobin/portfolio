@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Интеграции — Родион Мурашкин</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
+  <nav class="links">
+    <a href="index.html">Главная</a>
+    <a href="infrastructure.html">Инфраструктура</a>
+    <a href="integrations.html">Интеграции</a>
+    <a href="incidents.html">Инциденты</a>
+    <a href="mlops.html">MLOps</a>
+    <a href="articles.html">Статьи</a>
+  </nav>
+</header>
+<main>
+  <section class="hero">
+    <h1>Enterprise-интеграции</h1>
+    <p>Сквозные контуры обмена данными с внешними государственными и корпоративными системами. Главное в них — не «связать», а сделать надёжно: идемпотентность, сверка, обработка ошибок, наблюдаемость.</p>
+  </section>
+  <div class="grid">
+    <div class="card"><div class="tag">Integration · Production</div><h3>Маркировка «Честный знак»</h3>
+      <p>Сквозной контур маркировки: заказы, стикеры, импорт, SSCC.</p>
+      <ul>
+        <li>XML-контракты внешней системы: имя файла и структура — закон</li>
+        <li>Чанкинг: &gt;29999 кодов на документ, порядок сохраняется</li>
+        <li>FTP-обмен, чтение результата по точному имени файла</li>
+        <li>Callback в HQ, мультиокружение (прод/тест схемы)</li>
+      </ul>
+    </div>
+    <div class="card"><div class="tag">Integration · Systemd</div><h3>Приём УПД (документооборот)</h3>
+      <p>Конвейер приёма и обработки УПД от корпоративного HQ.</p>
+      <ul>
+        <li>Приём «logs-only» → Redis stream → worker → БД</li>
+        <li>Идемпотентность на входе: повторный пост не дублирует запись</li>
+        <li>Gate перед записью в БД: не сохраняем то, что не прошло стадию</li>
+        <li>Dry-run: внешние каналы включаются по одному, не разом</li>
+      </ul>
+    </div>
+    <div class="card"><div class="tag">Batch ETL · GitOps</div><h3>Sellout / inventory (эталонный проект)</h3>
+      <p>Разовый batch-ETL на Python, запускается по расписанию (CronJob).</p>
+      <ul>
+        <li>GitLab CI: test / build / gitops, uv + pytest</li>
+        <li>Dockerfile: многоступенчатый, непривилегированный пользователь</li>
+        <li>Helm-чарт: CronJob, requests/limits явно</li>
+        <li>ArgoCD применяет, откат = git revert</li>
+      </ul>
+    </div>
+  </div>
+  <h2>Паттерны надёжности, которые я применяю</h2>
+  <table>
+    <tr><th>Паттерн</th><th>Зачем</th></tr>
+    <tr><td>Идемпотентность с первого дня</td><td>Ретраи и повторные посты безопасны; ключ должен быть действительно уникальным</td></tr>
+    <tr><td>Dry-run перед боем</td><td>Сначала конвейер без внешних каналов, затем включение по одному — ошибки ловятся до отправки во внешнюю систему</td></tr>
+    <tr><td>Gate перед записью</td><td>В БД попадает только то, что прошло нужную стадию обработки</td></tr>
+    <tr><td>Чанкинг по контракту</td><td>Большие документы дробятся по лимиту внешней системы с сохранением порядка</td></tr>
+    <tr><td>Сверка и трейсы</td><td>Статусы на уровне данных, сквозная трассировка кода от входа до результата</td></tr>
+    <tr><td>Наблюдаемость</td><td>RED-метрики и логи с метками — инцидент виден, а не ищется вручную</td></tr>
+  </table>
+  <div class="note">Имена внешних систем и детали контрактов обобщены для публичного портфолио.</div>
+</main>
+<footer>© <span data-year>2026</span> Родион Мурашкин · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

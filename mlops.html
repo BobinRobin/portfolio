@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MLOps — Родион Мурашкин</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
+  <nav class="links">
+    <a href="index.html">Главная</a>
+    <a href="infrastructure.html">Инфраструктура</a>
+    <a href="integrations.html">Интеграции</a>
+    <a href="incidents.html">Инциденты</a>
+    <a href="mlops.html">MLOps</a>
+    <a href="articles.html">Статьи</a>
+  </nav>
+</header>
+<main>
+  <section class="hero">
+    <h1>MLOps и AI Automation</h1>
+    <p>Честная позиция: инфраструктурная база — сильная, MLOps-стек развёрнут и доводится до боевого состояния. Показываю, что сделано руками, и где лежит следующий шаг.</p>
+  </section>
+  <div class="grid">
+    <div class="card"><div class="tag">ML Project · Hands-on</div><h3>ML-пайплайн: предсказание цены поездки</h3>
+      <p>Полный цикл обработки данных и моделирования: загрузка, предобработка, признаки, обучение, прогноз.</p>
+      <ul>
+        <li>37 автоматических тестов, покрытие 88%</li>
+        <li>Воспроизводимость: uv + lock-файл, версии зависимостей</li>
+        <li>Качество кода: flake8, pylint, структура src/tests/docs</li>
+        <li>Документация: mkdocs + README</li>
+      </ul>
+      <p style="margin-top:.6rem">Это курсовой проект, доведённый до качества production-коддинга: тесты, покрытие, воспроизводимость.</p>
+    </div>
+    <div class="card"><div class="tag">ML Platform · PoC</div><h3>Основа ML-платформы</h3>
+      <p>Развёрнут стек для жизненного цикла моделей как фундамент:</p>
+      <ul>
+        <li>MLflow — трекинг экспериментов и реестр моделей</li>
+        <li>MinIO — объектное хранилище артефактов</li>
+        <li>KServe — сервинг моделей (PoC-манифесты)</li>
+      </ul>
+      <p style="margin-top:.6rem">Честно: прод-эксплуатация моделей — следующий этап, сейчас это развёрнутая основа и PoC.</p>
+    </div>
+    <div class="card"><div class="tag">AI-assisted</div><h3>AI-assisted engineering</h3>
+      <p>Инженерная работа с корпоративными AI-агентами как рабочий инструмент:</p>
+      <ul>
+        <li>Декомпозиция задач и подготовка контекста</li>
+        <li>Проверка и отладка сгенерированного кода</li>
+        <li>Тестирование результата, финальное решение — за человеком (human-in-the-loop)</li>
+        <li>Аудит-ранбуки и документация как часть процесса</li>
+      </ul>
+    </div>
+  </div>
+  <h2>Дорожная карта MLOps</h2>
+  <div class="timeline">
+    <div class="step"><b>DevOps-фундамент</b><span>Инфраструктура, CI/CD, наблюдаемость, секреты — закрыто.</span></div>
+    <div class="step"><b>ML-проект с качеством production</b><span>Пайплайн с тестами и покрытием — готов (репозиторий в GitHub).</span></div>
+    <div class="step"><b>ML-платформа в бою</b><span>Ввод MLflow/MinIO/KServe в эксплуатацию, эксперименты, реестр моделей.</span></div>
+    <div class="step"><b>Мониторинг моделей</b><span>Дрейф, качество в проде, алерты — следующий этап.</span></div>
+  </div>
+</main>
+<footer>© <span data-year>2026</span> Родион Мурашкин · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
