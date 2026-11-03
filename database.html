@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>База данных — Родион Мурашкин</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
+  <nav class="links">
+    <a href="index.html">Главная</a>
+    <a href="infrastructure.html">Инфраструктура</a>
+    <a href="integrations.html">Интеграции</a>
+    <a href="database.html">База данных</a>
+    <a href="incidents.html">Инциденты</a>
+    <a href="mlops.html">MLOps</a>
+    <a href="articles.html">Статьи</a>
+    <a href="playbook.html">Playbook</a>
+    <a href="lessons.html">Уроки</a>
+  </nav>
+</header>
+<main>
+  <section class="hero">
+    <h1>Слой данных</h1>
+    <p>Два PostgreSQL с разными ролями, Redis как транспорт событий, отдельные схемы для продуктива и теста. Объясняю, почему так, а не иначе.</p>
+  </section>
+
+  <h2>PostgreSQL: две разные задачи</h2>
+  <div class="grid">
+    <div class="card"><div class="tag">Бизнес-данные</div><h3>TBase — распределённый PostgreSQL</h3>
+      <p>Основные данные маркировки и документооборота лежат на TBase — форке PostgreSQL, который добавляет распределённые таблицы и горизонтальное масштабирование поверх обычного PostgreSQL.</p>
+      <ul>
+        <li>Версия на базе PostgreSQL 10.0, сборка TBase <code>5a3d705c</code></li>
+        <li>Компилятор GCC 7.3.0, x86_64, Linux</li>
+        <li>Причина выбора: рост объёма таблиц, шардинг без отказа от SQL-интерфейса PostgreSQL</li>
+      </ul>
+    </div>
+    <div class="card"><div class="tag">Инструменты</div><h3>PostgreSQL 16.15 (локально)</h3>
+      <p>Отдельный локальный PostgreSQL обслуживает GitLab и CI/CD-инструменты.</p>
+      <ul>
+        <li>Версия 16.15 (Ubuntu)</li>
+        <li>Не смешивается с бизнес-данными: отказ инструментов не трогает контур</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Redis — очередь и события</h2>
+  <p>Redis используется как транспорт асинхронных событий: входные сообщения пишутся в stream, воркеры читают и обрабатывают. Это даёт буфер между приёмом и обработкой и позволяет перезапускать воркеров независимо от приёма.</p>
+
+  <h2>Мультиокружение на уровне схем</h2>
+  <p>Продуктива и тест живут в разных схемах одной базы: прод — <code>raidep</code>, тест — <code>raidep_test</code>. Переключение сделано через contextvars и middleware — схема выбирается по окружению, без дублирования кода воркеров.</p>
+
+  <h2>Поток данных</h2>
+  <svg viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Схема потока данных" style="width:100%;height:auto;background:#0b1220;border:1px solid #24344d;border-radius:8px">
+    <defs>
+      <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#38bdf8"/></marker>
+    </defs>
+    <g font-family="sans-serif" font-size="12" fill="#e2e8f0">
+      <rect x="10" y="20" width="130" height="44" rx="6" fill="#151f35" stroke="#24344d"/>
+      <text x="75" y="46" text-anchor="middle">Приём (logs-only)</text>
+      <rect x="200" y="20" width="130" height="44" rx="6" fill="#151f35" stroke="#24344d"/>
+      <text x="265" y="46" text-anchor="middle">Redis stream</text>
+      <rect x="390" y="20" width="130" height="44" rx="6" fill="#151f35" stroke="#24344d"/>
+      <text x="455" y="46" text-anchor="middle">Воркеры</text>
+      <rect x="580" y="20" width="160" height="44" rx="6" fill="#151f35" stroke="#38bdf8"/>
+      <text x="660" y="42" text-anchor="middle">TBase</text>
+      <text x="660" y="56" text-anchor="middle" font-size="10" fill="#94a3b8">raidep / raidep_test</text>
+      <line x1="140" y1="42" x2="198" y2="42" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="330" y1="42" x2="388" y2="42" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="520" y1="42" x2="578" y2="42" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="390" y="110" width="130" height="40" rx="6" fill="#151f35" stroke="#24344d"/>
+      <text x="455" y="135" text-anchor="middle">FTP / callback</text>
+      <line x1="455" y1="64" x2="455" y2="108" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+      <text x="470" y="92" font-size="10" fill="#94a3b8">результат / статусы</text>
+    </g>
+  </svg>
+
+  <h2>Почему именно так</h2>
+  <ul>
+    <li>Контур single-node: локально держим только инструменты (GitLab/PG 16), бизнес-данные — на распределённом TBase, который умеет расти.</li>
+    <li>Redis как stream — буфер и декомпозиция: приём и обработка масштабируются и отказывают независимо.</li>
+    <li>Схемы вместо отдельных БД — проще миграции и переключение окружений в одном месте.</li>
+  </ul>
+  <div class="note">Версия TBase и топология приведены обобщённо, без внутренних адресов и имён хостов.</div>
+</main>
+<footer>© <span data-year>2026</span> Родион Мурашкин · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

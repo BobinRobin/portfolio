@@ -13,9 +13,12 @@
     <a href="index.html">Главная</a>
     <a href="infrastructure.html">Инфраструктура</a>
     <a href="integrations.html">Интеграции</a>
+    <a href="database.html">База данных</a>
     <a href="incidents.html">Инциденты</a>
     <a href="mlops.html">MLOps</a>
     <a href="articles.html">Статьи</a>
+    <a href="playbook.html">Playbook</a>
+    <a href="lessons.html">Уроки</a>
   </nav>
 </header>
 <main>
@@ -23,6 +26,25 @@
     <h1>MLOps</h1>
     <p>Показываю, что сделано руками, и где следующий этап. Боевая эксплуатация моделей — впереди.</p>
   </section>
+
+  <h2>Конвейер модели</h2>
+  <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MLOps-конвейер" style="width:100%;height:auto;background:#0b1220;border:1px solid #24344d;border-radius:8px">
+    <defs><marker id="arr3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#38bdf8"/></marker></defs>
+    <g font-family="sans-serif" font-size="12" fill="#e2e8f0">
+      <rect x="10" y="55" width="110" height="44" rx="6" fill="#151f35" stroke="#24344d"/><text x="65" y="81" text-anchor="middle">Данные</text>
+      <rect x="150" y="55" width="110" height="44" rx="6" fill="#151f35" stroke="#24344d"/><text x="205" y="81" text-anchor="middle">Обучение / эксперименты</text>
+      <rect x="290" y="55" width="110" height="44" rx="6" fill="#151f35" stroke="#38bdf8"/><text x="345" y="81" text-anchor="middle">MLflow (трекинг)</text>
+      <rect x="430" y="55" width="110" height="44" rx="6" fill="#151f35" stroke="#24344d"/><text x="485" y="81" text-anchor="middle">MinIO (артефакты)</text>
+      <rect x="570" y="55" width="110" height="44" rx="6" fill="#151f35" stroke="#24344d"/><text x="625" y="81" text-anchor="middle">KServe (сервинг)</text>
+      <line x1="120" y1="77" x2="148" y2="77" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="260" y1="77" x2="288" y2="77" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="400" y1="77" x2="428" y2="77" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="540" y1="77" x2="568" y2="77" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr3)"/>
+      <rect x="570" y="115" width="110" height="28" rx="6" fill="#151f35" stroke="#24344d"/><text x="625" y="133" text-anchor="middle">Мониторинг / дрейф</text>
+      <line x1="625" y1="99" x2="625" y2="113" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr3)"/>
+    </g>
+  </svg>
+
   <div class="grid">
     <div class="card"><div class="tag">ML-проект</div><h3>Предсказание цены поездки</h3>
       <p>Полный ML-пайплайн: загрузка данных, предобработка, признаки, модель, прогноз.</p>
@@ -41,6 +63,8 @@
       <p>Использую корпоративных AI-агентов как инструмент: декомпозиция задач, проверка и отладка сгенерированного кода, тесты. Решение — за человеком.</p>
     </div>
   </div>
+  <h2>Уровни зрелости (отсчёт для себя)</h2>
+  <p>Ориентируюсь на публичную рамку уровней зрелости MLOps: ручной процесс → автоматизация обучения → полноценный CI/CD моделей. Текущее состояние: DevOps-фундамент готов, ML-проект доведён до качества production-коддинга, платформа развёрнута. Следующий уровень — сквозная автоматизация и мониторинг моделей в проде.</p>
   <h2>Дорожная карта</h2>
   <div class="timeline">
     <div class="step"><b>DevOps-фундамент</b><span>Инфраструктура, CI/CD, наблюдаемость, секреты.</span></div>
