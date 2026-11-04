@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incidents — Rodion Murashkin</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+    <a href="index-en.html">Home</a>
+    <a href="infrastructure-en.html">Infrastructure</a>
+    <a href="integrations-en.html">Integrations</a>
+    <a href="database-en.html">Database</a>
+    <a href="incidents-en.html">Incidents</a>
+    <a href="mlops-en.html">MLOps</a>
+    <a href="articles-en.html">Articles</a>
+    <a href="playbook-en.html">Playbook</a>
+    <a href="lessons-en.html">Lessons</a>
+  </nav></header>
+<main>
+  <section class="hero">
+    <h1>Incidents</h1>
+    <p>Real production failures. Each one: symptom, cause, fix, what changed.</p>
+  </section>
+  <div class="star">
+    <h3>Stickers: new codes were not sent to FTP</h3>
+    <p><span class="sl">Symptom.</span> New records were written to the DB, but XML was not sent. Log line: <code>skip_no_pd=1000</code>.</p>
+    <p><span class="sl">Cause.</span> The product date was taken only from existing rows; new codes were inserted without it, even though dates existed in another table.</p>
+    <p><span class="sl">Fix.</span> Extended the batch processor to look up the date from the correct source for codes without one.</p>
+    <p><span class="sl">Result.</span> Codes flow to FTP again; the "data present, no send" mismatch is gone.</p>
+  </div>
+  <div class="star">
+    <h3>Idempotency: a wrong key duplicated records</h3>
+    <p><span class="sl">Symptom.</span> Re-processing created duplicates because the idempotency key was not unique per document.</p>
+    <p><span class="sl">Fix.</span> Switched deduplication to a truly unique key and verified the re-post scenario.</p>
+    <p><span class="sl">Result.</span> Re-posts stop duplicating; retries are safe.</p>
+  </div>
+  <div class="star">
+    <h3>Grafana could not reach Loki</h3>
+    <p><span class="sl">Symptom.</span> After assembling the observability stack, Grafana could not fetch logs.</p>
+    <p><span class="sl">Cause.</span> A proxy conflict on the server.</p>
+    <p><span class="sl">Fix.</span> Moved Grafana to host network with a loopback datasource; switched the log agent to journald with a unit label.</p>
+    <p><span class="sl">Result.</span> Logs are visible in Grafana and filterable per worker.</p>
+  </div>
+  <div class="star">
+    <h3>Go-live blockers (critical defects)</h3>
+    <p><span class="sl">Symptom.</span> A source audit found defects that blocked the production rollout.</p>
+    <p><span class="sl">Fix.</span> Fixed async logic in the FTP poller (races, lost results), a mismatched callback contract, chunking-limit bypass, disabled idempotency, and exposed secrets (moved to a secret store).</p>
+    <p><span class="sl">Result.</span> The loop reached a safe state; external channels are enabled one at a time.</p>
+  </div>
+  <div class="star">
+    <h3>Observability from scratch</h3>
+    <p><span class="sl">Symptom.</span> No metrics; worker logs were read manually.</p>
+    <p><span class="sl">Fix.</span> Assembled Prometheus + Grafana + Loki: RED metrics, business status counters, two SRE dashboards.</p>
+    <p><span class="sl">Result.</span> Diagnosis is no longer blind: incidents are visible in metrics and logs.</p>
+  </div>
+  <h2>Conclusions</h2>
+  <ul>
+    <li>Idempotency from day one — the key must be unique.</li>
+    <li>Enable external channels one at a time.</li>
+    <li>Observability before the incident, not after.</li>
+  </ul>
+</main><footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

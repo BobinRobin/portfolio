@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lessons — Rodion Murashkin</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+    <a href="index-en.html">Home</a>
+    <a href="infrastructure-en.html">Infrastructure</a>
+    <a href="integrations-en.html">Integrations</a>
+    <a href="database-en.html">Database</a>
+    <a href="incidents-en.html">Incidents</a>
+    <a href="mlops-en.html">MLOps</a>
+    <a href="articles-en.html">Articles</a>
+    <a href="playbook-en.html">Playbook</a>
+    <a href="lessons-en.html">Lessons</a>
+  </nav></header>
+<main>
+  <section class="hero">
+    <h1>Lessons &amp; anti-patterns</h1>
+    <p>The things I have already stepped on. Kept here so I do not hit the same rake twice.</p>
+  </section>
+  <div class="grid">
+    <div class="card"><div class="tag">Idempotency</div><h3>The key must be unique</h3><p>Re-processing must not duplicate records. Idempotency from day one, with a truly unique key.</p></div>
+    <div class="card"><div class="tag">Integrations</div><h3>Do not guess file names</h3><p>We searched for a response file by one field while the external system named it by another. The file name and schema of an external system are law.</p></div>
+    <div class="card"><div class="tag">Deployment</div><h3>Enable channels one at a time</h3><p>Never enable FTP/callback/sales at once. Run in dry-run first, then enable channels one by one.</p></div>
+    <div class="card"><div class="tag">Observability</div><h3>Metrics before the incident</h3><p>Without RED metrics and logs you fix blind. Minimum: rate/errors/duration and a "what fails, what queues" dashboard.</p></div>
+    <div class="card"><div class="tag">Tooling</div><h3>One layer, one tool</h3><p>Do not add a second tool for the same job. Dual runtime (systemd + Kubernetes) is tech debt to converge.</p></div>
+    <div class="card"><div class="tag">Network</div><h3>Proxies break "it can't see"</h3><p>"Grafana can't see Loki" was a proxy conflict. Check network mode and datasource address first.</p></div>
+    <div class="card"><div class="tag">Security</div><h3>Secrets never in Git</h3><p>Move credentials to Secret/Vault with least privilege; run containers as non-root.</p></div>
+    <div class="card"><div class="tag">GitOps</div><h3>Rollback is git revert</h3><p>Imperative deploys left drift between Git and the cluster. GitOps: the truth is in Git.</p></div>
+  </div>
+  <h2>How I use this</h2>
+  <p>Before a new service I run a checklist: idempotency on input, dry-run of external channels, requests/limits, non-root container, RED metrics, secrets out of Git. It covers most past failures.</p>
+</main><footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

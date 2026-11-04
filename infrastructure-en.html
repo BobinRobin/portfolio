@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Infrastructure — Rodion Murashkin</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+    <a href="index-en.html">Home</a>
+    <a href="infrastructure-en.html">Infrastructure</a>
+    <a href="integrations-en.html">Integrations</a>
+    <a href="database-en.html">Database</a>
+    <a href="incidents-en.html">Incidents</a>
+    <a href="mlops-en.html">MLOps</a>
+    <a href="articles-en.html">Articles</a>
+    <a href="playbook-en.html">Playbook</a>
+    <a href="lessons-en.html">Lessons</a>
+  </nav></header><main>
+  <section class="hero">
+    <h1>Infrastructure</h1>
+    <p>The platform that runs two integration services. Built from scratch and matured to GitOps.</p>
+  </section>
+
+  <h2>Architecture</h2>
+  <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Platform architecture" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
+    <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
+    <g font-family="sans-serif" font-size="12" fill="#e7f2ec">
+      <text x="14" y="30" font-size="11" fill="#8aa89a">CI/CD</text>
+      <rect x="14" y="40" width="90" height="40" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="59" y="64" text-anchor="middle">Git push</text>
+      <rect x="130" y="40" width="110" height="40" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="185" y="64" text-anchor="middle">GitLab CI</text>
+      <rect x="266" y="40" width="110" height="40" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="321" y="64" text-anchor="middle">registry</text>
+      <rect x="402" y="40" width="110" height="40" rx="6" fill="#0e2019" stroke="#34d399"/><text x="457" y="64" text-anchor="middle">ArgoCD</text>
+      <line x1="104" y1="60" x2="128" y2="60" stroke="#34d399" stroke-width="2" marker-end="url(#ar2)"/>
+      <line x1="240" y1="60" x2="264" y2="60" stroke="#34d399" stroke-width="2" marker-end="url(#ar2)"/>
+      <line x1="376" y1="60" x2="400" y2="60" stroke="#34d399" stroke-width="2" marker-end="url(#ar2)"/>
+      <text x="14" y="120" font-size="11" fill="#8aa89a">Runtime (K3s, one node)</text>
+      <rect x="14" y="130" width="640" height="150" rx="8" fill="#0a1a14" stroke="#1c3328"/>
+      <rect x="30" y="146" width="90" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="75" y="169" text-anchor="middle">nginx</text>
+      <rect x="140" y="146" width="110" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="195" y="169" text-anchor="middle">marking</text>
+      <rect x="270" y="146" width="110" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="325" y="169" text-anchor="middle">e-invoice</text>
+      <rect x="400" y="146" width="120" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="460" y="169" text-anchor="middle">ETL (CronJob)</text>
+      <rect x="540" y="146" width="88" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="584" y="169" text-anchor="middle">MinIO</text>
+      <rect x="30" y="200" width="90" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="75" y="223" text-anchor="middle">Vault</text>
+      <rect x="140" y="200" width="110" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="195" y="223" text-anchor="middle">Redis</text>
+      <rect x="270" y="200" width="180" height="36" rx="6" fill="#0e2019" stroke="#34d399"/><text x="360" y="223" text-anchor="middle">TBase (external)</text>
+      <rect x="470" y="200" width="158" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="549" y="223" text-anchor="middle">Prometheus · Grafana · Loki</text>
+    </g>
+  </svg>
+
+  <h2>How it evolved</h2>
+  <div class="timeline">
+    <div class="step"><b>Bare-metal setup</b><span>RAID, Linux, network and access.</span></div>
+    <div class="step"><b>Platform</b><span>K3s, nginx, Redis (queues), PostgreSQL.</span></div>
+    <div class="step"><b>First services</b><span>Manual deployment via bash scripts.</span></div>
+    <div class="step"><b>CI/CD</b><span>GitLab CI: tests, build, deploy.</span></div>
+    <div class="step"><b>Observability</b><span>Prometheus, Grafana, Loki. RED metrics.</span></div>
+    <div class="step"><b>GitOps</b><span>CI builds and moves the tag in Git, ArgoCD applies. Rollback = git revert.</span></div>
+    <div class="step"><b>Security</b><span>Vault, secrets out of Git, non-root containers, requests/limits.</span></div>
+  </div>
+
+  <h2>Why this path</h2>
+  <p>Each step fixed a concrete pain of the previous one, not "because it is trendy":</p>
+  <ul>
+    <li><b>K3s over full K8s</b> — one node: a lighter control plane for the same API and Helm/ArgoCD ecosystem.</li>
+    <li><b>GitOps over kubectl patch</b> — CI-only deploys left drift between Git and the cluster; ArgoCD reconciles to Git, rollback is revert.</li>
+    <li><b>Redis as a stream</b> — a buffer between intake and processing; workers restart independently.</li>
+    <li><b>Vault / Secret over secrets in code</b> — least privilege, rotation, audit.</li>
+    <li><b>RED metrics over raw CPU/RAM</b> — a dashboard that answers "what is failing and what is queued".</li>
+  </ul>
+  <div class="note">Topology and addresses are intentionally not disclosed.</div>
+</main><footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

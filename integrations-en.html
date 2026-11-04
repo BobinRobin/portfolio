@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Integrations — Rodion Murashkin</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+    <a href="index-en.html">Home</a>
+    <a href="infrastructure-en.html">Infrastructure</a>
+    <a href="integrations-en.html">Integrations</a>
+    <a href="database-en.html">Database</a>
+    <a href="incidents-en.html">Incidents</a>
+    <a href="mlops-en.html">MLOps</a>
+    <a href="articles-en.html">Articles</a>
+    <a href="playbook-en.html">Playbook</a>
+    <a href="lessons-en.html">Lessons</a>
+  </nav></header>
+<main>
+  <section class="hero">
+    <h1>Enterprise integrations</h1>
+    <p>End-to-end data-exchange loops with external systems. The priority is reliability: idempotency, reconciliation, error handling, observability.</p>
+  </section>
+  <div class="grid">
+    <div class="card"><div class="tag">Marking</div><h3>State marking system</h3>
+      <p>Orders, stickers, imports, SSCC. Strict XML contracts, chunking up to the per-document limit, FTP exchange, callback to HQ, prod/test schemas.</p>
+    </div>
+    <div class="card"><div class="tag">E-invoicing</div><h3>Incoming documents</h3>
+      <p>Pipeline: logs-only intake → Redis stream → worker → DB. Idempotency on input, a gate before writes, dry-run: external channels enabled one at a time.</p>
+    </div>
+    <div class="card"><div class="tag">Batch ETL</div><h3>Sales / inventory</h3>
+      <p>Scheduled Python ETL (CronJob). GitLab CI, multi-stage Dockerfile, Helm, ArgoCD.</p>
+    </div>
+  </div>
+  <h2>Reliability patterns</h2>
+  <table>
+    <tr><th>Pattern</th><th>Why</th></tr>
+    <tr><td>Idempotency from day one</td><td>Retries are safe; the key must be truly unique</td></tr>
+    <tr><td>Dry-run before go-live</td><td>Run without external channels first, then enable one by one</td></tr>
+    <tr><td>Gate before writes</td><td>Only validated data reaches the database</td></tr>
+    <tr><td>Contract-driven chunking</td><td>Respect external limits, preserve ordering</td></tr>
+    <tr><td>Reconciliation &amp; tracing</td><td>Status at the data level, end-to-end code path</td></tr>
+    <tr><td>Observability</td><td>Incidents are visible in metrics and logs</td></tr>
+  </table>
+  <div class="note">Contract details and counterparty names are generalized.</div>
+</main><footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

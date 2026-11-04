@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playbook &amp; Examples — Rodion Murashkin</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+    <a href="index-en.html">Home</a>
+    <a href="infrastructure-en.html">Infrastructure</a>
+    <a href="integrations-en.html">Integrations</a>
+    <a href="database-en.html">Database</a>
+    <a href="incidents-en.html">Incidents</a>
+    <a href="mlops-en.html">MLOps</a>
+    <a href="articles-en.html">Articles</a>
+    <a href="playbook-en.html">Playbook</a>
+    <a href="lessons-en.html">Lessons</a>
+  </nav></header>
+<main>
+  <section class="hero">
+    <h1>Playbook &amp; examples</h1>
+    <p>Ready-to-read fragments for learning and portfolio: runbook, Terraform, Ansible, CI/CD. No passwords or real addresses — just structure and approach.</p>
+  </section>
+  <h2>Runbook: incident triage</h2>
+  <pre><code># Incident response — general order
+1. Pin the symptom: what broke, since when, who noticed.
+2. Assess impact: which loop, are data/statuses at risk.
+3. Test hypotheses top-down:
+   - nginx/ingress (route, 5xx)
+   - service (pod/unit, logs, restarts)
+   - queue (Redis: stream length, processing)
+   - database (connectivity, schemas, locks)
+4. Find the root cause, not the symptom: "what changed right before".
+5. Fix minimally, with a backup/revert.
+6. Verify by data (record status, callback), not "seems to work".
+7. Write a postmortem: what, why, how to prevent.</code></pre>
+  <h2>Terraform: namespace and limits</h2>
+  <pre><code># main.tf — declarative namespace (simplified)
+terraform {
+  required_providers {
+    kubernetes = { source = "hashicorp/kubernetes" }
+  }
+}
+resource "kubernetes_namespace" "app" {
+  metadata { name = var.namespace }
+}
+resource "kubernetes_limit_range" "app_limits" {
+  metadata { namespace = kubernetes_namespace.app.metadata[0].name, name = "app-limits" }
+  spec {
+    limit {
+      type = "Container"
+      default = { cpu = "500m", memory = "512Mi" }
+      default_request = { cpu = "250m", memory = "256Mi" }
+    }
+  }
+}</code></pre>
+  <h2>Ansible: log agent install</h2>
+  <pre><code># playbook.yml — Promtail on hosts (simplified)
+- hosts: app
+  become: true
+  vars:
+    loki_url: "http://127.0.0.1:3100/loki/api/v1/push"
+  tasks:
+    - name: Install Promtail
+      apt: { name: promtail, state: present }
+    - name: Configure journald pipeline with unit label
+      template: { src: promtail.yml.j2, dest: /etc/promtail/config.yml }
+      notify: restart promtail
+    - name: Enable and start
+      systemd: { name: promtail, enabled: true, state: started }
+  handlers:
+    - name: restart promtail
+      systemd: { name: promtail, state: restarted }</code></pre>
+  <h2>GitLab CI: test / build / gitops</h2>
+  <pre><code># .gitlab-ci.yml — CI builds the image and moves the tag, ArgoCD applies
+stages: [test, build, gitops]
+variables:
+  IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
+  HELM_VALUES: "deploy/helm/app/values.yaml"
+test:
+  stage: test
+  script: [ "pip install uv", "uv sync --frozen --group dev", "uv run pytest -q" ]
+build:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "$CI_REGISTRY_IMAGE:$IMAGE_TAG" .
+    - docker push "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
+gitops:
+  stage: gitops
+  only: [main]
+  script:
+    - sed -i "s|^  tag: .*|  tag: \"$IMAGE_TAG\"|" "$HELM_VALUES"
+    - git commit -m "ci: deploy $IMAGE_TAG" || true
+    - git push origin HEAD:main</code></pre>
+  <div class="note">All credentials are replaced with CI/CD variables and placeholders. Real passwords/tokens are not stored in the repo or on this site.</div>
+</main><footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

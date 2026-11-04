@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Articles — Rodion Murashkin</title>
+<meta name="description" content="Engineering articles: platform migration, reliable integrations, incident investigation, human-in-the-loop AI.">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+    <a href="index-en.html">Home</a>
+    <a href="infrastructure-en.html">Infrastructure</a>
+    <a href="integrations-en.html">Integrations</a>
+    <a href="database-en.html">Database</a>
+    <a href="incidents-en.html">Incidents</a>
+    <a href="mlops-en.html">MLOps</a>
+    <a href="articles-en.html">Articles</a>
+    <a href="playbook-en.html">Playbook</a>
+    <a href="lessons-en.html">Lessons</a>
+  </nav></header>
+<main>
+  <section class="hero">
+    <h1>Articles</h1>
+    <p>Specifics, not a list of tools: decisions, trade-offs, code, and lessons from production.</p>
+  </section>
+
+  <article class="card" style="display:block;margin-bottom:1.5rem">
+    <div class="tag">Infrastructure</div>
+    <h2 style="margin-top:.2rem">From a legacy server to a maintainable platform</h2>
+    <p>Starting point: a server with no OS, no platform, no conventions. Goal: two production services for document flow and marking. I went layer by layer, each one fixing a concrete pain of the previous.</p>
+    <p><strong>Why K3s over full Kubernetes.</strong> One node: a full kube-apiserver, etcd and controllers would burn CPU/RAM for nothing. K3s gives the same API, Helm and ArgoCD with a light control plane. The trade-off is no control-plane HA — an accepted compromise for single-node.</p>
+    <p><strong>Why GitOps over kubectl patch from CI.</strong> Deploying from the pipeline left drift between Git and the cluster. ArgoCD reconciles the cluster to Git; rollback is a plain <code>git revert</code>. The cost is an extra controller, which buys reproducibility and change audit.</p>
+    <pre><code># CI no longer deploys — it moves the tag in values.yaml
+gitops:
+  stage: gitops
+  only: [main]
+  script:
+    - sed -i "s|^  tag: .*|  tag: \"$IMAGE_TAG\"|" deploy/helm/app/values.yaml
+    - git commit -m "ci: deploy $IMAGE_TAG" || true
+    - git push origin HEAD:main
+
+# ArgoCD reconciles the cluster to this Git state</code></pre>
+    <p><strong>Observability before the incident.</strong> RED metrics (Rate/Errors/Duration) instead of raw CPU/RAM; the dashboard answers "what fails and what queues". Promtail was moved to journald with a <code>unit</code> label, otherwise Loki could not filter logs per worker.</p>
+    <p>Result: declarative deploys, one-command rollback, secrets out of Git, transparent diagnosis. The next maturity step is multi-node and tested backup/restore.</p>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:1.5rem">
+    <div class="tag">Integrations</div>
+    <h2 style="margin-top:.2rem">Reliable enterprise integrations: patterns that survived outages</h2>
+    <p>An external system dictates the rules: file name, XML structure, a per-document code limit. You cannot "fix it from your side", so reliability goes in at the input. Four patterns.</p>
+    <p><strong>1. Idempotency from day one.</strong> A re-post must not duplicate a record. The key must be business-unique: once the key was an attribute that repeated within one document — we got duplicates. Fix: use a truly unique document-line identifier and check it before insert.</p>
+    <pre><code># pseudocode: a gate before the database write
+existing = db.exists(key=doc_key)
+if existing:
+    log.info("skip duplicate", key=doc_key)
+    return
+process_and_insert(doc)   # transaction commits only on success</code></pre>
+    <p><strong>2. Contract-driven chunking.</strong> The external system accepts at most N codes per document. Large documents are split into parts with preserved ordering, so a retry is deterministic: same chunk, same codes.</p>
+    <p><strong>3. Dry-run before go-live.</strong> External channels (FTP, callback, sales) are enabled one at a time. The pipeline first runs without real sending while metrics and logs are watched, then channels are switched on sequentially. Slower, but errors are caught before reaching the external system.</p>
+    <p><strong>4. Data-level reconciliation.</strong> An external response is matched by exact identifier and file name, not by EAN or timing. Once we searched by EAN while the system named files by order-line number — half a day lost. Since then: the external file name and schema are law.</p>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:1.5rem">
+    <div class="tag">Incidents</div>
+    <h2 style="margin-top:.2rem">Incident investigation: from symptom to root cause</h2>
+    <p>An engineer is defined not by tool knowledge but by the ability to go from symptom to root. The order that works for me.</p>
+    <pre><code>1. Symptom and time.        What broke, since when.
+2. Impact.                  Which loop, what is at risk.
+3. Hypotheses top-down.     edge → service → queue → database.
+4. Root cause.              What changed right before the failure.
+5. Minimal fix.             With backup/revert.
+6. Verify by data.          Record status or callback, not "seems fine".
+7. Postmortem.              What, why, how to prevent.</code></pre>
+    <p><strong>Case: codes were not sent to FTP.</strong> Symptom — records in the DB but no XML sent, log <code>skip_no_pd=1000</code>. The "broken pipeline" hypothesis failed: it was a data problem. The product date was taken only from existing rows; new codes were inserted without it, though dates sat in another table. The fix was not "restart" but extending the batch processor to look up the date from the right source.</p>
+    <p><strong>Case: Grafana could not reach Loki.</strong> First instinct was to fix the service. In reality it was a proxy conflict: Grafana was moved to host network with a loopback datasource. Moral: "the service is broken" usually means data, network, or config.</p>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:1.5rem">
+    <div class="tag">AI Engineering</div>
+    <h2 style="margin-top:.2rem">Human-in-the-loop: the discipline of working with AI agents</h2>
+    <p>AI agents accelerate, but they do not remove engineering responsibility. The useful role of an agent is decomposition, context gathering, and code generation. Then the human work starts.</p>
+    <p><strong>What I always check:</strong> what exactly was generated and where the context came from; what the code actually does, not what was intended; whether it passes tests and static analysis; whether it drags in secrets or unnecessary dependencies; whether it solves the task rather than "looking nice".</p>
+    <p><strong>Read-only audit.</strong> During incident reviews the agent runs with read-only rights and collects facts from logs, statuses, and configs. Only a human applies changes after review.</p>
+    <p><strong>A useful side effect:</strong> mandatory validation forces you to keep runbooks and docs in order — otherwise there is nothing to feed the agent and nothing to check its output against. Human-in-the-loop is not "watching an agent", it is a validation discipline.</p>
+  </article>
+</main><footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
