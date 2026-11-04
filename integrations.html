@@ -33,7 +33,7 @@
     <div class="card"><div class="tag">Документооборот</div><h3>Приём УПД</h3>
       <p>Конвейер: logs-only → Redis stream → worker → БД. Идемпотентность на входе, gate перед записью, dry-run: внешние каналы включаются по одному.</p>
     </div>
-    <div class="card"><div class="tag">Batch ETL</div><h3>Sellout / inventory</h3>
+    <div class="card"><div class="tag">Batch ETL</div><h3>ETL продаж / инвентарь</h3>
       <p>Разовый Python-ETL по расписанию (CronJob). GitLab CI, многоступенчатый Dockerfile, Helm, ArgoCD.</p>
     </div>
   </div>

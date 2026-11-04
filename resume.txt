@@ -1,0 +1,37 @@
+Родион Мурашкин — DevOps / Platform Engineer
+=============================================
+Email: rdmurashkin@xmail.ru | Telegram: @RodionMurashkin
+GitHub: https://github.com/BobinRobin | Сайт: https://bobinrobin.github.io/portfolio/
+Английский: C1
+
+Коротко
+Строю и эксплуатирую инфраструктуру и интеграционные сервисы: от подготовки
+сервера и CI/CD до диагностики production-инцидентов и документации.
+Вёл два боевых контура обмена данными с внешними системами на Kubernetes.
+
+Стек
+Kubernetes (K3s), Docker, GitLab CI/CD, ArgoCD (GitOps), Vault, Terraform,
+Ansible, nginx, Redis (Streams), PostgreSQL (включая распределённый форк TBase),
+Prometheus / Grafana / Loki, Python, Bash, Git. MLOps: MLflow, MinIO, KServe (PoC).
+
+Опыт
+Honor — IT-инженер / DevOps (март 2024 — н.в.)
+- Построил платформу с нуля: Linux, K3s, nginx, Redis, PostgreSQL.
+- Внедрил GitOps: CI собирает образ, ArgoCD применяет, откат = git revert.
+- Собрал наблюдаемость: Prometheus + Grafana + Loki, RED-метрики.
+- Вынес секреты в Vault; контейнеры от непривилегированного пользователя.
+- Обслуживал интеграции с внешними системами: XML-контракты, идемпотентность,
+  чанкинг, dry-run, сверка. Устранял production-инциденты (P0).
+- ETL-пайплайны (Python + SQL), автоматизация отчётности для команд в
+  России, Турции, Беларуси, Узбекистане.
+
+Музей архитектуры им. Щусева — Специалист по ИТ (апрель 2023 — февраль 2024)
+- Серверы (HP ProLiant, VMware ESXi, Windows Server 2012, Ubuntu), сети,
+  коммутаторы, 1С, ЭЦП.
+
+Образование
+МГУ им. М.В. Ломоносова — магистр, «Историческая информатика» (2024).
+
+MLOps-направление
+- ML-пайплайн с 37 тестами и покрытием 88% (uv, mkdocs, flake8/pylint).
+- Развёрнут MLOps-стек: MLflow, MinIO, KServe (как основа / PoC).
