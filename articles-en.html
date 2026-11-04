@@ -9,7 +9,8 @@
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>
+  <nav class="links">
     <a href="index-en.html">Home</a>
     <a href="infrastructure-en.html">Infrastructure</a>
     <a href="integrations-en.html">Integrations</a>
@@ -19,19 +20,41 @@
     <a href="articles-en.html">Articles</a>
     <a href="playbook-en.html">Playbook</a>
     <a href="lessons-en.html">Lessons</a>
-  </nav></header>
+  </nav>
+</header>
 <main>
   <section class="hero">
     <h1>Articles</h1>
-    <p>Specifics, not a list of tools: decisions, trade-offs, code, and lessons from production.</p>
+    <p>In-depth write-ups: decisions, trade-offs, code, metrics and lessons from production operations.</p>
   </section>
 
-  <article class="card" style="display:block;margin-bottom:1.5rem">
-    <div class="tag">Infrastructure</div>
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Infrastructure · ~10 min</div>
     <h2 style="margin-top:.2rem">From a legacy server to a maintainable platform</h2>
-    <p>Starting point: a server with no OS, no platform, no conventions. Goal: two production services for document flow and marking. I went layer by layer, each one fixing a concrete pain of the previous.</p>
-    <p><strong>Why K3s over full Kubernetes.</strong> One node: a full kube-apiserver, etcd and controllers would burn CPU/RAM for nothing. K3s gives the same API, Helm and ArgoCD with a light control plane. The trade-off is no control-plane HA — an accepted compromise for single-node.</p>
-    <p><strong>Why GitOps over kubectl patch from CI.</strong> Deploying from the pipeline left drift between Git and the cluster. ArgoCD reconciles the cluster to Git; rollback is a plain <code>git revert</code>. The cost is an extra controller, which buys reproducibility and change audit.</p>
+
+    <h3>Where it started</h3>
+    <p>A server with no OS, no orchestrator, no conventions. It had to run two integration services: intake and processing of electronic documents, plus a marking loop. No "deploy and forget": the system had to take traffic, survive failures, and answer "what is happening right now".</p>
+    <p>The path was layered: hardware and OS first, then the platform, then the services, and only then automation, observability and security. Below is each layer, the reason, and what it fixed.</p>
+
+    <h3>Layer 1: server and OS</h3>
+    <p>The disk subsystem was built for reliability and speed: mirroring plus striping (RAID). A server Linux was installed; network and access were configured. The point at this stage is not "install it" but to define how the system will be operated: who connects, from where, under which user, where logs live.</p>
+
+    <h3>Layer 2: why K3s, not full Kubernetes</h3>
+    <p>One node. Full Kubernetes on a single node burns a noticeable share of resources on the control plane — kube-apiserver, etcd, controllers. K3s provides the same API and ecosystem (Helm, ArgoCD, CNI) with a light control plane and lower consumption.</p>
+    <p>Honest trade-off: for a single node there is no control-plane HA — if the node goes down, the cluster does not survive by itself. This is a deliberate choice at the current scale, not an oversight.</p>
+
+    <h3>Layer 3: first services and manual deployment</h3>
+    <p>The first versions were deployed with bash scripts: copy the artifact, restart, check by eye. It worked while there were two services and few changes. The pains showed up quickly: manual builds, no reproducibility, manual rollback from memory.</p>
+
+    <h3>Layer 4: CI/CD</h3>
+    <p>GitLab CI took over builds: tests (pytest via uv), a multi-stage Dockerfile, publishing images to a local registry. Builds no longer depended on a developer's machine. Deployment at this stage stayed imperative — kubectl patch from CI.</p>
+
+    <h3>Layer 5: observability</h3>
+    <p>Until then logs were read manually via journalctl; there were no metrics. I assembled Prometheus (numbers), Grafana (dashboards), Loki (logs), introduced RED metrics — Rate/Errors/Duration — and business status counters. Promtail was moved to journald with a systemd-unit label; otherwise Loki could not filter logs per worker.</p>
+    <p>The dashboards answer three questions: how much is processed, what is failing, what is queued. That is a different state from "the server is alive".</p>
+
+    <h3>Layer 6: GitOps</h3>
+    <p>Imperative deploys left drift between Git and the cluster: manual edits were overwritten by the next deploy, rollback hurt. We moved to GitOps:</p>
     <pre><code># CI no longer deploys — it moves the tag in values.yaml
 gitops:
   stage: gitops
@@ -42,50 +65,122 @@ gitops:
     - git push origin HEAD:main
 
 # ArgoCD reconciles the cluster to this Git state</code></pre>
-    <p><strong>Observability before the incident.</strong> RED metrics (Rate/Errors/Duration) instead of raw CPU/RAM; the dashboard answers "what fails and what queues". Promtail was moved to journald with a <code>unit</code> label, otherwise Loki could not filter logs per worker.</p>
-    <p>Result: declarative deploys, one-command rollback, secrets out of Git, transparent diagnosis. The next maturity step is multi-node and tested backup/restore.</p>
+    <p>Now the truth is in Git; the cluster is derived from it. Rollback is a plain <code>git revert</code>, and every change is visible in repository history.</p>
+
+    <h3>Layer 7: security and resources</h3>
+    <p>Secrets were moved out of code and CI into Vault and Kubernetes Secret with least privilege: a service sees only its own secret. Containers run as a non-root user, and requests/limits are explicit — otherwise one service in a spike eats the node and drops the neighbours.</p>
+
+    <h3>What it gave and what is next</h3>
+    <p>The result: reproducible builds, declarative deploys, one-command rollback, secrets out of Git, transparent diagnosis. Honest limits of the current stage — single node and no verified recovery scenarios. Next maturity steps: multi-node with replica planning and regular backup/restore drills.</p>
   </article>
 
-  <article class="card" style="display:block;margin-bottom:1.5rem">
-    <div class="tag">Integrations</div>
-    <h2 style="margin-top:.2rem">Reliable enterprise integrations: patterns that survived outages</h2>
-    <p>An external system dictates the rules: file name, XML structure, a per-document code limit. You cannot "fix it from your side", so reliability goes in at the input. Four patterns.</p>
-    <p><strong>1. Idempotency from day one.</strong> A re-post must not duplicate a record. The key must be business-unique: once the key was an attribute that repeated within one document — we got duplicates. Fix: use a truly unique document-line identifier and check it before insert.</p>
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Integrations · ~10 min</div>
+    <h2 style="margin-top:.2rem">Reliable enterprise integrations: four patterns</h2>
+
+    <h3>The rules of the game</h3>
+    <p>An external system dictates the terms: file name, XML structure, the code limit per document, response requirements. You cannot "fix it from your side". So all reliability is built at the input — in your own pipeline, not in correspondence with the counterpart.</p>
+
+    <h3>Pattern 1. Idempotency from day one</h3>
+    <p>A re-send of the same data must not create duplicates. Sounds obvious, but in practice the key is easy to pick badly. We had a case: the key was an attribute that repeated within a single document — retries produced duplicates. The rule became simple: the key must be business-unique, and the check happens before the insert.</p>
     <pre><code># pseudocode: a gate before the database write
 existing = db.exists(key=doc_key)
 if existing:
     log.info("skip duplicate", key=doc_key)
     return
 process_and_insert(doc)   # transaction commits only on success</code></pre>
-    <p><strong>2. Contract-driven chunking.</strong> The external system accepts at most N codes per document. Large documents are split into parts with preserved ordering, so a retry is deterministic: same chunk, same codes.</p>
-    <p><strong>3. Dry-run before go-live.</strong> External channels (FTP, callback, sales) are enabled one at a time. The pipeline first runs without real sending while metrics and logs are watched, then channels are switched on sequentially. Slower, but errors are caught before reaching the external system.</p>
-    <p><strong>4. Data-level reconciliation.</strong> An external response is matched by exact identifier and file name, not by EAN or timing. Once we searched by EAN while the system named files by order-line number — half a day lost. Since then: the external file name and schema are law.</p>
+
+    <h3>Pattern 2. Contract-driven chunking</h3>
+    <p>The external system accepts at most N codes per document. Large documents are split into parts with preserved ordering. Why ordering: if one part goes through and the next fails, re-sending the second must be deterministic — the same codes in the same part, not a reassembled document.</p>
+    <pre><code># pseudocode: chunking with preserved ordering
+for chunk in split_preserving_order(codes, limit=29999):
+    filename = base + "_" + pad(index) + ".xml"
+    send(filename, chunk)</code></pre>
+
+    <h3>Pattern 3. Dry-run before go-live</h3>
+    <p>External channels (FTP, callback, sales) are enabled one at a time. First the pipeline runs without real sending: the same logs are written, the same metrics counted, but nothing goes outside. When data passes with no errors, channels are switched on sequentially. Slower, but errors are caught before they leave.</p>
+
+    <h3>Pattern 4. Data-level reconciliation</h3>
+    <p>An external response is matched by exact identifier and file name, not by EAN or timing. There was an incident: we searched for a response file by EAN while the external system named files by order-line number — half a day lost. Since then: the file name and schema of an external system are law, and everything is matched by that law.</p>
+
+    <h3>Common failures and what covers them</h3>
+    <table>
+      <tr><th>Failure</th><th>Covered by</th></tr>
+      <tr><td>A retry duplicates records</td><td>Idempotency with a unique key</td></tr>
+      <tr><td>A document exceeds the external limit</td><td>Chunking with preserved ordering</td></tr>
+      <tr><td>A pipeline error goes outside</td><td>Dry-run, channels one at a time</td></tr>
+      <tr><td>Status does not match the real result</td><td>Reconciliation by exact identifier</td></tr>
+      <tr><td>External service does not answer</td><td>Retries with exponential backoff and timeouts</td></tr>
+    </table>
+
+    <h3>Summary</h3>
+    <p>A reliable integration is contract + idempotency + reconciliation + observability. If one link drops out of the chain, incidents become a matter of time, not chance.</p>
   </article>
 
-  <article class="card" style="display:block;margin-bottom:1.5rem">
-    <div class="tag">Incidents</div>
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Incidents · ~10 min</div>
     <h2 style="margin-top:.2rem">Incident investigation: from symptom to root cause</h2>
-    <p>An engineer is defined not by tool knowledge but by the ability to go from symptom to root. The order that works for me.</p>
+
+    <h3>Why it is a skill</h3>
+    <p>An engineer is defined not by a list of tools but by the ability to go from a symptom to the root. Tools can be learned in a month; a way of reasoning cannot. Below is the method that works for me, plus the commands I back it with.</p>
+
+    <h3>The method in seven steps</h3>
     <pre><code>1. Symptom and time.        What broke, since when.
 2. Impact.                  Which loop, what is at risk.
 3. Hypotheses top-down.     edge → service → queue → database.
 4. Root cause.              What changed right before the failure.
-5. Minimal fix.             With backup/revert.
+5. Minimal fix.             With backup or revert.
 6. Verify by data.          Record status or callback, not "seems fine".
 7. Postmortem.              What, why, how to prevent.</code></pre>
-    <p><strong>Case: codes were not sent to FTP.</strong> Symptom — records in the DB but no XML sent, log <code>skip_no_pd=1000</code>. The "broken pipeline" hypothesis failed: it was a data problem. The product date was taken only from existing rows; new codes were inserted without it, though dates sat in another table. The fix was not "restart" but extending the batch processor to look up the date from the right source.</p>
-    <p><strong>Case: Grafana could not reach Loki.</strong> First instinct was to fix the service. In reality it was a proxy conflict: Grafana was moved to host network with a loopback datasource. Moral: "the service is broken" usually means data, network, or config.</p>
+
+    <h3>Diagnostic tooling</h3>
+    <pre><code>journalctl -u <unit> -n 200 --no-pager      # systemd service logs
+kubectl -n <ns> get pods,events             # state and events
+kubectl -n <ns> logs <pod> --tail=200       # container logs
+redis-cli XLEN <stream>                     # queue length
+redis-cli XINFO STREAM <stream>             # consumer lag
+psql -c "SELECT ..."                        # data state</code></pre>
+
+    <h3>Case 1: codes were not sent to FTP</h3>
+    <p>Symptom: records exist in the DB, no XML sent, log line <code>skip_no_pd=1000</code>. The first hypothesis — "the pipeline is broken" — did not hold: workers were running, the queue was empty. We moved to the data. The product date was taken only from existing rows; new codes were inserted without it, though the dates sat in another table. The fix was not "restart" but extending the batch processor to look up the date from the right source.</p>
+
+    <h3>Case 2: Grafana could not reach Loki</h3>
+    <p>Symptom: the Grafana dashboard returns no logs. The first instinct is to fix Grafana or Loki. In reality it was a proxy conflict: Grafana was moved to host network with a loopback datasource. The moral repeats: "the service is broken" usually means data, network or config, not the service code itself.</p>
+
+    <h3>Why method, not speed</h3>
+    <p>Speed without method is blind restarts: the symptom can disappear for an hour and come back. The method guarantees the fix hits the root cause, and the check confirms the result by data, not by feeling. That is what separates operations from "administering by intuition".</p>
   </article>
 
-  <article class="card" style="display:block;margin-bottom:1.5rem">
-    <div class="tag">AI Engineering</div>
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">AI Engineering · ~8 min</div>
     <h2 style="margin-top:.2rem">Human-in-the-loop: the discipline of working with AI agents</h2>
-    <p>AI agents accelerate, but they do not remove engineering responsibility. The useful role of an agent is decomposition, context gathering, and code generation. Then the human work starts.</p>
-    <p><strong>What I always check:</strong> what exactly was generated and where the context came from; what the code actually does, not what was intended; whether it passes tests and static analysis; whether it drags in secrets or unnecessary dependencies; whether it solves the task rather than "looking nice".</p>
-    <p><strong>Read-only audit.</strong> During incident reviews the agent runs with read-only rights and collects facts from logs, statuses, and configs. Only a human applies changes after review.</p>
-    <p><strong>A useful side effect:</strong> mandatory validation forces you to keep runbooks and docs in order — otherwise there is nothing to feed the agent and nothing to check its output against. Human-in-the-loop is not "watching an agent", it is a validation discipline.</p>
+
+    <h3>The agent's role</h3>
+    <p>AI agents speed up work but do not remove the engineer's responsibility for the result. In my practice an agent is useful in three places: task decomposition, context preparation, and code generation. Then the human work starts.</p>
+
+    <h3>Context decides everything</h3>
+    <p>The quality of an agent's answer directly depends on the quality of the context. Runbooks, manifests, ADRs, and a description of the current system state are what we feed the agent. No order in documentation — no precise answer. Hence the rule: documentation is part of the infrastructure, not a "paper for later".</p>
+
+    <h3>Read-only audit</h3>
+    <p>During incident reviews the agent runs with read-only rights: it collects facts from logs, statuses and configs, but cannot change anything. Only a human applies changes after review. The same rule covers suggested patches: the agent proposes — the engineer applies.</p>
+
+    <h3>Generation review checklist</h3>
+    <ul>
+      <li>what exactly was generated and where the context came from;</li>
+      <li>what the code actually does, not what was intended;</li>
+      <li>does it pass tests and static analysis;</li>
+      <li>does it drag in secrets or unnecessary dependencies;</li>
+      <li>does it solve the task rather than "looking nice".</li>
+    </ul>
+
+    <h3>Risks and how I close them</h3>
+    <p>The main risk is blindly accepting generation: "the agent wrote it — so it works". That is closed by tests and code review. The second risk is secret leakage into generated code; scanning and the "secrets only in Vault" rule handle that. The third is losing the task context; a short task description in the commit and in the agent prompt covers it.</p>
+
+    <h3>A side effect</h3>
+    <p>Mandatory validation of generation forces you to keep runbooks and docs in order: otherwise there is nothing to feed the agent and nothing to check its output against. In the end, an AI agent does not "do the work for me" — it makes me do it more disciplined.</p>
   </article>
-</main><footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+</main>
+<footer>© <span data-year>2026</span> Rodion Murashkin · <a href="https://github.com/BobinRobin">GitHub</a></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
