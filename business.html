@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Эффективность и бизнес-ценность — DevOps / Platform Engineer</title>
+<meta name="description" content="Бизнес-ценность автоматизированного контура: от заказа QR-кодов до подписанного УТД и продажи. Измеренные метрики без корпоративных данных.">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>  <nav class="links">
+    <a href="index.html">Главная</a>
+    <a href="infrastructure.html">Инфраструктура</a>
+    <a href="integrations.html">Интеграции</a>
+    <a href="database.html">База данных</a>
+    <a href="incidents.html">Инциденты</a>
+    <a href="mlops.html">MLOps</a>
+    <a href="articles.html">Статьи</a>
+    <a href="playbook.html">Playbook</a>
+    <a href="lessons.html">Уроки</a>
+  </nav></header><main>
+  <section class="hero">
+    <h1>Эффективность и бизнес-ценность</h1>
+    <p>Автоматизированный контур от заказа QR-кодов до подписанного УТД и фиксации продажи. Ниже — цифры, снятые с боевых экспортёров метрик; внутренние имена и детали обобщены.</p>
+  </section>  <h2>Что автоматизировано: полный контур</h2>
+  <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Контур order-to-sales" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
+    <defs><marker id="ar4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
+    <g font-family="sans-serif" font-size="12" fill="#e7f2ec">
+      <rect x="10" y="55" width="120" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="70" y="81" text-anchor="middle">Заказ + коды</text>
+      <rect x="160" y="55" width="120" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="220" y="81" text-anchor="middle">Маркировка</text>
+      <rect x="310" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="365" y="81" text-anchor="middle">Формирование УПД</text>
+      <rect x="450" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#34d399"/><text x="505" y="81" text-anchor="middle">Подписанный УТД</text>
+      <rect x="590" y="55" width="150" height="44" rx="6" fill="#0e2019" stroke="#34d399"/><text x="665" y="81" text-anchor="middle">Продажа (выручка)</text>
+      <line x1="130" y1="77" x2="158" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+      <line x1="280" y1="77" x2="308" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+      <line x1="420" y1="77" x2="448" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+      <line x1="560" y1="77" x2="588" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+    </g>
+  </svg>  <h2>Измерено на живом контуре</h2>
+  <table>
+    <tr><th>Показатель</th><th>Значение</th><th>Что значит для бизнеса</th></tr>
+    <tr><td>Событий маркировки за сутки</td><td>~550 000 кодов</td><td>Поток обрабатывается без участия человека</td></tr>
+    <tr><td>Ошибок в статусах отказа</td><td>0</td><td>Коды не теряются: товар не зависает из-за потери данных</td></tr>
+    <tr><td>Скорость обработки порции</td><td>1200 кодов за ~3 сек</td><td>Документы готовы раньше, чем доехал товар</td></tr>
+    <tr><td>Формирование файла УПД</td><td>~0,6 сек</td><td>Замена ручной сборки XML по шаблонам и лимитам</td></tr>
+    <tr><td>Подписанных документов</td><td>125</td><td>Юридическое основание для проводки сделки готово автоматически</td></tr>
+    <tr><td>Единиц на финальной стадии продажи</td><td>~129 000</td><td>Момент признания выручки достигается без ручных операций</td></tr>
+  </table>
+
+  <h2>Что это даёт бизнесу</h2>
+  <div class="grid">
+    <div class="card"><div class="icon">⛴</div><div class="tag">Логистика</div><h3>Товар не стоит на границе</h3><p>Маркировка и документы оформляются автоматически. Пока груз доходит до таможни, весь комплект уже готов — простои и связанные с ними издержки исключены.</p></div>
+    <div class="card"><div class="icon">▦</div><div class="tag">Закупки</div><h3>QR-коды не заказывают вручную</h3><p>Контур сам запрашивает коды и следит за их статусами. Ручной заказ и сверка по реестрам больше не нужны.</p></div>
+    <div class="card"><div class="icon">✎</div><div class="tag">Документы</div><h3>УПД формируются автоматически</h3><p>Генерация XML по контракту, лимитам и порядку — кодом, а не руками. Подписанный УТД готов без человека в цикле.</p></div>
+    <div class="card"><div class="icon">₽</div><div class="tag">Выручка</div><h3>Фиксация прибыли</h3><p>Стадия продажи достигается для ~129 тыс. единиц: подписанный УТД + статус продажи — это момент, когда сделку можно проводить. Контур доводит до этой точки сам.</p></div>
+  </div>
+
+  <h2>Надёжность как экономия</h2>
+  <p>Ноль статусов отказа в учётных счётчиках и единичные повторные попытки — это не везение, а идемпотентность, gate перед записью и dry-run каналов. Каждый предотвращённый сбой — это сохранённые дни продаж и не потраченные часы ручного разбора.</p>
+
+  <h2>Честно о цифрах</h2>
+  <div class="note">«Измерено» — счётчики Prometheus, длина очередей Redis, логи воркеров (время обработки). «Оценка» — любые денежные суммы: в открытом портфолио точные финансовые показатели не раскрываются. Цифры округлены и приведены в обобщённом виде без корпоративных идентификаторов.</div>
+</main><footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

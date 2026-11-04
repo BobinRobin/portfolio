@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Efficiency &amp; business value — DevOps / Platform Engineer</title>
+<meta name="description" content="Business value of an automated loop: from QR-code ordering to signed UTD and sales. Measured metrics without corporate data.">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+    <a href="index-en.html">Home</a>
+    <a href="infrastructure-en.html">Infrastructure</a>
+    <a href="integrations-en.html">Integrations</a>
+    <a href="database-en.html">Database</a>
+    <a href="incidents-en.html">Incidents</a>
+    <a href="mlops-en.html">MLOps</a>
+    <a href="articles-en.html">Articles</a>
+    <a href="playbook-en.html">Playbook</a>
+    <a href="lessons-en.html">Lessons</a>
+  </nav></header><main>
+  <section class="hero">
+    <h1>Efficiency &amp; business value</h1>
+    <p>An automated loop from QR-code ordering to a signed UTD and revenue recognition. The numbers below are taken from production metric exporters; internal names and details are generalized.</p>
+  </section>  <h2>What is automated: the full loop</h2>
+  <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Order-to-sales loop" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
+    <defs><marker id="ar4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
+    <g font-family="sans-serif" font-size="12" fill="#e7f2ec">
+      <rect x="10" y="55" width="120" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="70" y="81" text-anchor="middle">Order + codes</text>
+      <rect x="160" y="55" width="120" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="220" y="81" text-anchor="middle">Marking</text>
+      <rect x="310" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="365" y="81" text-anchor="middle">Build UPD</text>
+      <rect x="450" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#34d399"/><text x="505" y="81" text-anchor="middle">Signed UTD</text>
+      <rect x="590" y="55" width="150" height="44" rx="6" fill="#0e2019" stroke="#34d399"/><text x="665" y="81" text-anchor="middle">Sale (revenue)</text>
+      <line x1="130" y1="77" x2="158" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+      <line x1="280" y1="77" x2="308" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+      <line x1="420" y1="77" x2="448" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+      <line x1="560" y1="77" x2="588" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar4)"/>
+    </g>
+  </svg>  <h2>Measured on the live loop</h2>
+  <table>
+    <tr><th>Metric</th><th>Value</th><th>What it means for the business</th></tr>
+    <tr><td>Marking events per 24h</td><td>~550,000 codes</td><td>The flow runs unattended</td></tr>
+    <tr><td>Failure-status counters</td><td>0</td><td>Codes are not lost: goods do not stall on missing data</td></tr>
+    <tr><td>Batch processing speed</td><td>1,200 codes in ~3s</td><td>Documents are ready before the goods arrive</td></tr>
+    <tr><td>UPD file generation</td><td>~0.6s</td><td>Replaces manual XML assembly with templates and limits</td></tr>
+    <tr><td>Signed documents</td><td>125</td><td>The legal basis for a transaction is ready automatically</td></tr>
+    <tr><td>Units at the final sale stage</td><td>~129,000</td><td>Revenue recognition is reached without manual steps</td></tr>
+  </table>
+
+  <h2>What the business gets</h2>
+  <div class="grid">
+    <div class="card"><div class="icon">⛴</div><div class="tag">Logistics</div><h3>Goods do not wait at the border</h3><p>Marking and documents are prepared automatically. By the time freight reaches customs, the whole package is ready — delays and their costs are removed.</p></div>
+    <div class="card"><div class="icon">▦</div><div class="tag">Procurement</div><h3>No manual QR ordering</h3><p>The loop requests codes and tracks their statuses itself. Manual ordering and registry reconciliation are gone.</p></div>
+    <div class="card"><div class="icon">✎</div><div class="tag">Documents</div><h3>UPDs are built automatically</h3><p>XML generation follows the contract, limits and ordering — by code, not by hand. A signed UTD is produced without a human in the loop.</p></div>
+    <div class="card"><div class="icon">₽</div><div class="tag">Revenue</div><h3>Profit recognition</h3><p>~129,000 units reach the sale stage: a signed UTD plus the sale status is the moment a deal can be booked. The loop gets there by itself.</p></div>
+  </div>
+
+  <h2>Reliability as savings</h2>
+  <p>Zero failure-status counters and single retries are not luck — they come from idempotency, a gate before writes, and dry-run channels. Every prevented failure is saved sales days and unspent hours of manual triage.</p>
+
+  <h2>Honest about numbers</h2>
+  <div class="note">"Measured" — Prometheus counters, Redis queue lengths, worker logs (processing time). "Estimated" — any money amounts: exact financials are not disclosed in a public portfolio. Figures are rounded and generalized without corporate identifiers.</div>
+</main><footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

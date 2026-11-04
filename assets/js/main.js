@@ -7,7 +7,8 @@ var LANG_MAP = {
   'mlops.html':'mlops-en.html','mlops-en.html':'mlops.html',
   'articles.html':'articles-en.html','articles-en.html':'articles.html',
   'playbook.html':'playbook-en.html','playbook-en.html':'playbook.html',
-  'lessons.html':'lessons-en.html','lessons-en.html':'lessons.html'
+  'lessons.html':'lessons-en.html','lessons-en.html':'lessons.html',
+  'business.html':'business-en.html','business-en.html':'business.html'
 };
 function currentFile(){ return location.pathname.split('/').pop() || 'index.html'; }
 
@@ -19,8 +20,17 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
   });
 })();
 
-// Автоопределение языка: сначала гео-регион по IP, затем язык браузера.
-// Выбор запоминается в localStorage и больше не переспрашивается.
+// Пункт меню «Бизнес-ценность» / «Business value»
+(function(){
+  var nav = document.querySelector('nav.links'); if(!nav) return;
+  var isEn = document.documentElement.lang === 'en';
+  var a = document.createElement('a');
+  a.href = isEn ? 'business-en.html' : 'business.html';
+  a.textContent = isEn ? 'Business' : 'Бизнес';
+  nav.appendChild(a);
+})();
+
+// Автоопределение языка: гео-регион по IP, затем язык браузера
 (function(){
   try {
     if(localStorage.getItem('lang')) return;
@@ -45,7 +55,6 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
     apply(isRu);
   }
 
-  // 1) Регион по IP (бесплатный гео-сервис, без ключа)
   try {
     fetch('https://ipwho.is/')
       .then(function(r){ return r.json(); })
@@ -56,7 +65,6 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
       .catch(function(){ fallbackToBrowserLang(); });
   } catch(e){ fallbackToBrowserLang(); }
 
-  // 2) Запасной вариант: язык браузера
   function fallbackToBrowserLang(){
     var lang = (navigator.language || navigator.userLanguage || '').toLowerCase();
     decide(lang.indexOf('ru') === 0);
@@ -104,7 +112,7 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
   });
 })();
 
-// Scroll-reveal анимация
+// Scroll-reveal
 (function(){
   var els = document.querySelectorAll('.card, .star, .timeline .step, section h2, .hero .chips, .hero p');
   els.forEach(function(el){ el.classList.add('reveal'); });
@@ -115,7 +123,7 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
   els.forEach(function(el){ io.observe(el); });
 })();
 
-// Lazy loading изображений
+// Lazy loading
 (function(){
   var imgs = document.querySelectorAll('img[data-src]');
   if(!imgs.length) return;
