@@ -19,21 +19,48 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
   });
 })();
 
-// Автоопределение языка (один раз, запоминается)
+// Автоопределение языка: сначала гео-регион по IP, затем язык браузера.
+// Выбор запоминается в localStorage и больше не переспрашивается.
 (function(){
   try {
     if(localStorage.getItem('lang')) return;
-    var lang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-    var isRu = lang.indexOf('ru') === 0;
-    var file = currentFile();
-    var counterpart = LANG_MAP[file];
-    if(!isRu && counterpart && counterpart.indexOf('-en') !== -1){
-      localStorage.setItem('lang','en');
-      location.replace(counterpart);
-      return;
-    }
-    localStorage.setItem('lang', isRu ? 'ru' : 'en');
   } catch(e){}
+
+  function apply(isRu){
+    try {
+      var file = currentFile();
+      var counterpart = LANG_MAP[file];
+      if(!isRu && counterpart && counterpart.indexOf('-en') !== -1){
+        localStorage.setItem('lang','en');
+        location.replace(counterpart);
+        return;
+      }
+      localStorage.setItem('lang', isRu ? 'ru' : 'en');
+    } catch(err){}
+  }
+
+  var settled = false;
+  function decide(isRu){
+    if(settled) return; settled = true;
+    apply(isRu);
+  }
+
+  // 1) Регион по IP (бесплатный гео-сервис, без ключа)
+  try {
+    fetch('https://ipwho.is/')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        var code = (d && d.country_code) ? String(d.country_code) : '';
+        decide(code === 'RU');
+      })
+      .catch(function(){ fallbackToBrowserLang(); });
+  } catch(e){ fallbackToBrowserLang(); }
+
+  // 2) Запасной вариант: язык браузера
+  function fallbackToBrowserLang(){
+    var lang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    decide(lang.indexOf('ru') === 0);
+  }
 })();
 
 // Переключатель языка: остаётся на текущей странице
