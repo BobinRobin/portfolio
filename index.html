@@ -14,64 +14,62 @@
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>  <nav class="links">
+  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
+  <nav class="links">
     <a href="index.html">Главная</a>
-    <a href="infrastructure.html">Инфраструктура</a>
-    <a href="integrations.html">Интеграции</a>
-    <a href="database.html">База данных</a>
-    <a href="incidents.html">Инциденты</a>
-    <a href="mlops.html">MLOps</a>
-    <a href="articles.html">Статьи</a>
-    <a href="playbook.html">Playbook</a>
-    <a href="lessons.html">Уроки</a>
-  </nav></header>
+    <a href="business.html">Эффективность</a>
+    <a href="incidents.html">Кейсы</a>
+    <a href="infrastructure.html">Стек</a>
+    <a href="index.html#contact">Контакты</a>
+  </nav>
+</header>
 <main>
   <section class="hero">
     <div class="badge">Открыт к предложениям · DevOps / Platform Engineer</div>
     <h1>Родион Мурашкин</h1>
     <div class="sub">DevOps / Platform Engineer</div>
-    <p>Строю и эксплуатирую инфраструктуру и интеграционные сервисы: Kubernetes, GitOps, CI/CD, наблюдаемость, разбор инцидентов. Два контура обмена данными с внешними системами — в продакшн-эксплуатации.</p>
-    <div class="chips">
-      <span class="chip">Kubernetes (K3s)</span><span class="chip">Docker</span><span class="chip">GitLab CI/CD</span><span class="chip">ArgoCD</span><span class="chip">Vault</span><span class="chip">Prometheus · Grafana · Loki</span><span class="chip">Redis · PostgreSQL (TBase)</span><span class="chip">Python · Bash</span><span class="chip">MLflow · KServe</span>
-    </div>
+    <p>Строю и эксплуатирую инфраструктуру и интеграции: Kubernetes, GitOps, CI/CD, наблюдаемость, разбор инцидентов. Два контура обмена данными — в продакшн-эксплуатации.</p>
   </section>
 
   <section class="stats">
     <div class="stat"><b>2</b><span>контура обмена данными в продакшн-эксплуатации</span></div>
-    <div class="stat"><b>5</b><span>разборов инцидентов по STAR</span></div>
-    <div class="stat"><b>88%</b><span>покрытие ML-пайплайна тестами (37 тестов)</span></div>
-    <div class="stat"><b>C1</b><span>английский · команды в 4 странах</span></div>
-  </section>  <h2>Что внутри</h2>
+    <div class="stat"><b>~550k</b><span>кодов в сутки обрабатывается автоматически</span></div>
+    <div class="stat"><b>0</b><span>отказов в учётных статусах</span></div>
+    <div class="stat"><b>125</b><span>подписанных УПД без ручных операций</span></div>
+  </section>
+
+  <div class="chips" style="margin-top:1.2rem">
+    <span class="chip">Kubernetes (K3s)</span><span class="chip">Docker</span><span class="chip">GitLab CI/CD</span><span class="chip">ArgoCD</span><span class="chip">Vault</span><span class="chip">Prometheus · Grafana · Loki</span><span class="chip">Redis · PostgreSQL (TBase)</span><span class="chip">Python · Bash</span>
+  </div>
+
+  <h2>Бизнес-эффект</h2>
+  <div class="grid">
+    <div class="card"><div class="icon">₽</div><div class="tag">Выручка</div><h3>Фиксация прибыли</h3><p>Контур доводит до «подписанный УТД + продажа» — момент признания выручки — без ручных операций.</p></div>
+    <div class="card"><div class="icon">⛴</div><div class="tag">Логистика</div><h3>Без простоя на границе</h3><p>Маркировка и документы готовы раньше груза; простои и складские издержки исключены.</p></div>
+    <div class="card"><div class="icon">⚡</div><div class="tag">Скорость</div><h3>Секунды вместо часов</h3><p>1200 кодов — за ~3 сек, файл УПД — за ~0,6 сек. Отказов в учётных статусах нет.</p></div>
+  </div>
+
+  <h2>Инженерные опоры</h2>
   <div class="grid">
     <a class="card" href="infrastructure.html"><div class="icon">▦</div><div class="tag">Инфраструктура</div><h3>Платформа</h3><p>Linux, K3s, nginx, Redis, PostgreSQL. GitOps через ArgoCD, секреты в Vault.</p></a>
     <a class="card" href="integrations.html"><div class="icon">⧉</div><div class="tag">Интеграции</div><h3>Интеграции</h3><p>Внешние системы, УПД, batch-ETL: контракты, идемпотентность, чанкинг.</p></a>
-    <a class="card" href="database.html"><div class="icon">▤</div><div class="tag">Данные</div><h3>База данных</h3><p>TBase (распределённый PostgreSQL) + локальный PG 16 + Redis, прод/тест схемы.</p></a>
-    <a class="card" href="incidents.html"><div class="icon">⚠</div><div class="tag">Инциденты</div><h3>Инциденты</h3><p>Разборы реальных сбоев: симптом, первопричина, исправление.</p></a>
-    <a class="card" href="mlops.html"><div class="icon">◆</div><div class="tag">MLOps</div><h3>MLOps</h3><p>ML-пайплайн с тестами и покрытием; MLflow, MinIO, KServe.</p></a>
-    <a class="card" href="articles.html"><div class="icon">✎</div><div class="tag">Статьи</div><h3>Статьи</h3><p>Разборы решений и уроки эксплуатации.</p></a>
-    <a class="card" href="playbook.html"><div class="icon">⌘</div><div class="tag">Playbook</div><h3>Playbook</h3><p>Runbook, Terraform, Ansible, CI/CD — без паролей.</p></a>
-    <a class="card" href="lessons.html"><div class="icon">✓</div><div class="tag">Уроки</div><h3>Уроки</h3><p>Анти-паттерны, на которые уже наступал.</p></a>
-  </div>  <h2>О себе</h2>
-  <p>Автоматизировал отчётность и ETL для команд в России, Турции, Беларуси и Узбекистане. Сайт собирается и публикуется через GitHub Actions; исходники открыты в репозитории.</p>
-  <h2>Курсы и сертификаты</h2>
-  <ul>
-    <li><a href="https://github.com/BobinRobin/lesson-08-code-review">MLOps-интенсив</a> — полный ML-пайплайн: 37 тестов, покрытие 88%, uv, mkdocs, flake8/pylint.</li>
-    <li><a href="https://github.com/BobinRobin/mlops_lesson_8">MLOps-курс</a> — курсовая работа по MLOps.</li>
-    <li>MLOps-архитектура: фреймворк уровней зрелости (Level 0/1/2).</li>
-  </ul>
-  <h2>Полезные репозитории</h2>
-  <ul>
-    <li><a href="https://github.com/BobinRobin/infrastructure-playbook">infrastructure-playbook</a> — Terraform, Ansible, GitLab CI, runbooks (обезличенные)</li>
-    <li><a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> — ML-пайплайн</li>
-    <li><a href="https://github.com/BobinRobin/mlops_lesson_8">mlops_lesson_8</a> — курсовая по MLOps</li>
-  </ul>
-  <h2>Контакты</h2>
-  <ul>
-    <li>Email: <a href="mailto:rdmurashkin@xmail.ru">rdmurashkin@xmail.ru</a></li>
-    <li>Telegram: <a href="https://t.me/RodionMurashkin">@RodionMurashkin</a></li>
-    <li>GitHub: <a href="https://github.com/BobinRobin">BobinRobin</a></li>
-    <li>Резюме текстом: <code>curl https://bobinrobin.github.io/portfolio/resume.txt</code></li>
-  </ul>
+    <a class="card" href="incidents.html"><div class="icon">⚠</div><div class="tag">Инциденты</div><h3>Разбор инцидентов</h3><p>Реальные сбои: симптом → первопричина → исправление → предотвращение.</p></a>
+  </div>
+
+  <h2>Глубокие разборы</h2>
+  <p><a href="business.html">Эффективность в цифрах</a> · <a href="database.html">База данных</a> · <a href="mlops.html">MLOps</a> · <a href="articles.html">Статьи</a> · <a href="playbook.html">Playbook</a> · <a href="lessons.html">Уроки</a></p>
+  <p><strong>Курсы:</strong> <a href="https://github.com/BobinRobin/lesson-08-code-review">MLOps-интенсив</a> (37 тестов, 88% покрытия) · <a href="https://github.com/BobinRobin/mlops_lesson_8">MLOps-курс</a></p>
+  <p><strong>Репозитории:</strong> <a href="https://github.com/BobinRobin/infrastructure-playbook">infrastructure-playbook</a> · <a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> · <a href="https://github.com/BobinRobin/mlops_lesson_8">mlops_lesson_8</a></p>
+
+  <section id="contact">
+    <h2>Контакты</h2>
+    <ul>
+      <li>Email: <a href="mailto:rdmurashkin@xmail.ru">rdmurashkin@xmail.ru</a></li>
+      <li>Telegram: <a href="https://t.me/RodionMurashkin">@RodionMurashkin</a></li>
+      <li>GitHub: <a href="https://github.com/BobinRobin">BobinRobin</a></li>
+      <li>Резюме текстом: <code>curl https://bobinrobin.github.io/portfolio/resume.txt</code></li>
+    </ul>
+  </section>
   <div class="note">Топология, адреса и конфигурация намеренно обобщены: детали не раскрываю.</div>
 </main>
 <footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>

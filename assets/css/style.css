@@ -139,3 +139,15 @@ footer a { margin:0 .3rem; }
 /* --- h2 section marker (лёгкий акцент) --- */
 main h2 { display: flex; align-items: center; gap: .6rem; }
 main h2::before { content: ""; width: 6px; height: 24px; border-radius: 3px; background: var(--accent-grad); flex: none; }
+/* --- nav "Ещё" dropdown --- */
+nav.links details.more { position: relative; }
+nav.links details.more > summary { list-style: none; cursor: pointer; color: var(--muted); font-size: .93rem; padding: .1rem 0; }
+nav.links details.more > summary::-webkit-details-marker { display: none; }
+nav.links details.more > summary:hover { color: var(--text); }
+.more-menu { position: absolute; top: 1.9rem; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: .45rem; min-width: 200px; display: flex; flex-direction: column; gap: .15rem; z-index: 60; box-shadow: var(--shadow); }
+.more-menu a { padding: .4rem .6rem; border-radius: 6px; color: var(--muted); font-size: .9rem; }
+.more-menu a:hover { background: var(--bg-soft); color: var(--text); }
+@media (max-width: 760px) {
+  .more-menu { position: static; border: none; box-shadow: none; padding: 0; background: none; }
+  nav.links details.more { width: 100%; }
+}
