@@ -122,3 +122,20 @@ footer a { margin:0 .3rem; }
   * { animation:none !important; transition:none !important; }
   .reveal { opacity:1; transform:none; }
 }
+/* --- hero badge --- */
+.hero .badge {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+  padding: .35rem .9rem; font-size: .8rem; color: var(--accent); margin-bottom: 1rem;
+}
+/* --- stats strip --- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.8rem 0 1rem; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+.stat b { display: block; font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1.1; }
+.stat span { color: var(--muted); font-size: .82rem; line-height: 1.35; display: block; margin-top: .3rem; }
+/* --- card icons --- */
+.card .icon { font-size: 1.5rem; line-height: 1; color: var(--accent); margin-bottom: .5rem; }
+.card .tag { margin-top: .1rem; }
+/* --- h2 section marker (лёгкий акцент) --- */
+main h2 { display: flex; align-items: center; gap: .6rem; }
+main h2::before { content: ""; width: 6px; height: 24px; border-radius: 3px; background: var(--accent-grad); flex: none; }

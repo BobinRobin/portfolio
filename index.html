@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Родион Мурашкин — DevOps / Platform Engineer · Kubernetes · GitOps · CI/CD · MLOps</title>
+<title>Родион Мурашкин — DevOps / Platform Engineer</title>
 <meta name="description" content="DevOps / Platform Engineer: Kubernetes (K3s), GitOps (ArgoCD), CI/CD, enterprise-интеграции, инциденты по STAR, MLOps. Опыт продакшн-контуров обмена данными с внешними системами.">
 <meta property="og:title" content="Родион Мурашкин — DevOps / Platform Engineer">
 <meta property="og:description" content="Kubernetes, GitOps, CI/CD, интеграции, инциденты по STAR, MLOps. Портфолио инженера платформы.">
@@ -14,8 +14,7 @@
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
-  <nav class="links">
+  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>  <nav class="links">
     <a href="index.html">Главная</a>
     <a href="infrastructure.html">Инфраструктура</a>
     <a href="integrations.html">Интеграции</a>
@@ -25,41 +24,46 @@
     <a href="articles.html">Статьи</a>
     <a href="playbook.html">Playbook</a>
     <a href="lessons.html">Уроки</a>
-  </nav>
-</header>
+  </nav></header>
 <main>
   <section class="hero">
-    <h1>DevOps / Platform Engineer</h1>
-    <div class="sub">Родион Мурашкин</div>
-    <p>Строю и эксплуатирую инфраструктуру и интеграционные сервисы: от подготовки сервера и CI/CD до диагностики production-инцидентов и документации. Сопровождал два контура обмена данными с внешними системами в продакшн-эксплуатации на Kubernetes.</p>
+    <div class="badge">Открыт к предложениям · DevOps / Platform Engineer</div>
+    <h1>Родион Мурашкин</h1>
+    <div class="sub">DevOps / Platform Engineer</div>
+    <p>Строю и эксплуатирую инфраструктуру и интеграционные сервисы: Kubernetes, GitOps, CI/CD, наблюдаемость, разбор инцидентов. Два контура обмена данными с внешними системами — в продакшн-эксплуатации.</p>
     <div class="chips">
       <span class="chip">Kubernetes (K3s)</span><span class="chip">Docker</span><span class="chip">GitLab CI/CD</span><span class="chip">ArgoCD</span><span class="chip">Vault</span><span class="chip">Prometheus · Grafana · Loki</span><span class="chip">Redis · PostgreSQL (TBase)</span><span class="chip">Python · Bash</span><span class="chip">MLflow · KServe</span>
     </div>
   </section>
-  <h2>Разделы</h2>
+
+  <section class="stats">
+    <div class="stat"><b>2</b><span>контура обмена данными в продакшн-эксплуатации</span></div>
+    <div class="stat"><b>5</b><span>разборов инцидентов по STAR</span></div>
+    <div class="stat"><b>88%</b><span>покрытие ML-пайплайна тестами (37 тестов)</span></div>
+    <div class="stat"><b>C1</b><span>английский · команды в 4 странах</span></div>
+  </section>  <h2>Что внутри</h2>
   <div class="grid">
-    <a class="card" href="infrastructure.html"><div class="tag">Инфраструктура</div><h3>Платформа</h3><p>Linux, K3s, nginx, Redis, PostgreSQL. GitOps через ArgoCD, секреты в Vault.</p></a>
-    <a class="card" href="integrations.html"><div class="tag">Интеграции</div><h3>Интеграции</h3><p>Внешние системы, УПД, batch-ETL: контракты, идемпотентность, чанкинг.</p></a>
-    <a class="card" href="database.html"><div class="tag">Данные</div><h3>База данных</h3><p>TBase (распределённый PostgreSQL) + локальный PG 16 + Redis, прод/тест схемы.</p></a>
-    <a class="card" href="incidents.html"><div class="tag">Инциденты</div><h3>Инциденты</h3><p>Разборы реальных сбоев: симптом, первопричина, исправление.</p></a>
-    <a class="card" href="mlops.html"><div class="tag">MLOps</div><h3>MLOps</h3><p>ML-пайплайн с тестами и покрытием; MLflow, MinIO, KServe.</p></a>
-    <a class="card" href="articles.html"><div class="tag">Статьи</div><h3>Статьи</h3><p>Разборы решений и уроки эксплуатации.</p></a>
-    <a class="card" href="playbook.html"><div class="tag">Playbook</div><h3>Playbook</h3><p>Runbook, Terraform, Ansible, CI/CD — без паролей.</p></a>
-    <a class="card" href="lessons.html"><div class="tag">Уроки</div><h3>Уроки</h3><p>Анти-паттерны, на которые уже наступал.</p></a>
-  </div>
-  <h2>О себе</h2>
-  <p>Автоматизировал отчётность и ETL для команд в России, Турции, Беларуси и Узбекистане. Английский — C1. Сайт собирается и публикуется через GitHub Actions; исходники открыты в репозитории.</p>
+    <a class="card" href="infrastructure.html"><div class="icon">▦</div><div class="tag">Инфраструктура</div><h3>Платформа</h3><p>Linux, K3s, nginx, Redis, PostgreSQL. GitOps через ArgoCD, секреты в Vault.</p></a>
+    <a class="card" href="integrations.html"><div class="icon">⧉</div><div class="tag">Интеграции</div><h3>Интеграции</h3><p>Внешние системы, УПД, batch-ETL: контракты, идемпотентность, чанкинг.</p></a>
+    <a class="card" href="database.html"><div class="icon">▤</div><div class="tag">Данные</div><h3>База данных</h3><p>TBase (распределённый PostgreSQL) + локальный PG 16 + Redis, прод/тест схемы.</p></a>
+    <a class="card" href="incidents.html"><div class="icon">⚠</div><div class="tag">Инциденты</div><h3>Инциденты</h3><p>Разборы реальных сбоев: симптом, первопричина, исправление.</p></a>
+    <a class="card" href="mlops.html"><div class="icon">◆</div><div class="tag">MLOps</div><h3>MLOps</h3><p>ML-пайплайн с тестами и покрытием; MLflow, MinIO, KServe.</p></a>
+    <a class="card" href="articles.html"><div class="icon">✎</div><div class="tag">Статьи</div><h3>Статьи</h3><p>Разборы решений и уроки эксплуатации.</p></a>
+    <a class="card" href="playbook.html"><div class="icon">⌘</div><div class="tag">Playbook</div><h3>Playbook</h3><p>Runbook, Terraform, Ansible, CI/CD — без паролей.</p></a>
+    <a class="card" href="lessons.html"><div class="icon">✓</div><div class="tag">Уроки</div><h3>Уроки</h3><p>Анти-паттерны, на которые уже наступал.</p></a>
+  </div>  <h2>О себе</h2>
+  <p>Автоматизировал отчётность и ETL для команд в России, Турции, Беларуси и Узбекистане. Сайт собирается и публикуется через GitHub Actions; исходники открыты в репозитории.</p>
   <h2>Курсы и сертификаты</h2>
   <ul>
     <li><a href="https://github.com/BobinRobin/lesson-08-code-review">MLOps-интенсив</a> — полный ML-пайплайн: 37 тестов, покрытие 88%, uv, mkdocs, flake8/pylint.</li>
-    <li><a href="https://github.com/BobinRobin/mlops_lesson_8">MLOps-курс</a> — курсовая работа по MLOps (конвейер в <code>main</code>).</li>
-    <li>MLOps-архитектура: фреймворк уровней зрелости (Level 0/1/2) — применён в разделе MLOps.</li>
+    <li><a href="https://github.com/BobinRobin/mlops_lesson_8">MLOps-курс</a> — курсовая работа по MLOps.</li>
+    <li>MLOps-архитектура: фреймворк уровней зрелости (Level 0/1/2).</li>
   </ul>
   <h2>Полезные репозитории</h2>
   <ul>
-    <li><a href="https://github.com/BobinRobin/infrastructure-playbook">infrastructure-playbook</a> — Terraform, Ansible, GitLab CI, runbooks (обезличенные примеры)</li>
+    <li><a href="https://github.com/BobinRobin/infrastructure-playbook">infrastructure-playbook</a> — Terraform, Ansible, GitLab CI, runbooks (обезличенные)</li>
     <li><a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> — ML-пайплайн</li>
-    <li><a href="https://github.com/BobinRobin/mlops_lesson_8">mlops_lesson_8</a> — курсовая работа по MLOps</li>
+    <li><a href="https://github.com/BobinRobin/mlops_lesson_8">mlops_lesson_8</a> — курсовая по MLOps</li>
   </ul>
   <h2>Контакты</h2>
   <ul>
@@ -70,7 +74,7 @@
   </ul>
   <div class="note">Топология, адреса и конфигурация намеренно обобщены: детали не раскрываю.</div>
 </main>
-<footer>© <span data-year>2026</span> Родион Мурашкин · <a href="https://github.com/BobinRobin">GitHub</a> · <a href="index-en.html">EN</a></footer>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
