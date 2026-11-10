@@ -8,24 +8,22 @@
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>
+  <nav class="links">
     <a href="index-en.html">Home</a>
-    <a href="infrastructure-en.html">Infrastructure</a>
-    <a href="integrations-en.html">Integrations</a>
-    <a href="database-en.html">Database</a>
-    <a href="incidents-en.html">Incidents</a>
-    <a href="mlops-en.html">MLOps</a>
-    <a href="articles-en.html">Articles</a>
-    <a href="playbook-en.html">Playbook</a>
-    <a href="lessons-en.html">Lessons</a>
-  </nav></header><main>
+    <a href="business-en.html">Impact</a>
+    <a href="incidents-en.html">Cases</a>
+    <a href="infrastructure-en.html">Stack</a>
+    <a href="index-en.html#contact">Contact</a>
+  </nav>
+</header>
+<main>
   <section class="hero">
     <h1>Infrastructure</h1>
-    <p>The platform that runs two integration services. Built from scratch and matured to GitOps.</p>
+    <p>The platform that runs integration services, ETL loops and an alerting system. Built from scratch, matured to GitOps, then grew: monitoring, Telegram and eLink alerts, an ETL scheduler.</p>
   </section>
 
-  <h2>Architecture</h2>
-  <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Platform architecture" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
+  <h2>Architecture</h2>  <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Platform architecture" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
     <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
     <g font-family="sans-serif" font-size="12" fill="#e7f2ec">
       <text x="14" y="30" font-size="11" fill="#8aa89a">CI/CD</text>
@@ -48,9 +46,7 @@
       <rect x="270" y="200" width="180" height="36" rx="6" fill="#0e2019" stroke="#34d399"/><text x="360" y="223" text-anchor="middle">TBase (external)</text>
       <rect x="470" y="200" width="158" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="549" y="223" text-anchor="middle">Prometheus · Grafana · Loki</text>
     </g>
-  </svg>
-
-  <h2>How it evolved</h2>
+  </svg>  <h2>How it evolved</h2>
   <div class="timeline">
     <div class="step"><b>Bare-metal setup</b><span>RAID, Linux, network and access.</span></div>
     <div class="step"><b>Platform</b><span>K3s, nginx, Redis (queues), PostgreSQL.</span></div>
@@ -59,10 +55,12 @@
     <div class="step"><b>Observability</b><span>Prometheus, Grafana, Loki. RED metrics.</span></div>
     <div class="step"><b>GitOps</b><span>CI builds and moves the tag in Git, ArgoCD applies. Rollback = git revert.</span></div>
     <div class="step"><b>Security</b><span>Vault, secrets out of Git, non-root containers, requests/limits.</span></div>
+    <div class="step"><b>Alerting</b><span>Health check every 5 minutes: Telegram (short) + eLink (detailed).</span></div>
+    <div class="step"><b>Growth</b><span>Pushgateway for batch jobs, an operations monitor, an ETL scheduler, new cronjob loops.</span></div>
   </div>
 
   <h2>Why this path</h2>
-  <p>Each step fixed a concrete pain of the previous one, not "because it is trendy":</p>
+  <p>Each step fixed a concrete pain of the previous one:</p>
   <ul>
     <li><b>K3s over full K8s</b> — one node: a lighter control plane for the same API and Helm/ArgoCD ecosystem.</li>
     <li><b>GitOps over kubectl patch</b> — CI-only deploys left drift between Git and the cluster; ArgoCD reconciles to Git, rollback is revert.</li>
@@ -70,8 +68,21 @@
     <li><b>Vault / Secret over secrets in code</b> — least privilege, rotation, audit.</li>
     <li><b>RED metrics over raw CPU/RAM</b> — a dashboard that answers "what is failing and what is queued".</li>
   </ul>
-  <div class="note">Topology and addresses are intentionally not disclosed.</div>
-</main><footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+
+  <h2>Alerting: Telegram + eLink</h2>
+  <p>A health check runs every 5 minutes and probes services, endpoints, database connectivity and queues. On a problem, two-channel alerts are sent: short ones to Telegram, detailed ones with error context to the corporate messenger eLink. Status changes are persisted so repeat alerts do not spam, and eLink delivery works via CLI or a relay queue.</p>
+
+  <h2>Stack: what grew</h2>
+  <table>
+    <tr><th>Layer</th><th>Components</th></tr>
+    <tr><td>Alerting</td><td>Telegram bot, eLink (corporate IM), Alertmanager, Pushgateway (batch-job metrics)</td></tr>
+    <tr><td>Loop monitoring</td><td>Operations monitor (web), RED exporter for the marking loop</td></tr>
+    <tr><td>ETL scheduler</td><td>Scheduler every 5 minutes, DAG-based approach, docker-compose for the ML stack</td></tr>
+  </table>
+
+  <div class="note">Channels and configuration details are generalized; credentials are not disclosed.</div>
+</main>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
