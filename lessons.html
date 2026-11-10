@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Уроки и анти-паттерны</title>
+<title>Уроки</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -11,35 +11,29 @@
   <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
   <nav class="links">
     <a href="index.html">Главная</a>
-    <a href="infrastructure.html">Инфраструктура</a>
-    <a href="integrations.html">Интеграции</a>
-    <a href="database.html">База данных</a>
-    <a href="incidents.html">Инциденты</a>
-    <a href="mlops.html">MLOps</a>
-    <a href="articles.html">Статьи</a>
-    <a href="playbook.html">Playbook</a>
-    <a href="lessons.html">Уроки</a>
+    <a href="business.html">Эффективность</a>
+    <a href="incidents.html">Кейсы</a>
+    <a href="infrastructure.html">Стек</a>
+    <a href="index.html#contact">Контакты</a>
   </nav>
 </header>
 <main>
   <section class="hero">
     <h1>Уроки и анти-паттерны</h1>
-    <p>Список того, на что я уже наступал. Держу здесь, чтобы не повторять одни и те же грабли.</p>
+    <p>На чём я уже наступал. Записал, чтобы не повторять одни и те же грабли.</p>
   </section>
-
   <div class="grid">
-    <div class="card"><div class="tag">Идемпотентность</div><h3>Ключ должен быть уникальным</h3><p>Повторная обработка не должна дублировать записи. Сначала ключом был не уникальный атрибут — получали дубли. Теперь: идемпотентность с первого дня, ключ проверяем на уникальность.</p></div>
-    <div class="card"><div class="tag">Интеграции</div><h3>Не искать файл по догадке</h3><p>Искали файл ответа по EAN, а внешняя система называла его по номеру строки заказа. Правило: имя файла и структура внешней системы — закон, читать по точному имени.</p></div>
-    <div class="card"><div class="tag">Деплой</div><h3>Внешние каналы — по одному</h3><p>Не включать FTP/callback/Sales разом. Сначала конвейер работает в dry-run, потом каналы включаются по одному. Дороже по времени, но ошибки ловятся до внешней системы.</p></div>
-    <div class="card"><div class="tag">Наблюдаемость</div><h3>Метрики — до инцидента</h3><p>Без RED-метрик и логов чинишь вслепую. Минимум: rate/errors/duration и дашборд «что готово, что падает, что ждёт».</p></div>
-    <div class="card"><div class="tag">Инструменты</div><h3>Один слой — один инструмент</h3><p>Не заводить второй инструмент на ту же задачу, пока первый не упёрся в предел. Двойной рантайм (systemd + Kubernetes) — техдолг, сводить к одному.</p></div>
-    <div class="card"><div class="tag">Сеть</div><h3>Прокси — частая причина «не видит»</h3><p>«Grafana не видит Loki» оказалось конфликтом прокси на сервере. Проверяй network mode и адрес datasource, прежде чем чинить сам сервис.</p></div>
-    <div class="card"><div class="tag">Безопасность</div><h3>Секреты не в Git</h3><p>Креденшилы в коде и CI — критический риск. Выносить в Secret/Vault по принципу least privilege; контейнеры — не от root.</p></div>
-    <div class="card"><div class="tag">GitOps</div><h3>Откат — это git revert</h3><p>Императивный <code>kubectl patch</code> из CI оставлял расхождение «что в Git и что в кластере». GitOps: правда в Git, откат — revert.</p></div>
+    <div class="card"><div class="tag">Идемпотентность</div><h3>Ключ должен быть уникальным</h3><p>Звучит банально, пока на ретрае не получаешь дубли. Теперь: проверяю ключ до вставки. Всегда.</p></div>
+    <div class="card"><div class="tag">Интеграции</div><h3>Не гадай имена файлов</h3><p>Искал файл ответа по EAN, а система называла его по номеру строки. Полдня потеряно. Имя файла и структура внешней системы — закон.</p></div>
+    <div class="card"><div class="tag">Деплой</div><h3>Каналы — по одному</h3><p>Включил разом FTP, callback и sales? Добро пожаловать в заварушку. Теперь dry-run сначала, потом по одному.</p></div>
+    <div class="card"><div class="tag">Наблюдаемость</div><h3>Метрики — до инцидента</h3><p>Чинил вслепую, пока не запилил RED-метрики. Теперь «что падает и что ждёт» видно сразу.</p></div>
+    <div class="card"><div class="tag">Инструменты</div><h3>Один слой — один инструмент</h3><p>Два инструмента на одну задачу — два места, где всё ломается. Двойной рантайм (systemd + K8s) — техдолг, сводим к одному.</p></div>
+    <div class="card"><div class="tag">Сеть</div><h3>Прокси виноват чаще, чем код</h3><p>Grafana не видела Loki. Начал чинить не то. Оказалось — прокси. Проверяй сеть и конфиг первыми.</p></div>
+    <div class="card"><div class="tag">Безопасность</div><h3>Секреты не в Git</h3><p>Креденшилы в коде и CI — критический риск. Теперь Vault + least privilege, контейнеры не от root.</p></div>
+    <div class="card"><div class="tag">GitOps</div><h3>Откат — это git revert</h3><p>kubectl patch из CI оставлял расхождение между Git и кластером. Теперь правда в Git, откат — revert.</p></div>
   </div>
-
-  <h2>Как этим пользоваться</h2>
-  <p>Перед новым сервисом прогоняю чек-лист: идемпотентность на входе, dry-run внешних каналов, requests/limits, непривилегированный контейнер, RED-метрики, секреты вне Git. Это закрывает большую часть прошлых граблей.</p>
+  <h2>Как этим пользуюсь</h2>
+  <p>Перед запуском нового сервиса прогоняю чек-лист: идемпотентность на входе, dry-run внешних каналов, requests/limits, непривилегированный контейнер, RED-метрики, секреты вне Git. Он закрывает большую часть прошлых граблей.</p>
 </main>
 <footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
 <script src="assets/js/main.js"></script>
