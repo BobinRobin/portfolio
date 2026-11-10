@@ -151,3 +151,17 @@ nav.links details.more > summary:hover { color: var(--text); }
   .more-menu { position: static; border: none; box-shadow: none; padding: 0; background: none; }
   nav.links details.more { width: 100%; }
 }
+/* --- hero avatar --- */
+.avatar { display:block; width:104px; height:104px; border-radius:50%; object-fit:cover; border:3px solid var(--accent); margin:0 0 1.1rem; box-shadow: var(--shadow); background: var(--card); }
+/* --- кнопка --- */
+.btn { display:inline-flex; align-items:center; gap:.45rem; background: var(--accent-grad); color:#06281c; font-weight:700; border-radius:8px; padding:.6rem 1.1rem; margin-top:.3rem; font-size:.95rem; }
+.btn:hover { color:#06281c; box-shadow: var(--shadow); }
+/* --- опыт --- */
+.experience { display:flex; flex-direction:column; gap:.8rem; margin:1rem 0; }
+.exp { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem 1.2rem; }
+.exp-head { font-size:1.05rem; font-weight:700; }
+.exp-meta { color:var(--accent); font-size:.85rem; margin:.15rem 0 .45rem; }
+.exp p { margin:0; font-size:.92rem; }
+/* --- тех-бейджи --- */
+.badges { display:flex; flex-wrap:wrap; gap:.55rem; margin:.9rem 0 .4rem; align-items:center; }
+.badges img { height:27px; border-radius:6px; }
