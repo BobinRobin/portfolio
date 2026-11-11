@@ -370,7 +370,7 @@ textarea.json{width:100%;min-height:340px;background:#0B0F1B;border:1px solid va
     </div>
     <pre class="prompt" id="promptPre"></pre>
   </div>
-  <div class="cron">Расписание: <b>0 6 * * *</b> · агент читает b2bmain (read-only) → добавляет строку за день в <b>metrics.daily</b> → коммит <b>data: daily metrics YYYY-MM-DD</b> → CI публикует. Источник недоступен → цифры не выдумывать, оставить meta.note.</div>
+  <div class="cron">Расписание: <b>0 6 * * *</b> · агент читает bare-metal корпоративный сервер (read-only) → добавляет строку за день в <b>metrics.daily</b> → коммит <b>data: daily metrics YYYY-MM-DD</b> → CI публикует. Источник недоступен → цифры не выдумывать, оставить meta.note.</div>
 </section>
 
 <!-- ================= CONTACT ================= -->
@@ -500,7 +500,7 @@ textarea.json{width:100%;min-height:340px;background:#0B0F1B;border:1px solid va
   },
   "agent": {
     "title": "Промпт, которым агент обновляет сайт ежедневно",
-    "lead": "Агент меняет только data.json: тянет суточные цифры из продакшен-контура (read-only), обезличивает, коммитит. Дизайн и голос зашиты в промпт — ниже он целиком, копируй как есть."
+    "lead": "Агент меняет только data.json: тянет суточные цифры с bare-metal корпоративного сервера (read-only), обезличивает, коммитит. Дизайн и голос зашиты в промпт — ниже он целиком, копируй как есть."
   },
   "contact": {
     "title": "Написать нам обо мне",
@@ -556,7 +556,7 @@ const AGENT_PROMPT=`# Промпт для агента: ежедневное о�
   (single-node, нет проверенного restore — если это всё ещё так).
 
 ## Ежедневные данные (главное)
-1. Источник — продакшен-контур b2bmain, ТОЛЬКО read-only:
+1. Источник — bare-metal корпоративный сервер, ТОЛЬКО read-only:
    - TBase/PostgreSQL: суточные counts по таблицам кодов и УПД
      (GROUP BY date_trunc('day', created_at)).
    - Redis: XLEN / XINFO GROUPS — длина очереди и лаг потребителей.
