@@ -1,889 +1,98 @@
 <!doctype html>
-<!-- index.html · portfolio v3 · team voice + daily metrics + self-editor -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Родион Мурашкин — DevOps / Platform Engineer · команда и ежедневные метрики</title>
-<meta name="description" content="От ETL-скриптов до платформы. Командой. Суточные метрики, расследования инцидентов, GitOps.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0A0D14; --bg2:#0E1220; --surface:#121829; --overlay:#182036; --line:#24304E;
-  --text:#E9E6DC; --muted:#9AA4BB; --warm:#F2E9D8;
-  --blue:#4D7CFE; --cyan:#39C6D6; --green:#3DDC84; --red:#FF5C5C; --amber:#FFB020; --magenta:#FF5CA8;
-  --disp:'Unbounded',system-ui,sans-serif; --body:'Golos Text',system-ui,'Segoe UI',sans-serif; --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
-  --nav-h:64px; --rad:14px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.6;overflow-x:hidden}
-::selection{background:var(--blue);color:#fff}
-*{scrollbar-width:thin;scrollbar-color:var(--blue) var(--bg2)}
-::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:var(--bg2)}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--blue),var(--magenta));border-radius:6px;border:2px solid var(--bg2)}
-::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--cyan),var(--magenta))}
-a{color:var(--cyan);text-decoration:none}
-a:hover{text-decoration:underline}
-button{font-family:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
-
-/* ---- layered background ---- */
-.bg-aurora{position:fixed;inset:-20%;z-index:-2;pointer-events:none;filter:blur(90px);opacity:.5}
-.bg-aurora i{position:absolute;border-radius:50%;display:block}
-.bg-aurora i:nth-child(1){width:55vw;height:55vw;left:-12vw;top:-14vw;background:radial-gradient(circle,#1B3B8F 0%,transparent 65%);animation:drift1 26s ease-in-out infinite alternate}
-.bg-aurora i:nth-child(2){width:44vw;height:44vw;right:-10vw;top:22vh;background:radial-gradient(circle,#5A1E46 0%,transparent 65%);animation:drift2 32s ease-in-out infinite alternate}
-.bg-aurora i:nth-child(3){width:40vw;height:40vw;left:24vw;bottom:-16vw;background:radial-gradient(circle,#4A3410 0%,transparent 65%);animation:drift1 38s ease-in-out infinite alternate-reverse}
-@keyframes drift1{to{transform:translate(6vw,4vh) scale(1.08)}}
-@keyframes drift2{to{transform:translate(-5vw,-5vh) scale(.94)}}
-.bg-grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
-
-/* ---- nav ---- */
-.nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:50;display:flex;align-items:center;gap:18px;padding:0 22px;
-  background:rgba(10,13,20,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.brand{font-family:var(--mono);font-weight:600;font-size:14px;color:var(--warm);white-space:nowrap}
-.brand b{color:var(--green)}
-.nav-links{display:flex;gap:4px;overflow-x:auto;flex:1;padding:4px 0}
-.nav-links a{font-size:13px;font-weight:500;color:var(--muted);padding:7px 11px;border-radius:8px;white-space:nowrap;position:relative}
-.nav-links a:hover{color:var(--text);text-decoration:none;background:var(--surface)}
-.nav-links a.active{color:var(--warm)}
-.nav-links a.active::after{content:"";position:absolute;left:11px;right:11px;bottom:2px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--magenta))}
-.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 15px;font-size:13px;font-weight:600;transition:.18s;white-space:nowrap}
-.btn:hover{border-color:var(--blue);transform:translateY(-1px)}
-.btn.primary{background:linear-gradient(120deg,var(--blue),#6A5CFF 60%,var(--magenta));border-color:transparent;color:#fff}
-.btn.primary:hover{filter:brightness(1.12)}
-.btn.amber{border-color:#6b4d12;color:var(--amber);background:rgba(255,176,32,.08)}
-.btn.amber[aria-pressed="true"]{background:var(--amber);color:#1a1204;border-color:var(--amber)}
-.btn.ghost{background:transparent}
-.btn.sm{padding:6px 10px;font-size:12px;border-radius:8px}
-
-/* ---- layout ---- */
-main{max-width:1180px;margin:0 auto;padding:0 22px}
-section{padding:88px 0;scroll-margin-top:calc(var(--nav-h) + 16px);position:relative}
-.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc,var(--blue));margin-bottom:14px;display:flex;align-items:center;gap:10px}
-.kicker::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--acc,var(--blue)),transparent)}
-h2{font-family:var(--disp);font-weight:700;font-size:clamp(24px,3.4vw,38px);line-height:1.2;margin-bottom:16px;color:var(--warm)}
-.lead{color:var(--muted);max-width:760px;font-size:17px}
-#path{--acc:var(--amber)} #metrics{--acc:var(--blue)} #cases{--acc:var(--red)} #stack{--acc:var(--cyan)} #how{--acc:var(--green)} #agent{--acc:var(--magenta)} #contact{--acc:var(--green)}
-
-/* ---- hero ---- */
-.hero{min-height:92vh;display:grid;grid-template-columns:1.25fr .9fr;gap:48px;align-items:center;padding-top:calc(var(--nav-h) + 48px)}
-.hero .who{font-family:var(--mono);font-size:13px;color:var(--cyan);margin-bottom:18px}
-.hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(30px,4.6vw,54px);line-height:1.14;margin-bottom:22px;caret-color:var(--text);
-  background:linear-gradient(115deg,var(--warm) 20%,#BFD4FF 55%,var(--cyan) 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero .lead{font-size:18px;margin-bottom:16px}
-.hero .honest{border-left:3px solid var(--amber);padding:12px 16px;background:rgba(255,176,32,.06);border-radius:0 10px 10px 0;color:var(--text);font-size:15px;margin:20px 0 26px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
-.chip{font-family:var(--mono);font-size:12px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--surface)}
-.cta{display:flex;gap:12px;flex-wrap:wrap}
-.term{background:linear-gradient(160deg,var(--surface),var(--bg2));border:1px solid var(--line);border-radius:var(--rad);padding:20px 22px;font-family:var(--mono);font-size:13px;box-shadow:0 24px 60px rgba(0,0,0,.45);position:relative;overflow:hidden}
-.term::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(77,124,254,.08),transparent 40%,rgba(255,92,168,.06));pointer-events:none}
-.term .bar{display:flex;gap:6px;margin-bottom:14px}
-.term .bar i{width:10px;height:10px;border-radius:50%;display:block}
-.term .bar i:nth-child(1){background:var(--red)}.term .bar i:nth-child(2){background:var(--amber)}.term .bar i:nth-child(3){background:var(--green)}
-.term .ln{display:block;padding:3px 0;color:var(--muted);opacity:0;animation:fadeUp .5s forwards}
-.term .ln b{color:var(--text);font-weight:600}
-.term .ok{color:var(--green)} .term .warn{color:var(--amber)} .term .cmd{color:var(--cyan)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-[data-stage]{opacity:0;animation:fadeUp .7s forwards}
-
-/* ---- path ---- */
-.path-grid{display:grid;grid-template-columns:280px 1fr;gap:44px;margin-top:34px}
-.path-side{position:sticky;top:calc(var(--nav-h) + 24px);align-self:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:22px}
-.path-side .big{font-family:var(--disp);font-size:30px;color:var(--amber);font-weight:700}
-.path-side p{color:var(--muted);font-size:14px;margin-top:8px}
-.timeline{position:relative;padding-left:26px}
-.timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,var(--amber),var(--blue),var(--green))}
-.t-item{position:relative;margin-bottom:26px;background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:18px 20px;transition:.2s}
-.t-item:hover{border-color:#3a4a75;transform:translateX(4px)}
-.t-item::before{content:"";position:absolute;left:-24px;top:24px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:3px solid var(--amber)}
-.t-item .era{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
-.t-item h3{font-size:18px;font-weight:600;margin:6px 0;color:var(--warm)}
-.t-item p{color:var(--muted);font-size:15px}
-
-/* ---- metrics ---- */
-.fresh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:22px 0;font-size:14px}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);flex:none}
-.dot.stale{background:var(--amber);box-shadow:0 0 12px var(--amber)}
-.fresh .muted{color:var(--muted)}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px}
-.card{background:linear-gradient(165deg,var(--surface),var(--bg2));border:1px solid var(--line);border-radius:var(--rad);padding:18px;position:relative;overflow:hidden;transition:.2s}
-.card:hover{transform:translateY(-3px);border-color:#3a4a75}
-.card .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
-.card .val{font-family:var(--disp);font-size:clamp(24px,2.6vw,32px);font-weight:700;margin:10px 0 4px;color:var(--warm)}
-.card .sub{font-size:13px;color:var(--muted)}
-.card .delta{font-family:var(--mono);font-size:12px;padding:2px 8px;border-radius:999px}
-.delta.good{color:var(--green);background:rgba(61,220,132,.1)} .delta.bad{color:var(--red);background:rgba(255,92,92,.1)} .delta.flat{color:var(--muted);background:var(--overlay)}
-.card svg.spark{position:absolute;right:14px;bottom:12px;opacity:.9}
-.chart-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:20px}
-.chart-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
-.tab{font-family:var(--mono);font-size:12px;padding:7px 12px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);transition:.15s}
-.tab:hover{color:var(--text)}
-.tab.active{color:#fff;border-color:transparent;background:var(--tc,var(--blue))}
-.chart-ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-select,input[type=date],input[type=number],input[type=text]{background:var(--bg2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 10px;font-family:var(--mono);font-size:12px}
-.toggle{font-family:var(--mono);font-size:12px;padding:7px 11px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted)}
-.toggle[aria-pressed="true"]{color:var(--cyan);border-color:var(--cyan);background:rgba(57,198,214,.08)}
-.chart-wrap{position:relative}
-.chart-wrap svg{width:100%;height:auto;display:block}
-.tip{position:absolute;top:8px;pointer-events:none;background:var(--overlay);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-family:var(--mono);font-size:12px;color:var(--text);opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:5}
-.tip b{color:var(--warm)}
-.note{color:var(--muted);font-size:14px;margin-top:16px;border-left:3px solid var(--blue);padding-left:14px}
-
-/* ---- cases ---- */
-.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
-.case{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:var(--rad);padding:20px;transition:.2s;position:relative}
-.case:hover{transform:translateY(-3px);border-color:#5a2c3a;border-left-color:var(--red)}
-.case .tag{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:.08em;text-transform:uppercase}
-.case h3{font-size:17px;font-weight:600;margin:8px 0 14px;color:var(--warm)}
-.case dl{font-size:14px}
-.case dt{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:10px}
-.case dd{color:var(--text);margin-top:2px}
-.case dd.rule{color:var(--amber)}
-
-/* ---- pillars / stack ---- */
-.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
-.pillar{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:18px}
-.pillar .ic{font-size:20px;color:var(--cyan)}
-.pillar h3{font-size:15px;font-weight:600;margin:8px 0 6px;color:var(--warm)}
-.pillar p{font-size:13px;color:var(--muted)}
-.stack{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}
-.stack .chip{font-size:13px;color:var(--text);border-color:#2e3c60;position:relative}
-
-/* ---- how / agent ---- */
-.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0}
-.how{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:20px}
-.how .n{font-family:var(--disp);font-size:26px;color:var(--green);font-weight:700}
-.how h3{font-size:16px;margin:8px 0 6px;color:var(--warm)}
-.how p{font-size:14px;color:var(--muted)}
-.prompt-box{background:#0B0F1B;border:1px solid var(--line);border-radius:var(--rad);overflow:hidden;margin-top:22px}
-.prompt-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
-.prompt-head .t{font-family:var(--mono);font-size:12px;color:var(--magenta)}
-pre.prompt{font-family:var(--mono);font-size:12.5px;line-height:1.65;color:#C9D4EE;padding:18px;max-height:440px;overflow:auto;white-space:pre-wrap}
-.cron{font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--bg2);border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin-top:14px}
-.cron b{color:var(--cyan)}
-
-/* ---- contact / footer ---- */
-.contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px}
-.c-link{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;color:var(--text);font-weight:500;transition:.18s}
-.c-link:hover{border-color:var(--green);text-decoration:none;transform:translateY(-2px)}
-.c-link .ic{font-family:var(--mono);color:var(--green)}
-footer{border-top:1px solid var(--line);padding:30px 22px 44px;text-align:center;color:var(--muted);font-size:13px;max-width:1180px;margin:0 auto}
-
-/* ---- editor ---- */
-body.editing [data-t]{outline:1px dashed rgba(255,176,32,.55);outline-offset:3px;border-radius:4px;cursor:text;min-width:20px}
-body.editing [data-t]:hover{outline-color:var(--amber);background:rgba(255,176,32,.05)}
-body.editing [data-t]:focus{outline:2px solid var(--amber);background:rgba(255,176,32,.07)}
-.item-ctrl{display:none;gap:6px;margin-top:12px}
-body.editing .item-ctrl{display:flex}
-.add-item{display:none;margin:10px 0 26px}
-body.editing .add-item{display:inline-block}
-.chip .x{display:none;margin-left:6px;color:var(--red);background:none;border:none;font-size:13px}
-body.editing .chip .x{display:inline}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:100vw;background:var(--bg2);border-left:1px solid var(--line);z-index:60;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.5)}
-.drawer.open{transform:none}
-.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
-.drawer-head .t{font-family:var(--disp);font-size:15px;color:var(--amber);font-weight:700}
-.drawer-tabs{display:flex;gap:6px;padding:12px 18px 0}
-.drawer-body{flex:1;overflow-y:auto;padding:16px 18px}
-.d-panel{display:none}.d-panel.active{display:block}
-.d-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.d-hint{font-size:12.5px;color:var(--muted);margin-bottom:14px}
-table.days{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px}
-table.days th{color:var(--muted);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line);font-weight:400}
-table.days td{padding:4px 2px;border-bottom:1px solid rgba(36,48,78,.5)}
-table.days input{width:100%;padding:5px 6px;font-size:11.5px;border-radius:6px}
-table.days input[type=date]{width:118px}
-table.days .del{background:none;border:none;color:var(--red);font-size:14px;padding:4px}
-.add-form{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:14px}
-.add-form .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.add-form label{font-size:11px;color:var(--muted);display:block;margin-bottom:3px;font-family:var(--mono)}
-.add-form input{width:100%}
-textarea.json{width:100%;min-height:340px;background:#0B0F1B;border:1px solid var(--line);border-radius:10px;color:#C9D4EE;font-family:var(--mono);font-size:11.5px;padding:12px;resize:vertical}
-.err{color:var(--red);font-size:12px;margin-top:8px;font-family:var(--mono)}
-.drawer-foot{padding:12px 18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--muted)}
-.toast-wrap{position:fixed;left:20px;bottom:20px;z-index:80;display:flex;flex-direction:column;gap:10px}
-.toast{background:var(--overlay);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:12px;padding:12px 16px;font-size:14px;display:flex;gap:14px;align-items:center;box-shadow:0 14px 40px rgba(0,0,0,.5);animation:fadeUp .25s}
-.toast button{background:none;border:none;color:var(--amber);font-weight:600;font-size:13px}
-.draft-banner{position:fixed;top:calc(var(--nav-h) + 10px);left:50%;transform:translateX(-50%);z-index:70;background:var(--overlay);border:1px solid var(--amber);border-radius:12px;padding:10px 16px;display:none;gap:12px;align-items:center;font-size:13px;box-shadow:0 14px 40px rgba(0,0,0,.5)}
-.draft-banner.show{display:flex}
-
-/* ---- reveal ---- */
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .6s,transform .6s}
-.reveal.in{opacity:1;transform:none}
-
-@media (max-width:980px){
-  .hero{grid-template-columns:1fr;min-height:auto}
-  .cards,.cases,.how-grid{grid-template-columns:1fr 1fr}
-  .pillars{grid-template-columns:1fr 1fr}
-  .path-grid{grid-template-columns:1fr}
-  .path-side{position:static}
-}
-@media (max-width:640px){
-  .cards,.cases,.how-grid,.pillars,.contact-grid{grid-template-columns:1fr}
-  .nav{padding:0 12px;gap:10px}
-  section{padding:64px 0}
-  .drawer{width:100vw}
-}
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
-  html{scroll-behavior:auto}
-  .reveal,[data-stage],.term .ln{opacity:1;transform:none}
-}
-</style>
+<title>Родион Мурашкин — DevOps / Platform Engineer</title>
+<meta name="description" content="DevOps / Platform Engineer: Kubernetes (K3s), GitOps (ArgoCD), CI/CD, enterprise-интеграции, инциденты, MLOps, алертинг Telegram+eLink.">
+<meta property="og:title" content="Родион Мурашкин — DevOps / Platform Engineer">
+<meta property="og:description" content="Kubernetes, GitOps, CI/CD, интеграции, инциденты, алертинг, MLOps. Портфолио инженера платформы.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bobinrobin.github.io/portfolio/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/91057948?v=4">
+<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="bg-aurora" id="aurora"><i></i><i></i><i></i></div>
-<div class="bg-grain"></div>
-
 <header class="nav">
-  <span class="brand">rm<b>://</b>platform</span>
-  <nav class="nav-links" id="navLinks" aria-label="Разделы">
-    <a href="#path">Путь</a><a href="#metrics">Метрики</a><a href="#cases">Расследования</a><a href="#stack">Стек</a><a href="#how">Как править</a><a href="#agent">Агенту</a><a href="#contact">Контакты</a>
+  <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
+  <nav class="links">
+    <a href="index.html">Главная</a>
+    <a href="business.html">Эффективность</a>
+    <a href="incidents.html">Кейсы</a>
+    <a href="infrastructure.html">Стек</a>
+    <a href="index.html#contact">Контакты</a>
   </nav>
-  <button class="btn amber" id="editBtn" aria-pressed="false" title="Режим правок (Esc — выход)">✎ Правки</button>
 </header>
-
-<div class="draft-banner" id="draftBanner">
-  <span>Есть черновик правок в этом браузере.</span>
-  <button class="btn sm amber" id="draftRestore">Восстановить</button>
-  <button class="btn sm ghost" id="draftDiscard">Выбросить</button>
-</div>
-
 <main>
-<!-- ================= HERO ================= -->
-<section class="hero" id="top">
-  <div>
-    <div class="who" data-stage style="animation-delay:.05s" data-t="hero.kicker"></div>
-    <h1 data-stage style="animation-delay:.15s" data-t="hero.title"></h1>
-    <p class="lead" data-stage style="animation-delay:.25s" data-t="hero.lead"></p>
-    <div class="honest" data-stage style="animation-delay:.35s" data-t="hero.honest"></div>
-    <div class="chips" data-stage style="animation-delay:.45s" id="heroChips"></div>
-    <div class="cta" data-stage style="animation-delay:.55s">
-      <a class="btn primary" href="#metrics">Метрики дня →</a>
-      <a class="btn ghost" href="#path">Путь команды</a>
-      <a class="btn ghost" href="#agent">Промпт для агента</a>
-    </div>
-  </div>
-  <div class="term" data-stage style="animation-delay:.4s" aria-label="Статус платформы">
-    <div class="bar"><i></i><i></i><i></i></div>
-    <div id="termLines"></div>
-  </div>
-</section>
+  <section class="hero">
+    <img class="avatar" src="https://avatars.githubusercontent.com/u/91057948?v=4" alt="Родион Мурашкин" width="104" height="104">
+    <div class="badge">Открыт к предложениям · DevOps / Platform Engineer</div>
+    <h1>Родион Мурашкин</h1>
+    <div class="sub">DevOps / Platform Engineer</div>
+    <p>DevOps / Platform Engineer широкого профиля: разработка, MLOps, аналитика и бизнес-процессы — от логистики до финансов, ритейла и GTM. Работаю и в команде сильных инженеров, и соло. Поднимаю серверы с нуля, клею интеграции, чиню прод в три ночи. Когда всё ломается и никто не понимает, почему — это мой звёздный час.</p>
+    <a class="btn" href="resume.txt">Скачать резюме (.txt)</a>
+  </section>
 
-<!-- ================= PATH ================= -->
-<section id="path">
-  <div class="kicker">01 · путь команды</div>
-  <h2 data-t="path.title"></h2>
-  <p class="lead" data-t="path.lead"></p>
-  <div class="path-grid">
-    <aside class="path-side reveal">
-      <div class="big">2 года</div>
-      <p data-t="path.side"></p>
-    </aside>
-    <div>
-      <div class="timeline" id="timeline"></div>
-      <button class="btn sm amber add-item" data-add="timeline">+ этап</button>
-    </div>
-  </div>
-</section>
+  <section class="stats">
+    <div class="stat"><b>2</b><span>контура обмена данными в продакшн-эксплуатации</span></div>
+    <div class="stat"><b>~550k</b><span>кодов в сутки обрабатывается автоматически</span></div>
+    <div class="stat"><b>0</b><span>отказов в учётных статусах</span></div>
+    <div class="stat"><b>125</b><span>подписанных УПД без ручных операций</span></div>
+  </section>
 
-<!-- ================= METRICS ================= -->
-<section id="metrics">
-  <div class="kicker">02 · каждый день, не за всё время</div>
-  <h2 data-t="metrics.title"></h2>
-  <div class="fresh">
-    <span class="dot" id="freshDot"></span>
-    <span id="freshText"></span>
-    <span class="muted" id="freshHint"></span>
-    <a href="#agent" style="margin-left:auto;font-size:13px">обновляется агентом →</a>
+  <h2>Опыт</h2>
+  <div class="experience">
+    <div class="exp"><div class="exp-head">Honor · DevOps / Platform Engineer</div><div class="exp-meta">март 2024 — настоящее время</div><p>Инфраструктура с нуля (Linux, K3s), GitOps, CI/CD, наблюдаемость, алертинг Telegram+eLink, интеграции, ETL, разбор инцидентов. Один узел, два контура, ноль потерянных кодов.</p></div>
+    <div class="exp"><div class="exp-head">Музей архитектуры им. А.В. Щусева · Специалист по ИТ</div><div class="exp-meta">апрель 2023 — февраль 2024</div><p>Серверы (HP ProLiant, VMware ESXi, Ubuntu/Windows), сети и коммутаторы, 1С, ЭЦП. Там началась любовь к железу и желание это автоматизировать.</p></div>
   </div>
-  <div class="cards" id="cards"></div>
-  <div class="chart-panel reveal">
-    <div class="chart-head">
-      <div class="tabs" id="metricTabs" role="tablist"></div>
-      <div class="chart-ctrl">
-        <select id="rangeSel" aria-label="Период">
-          <option value="7">7 дней</option><option value="14">14 дней</option><option value="30" selected>30 дней</option>
-        </select>
-        <button class="toggle" id="avgToggle" aria-pressed="true">среднее</button>
-        <button class="toggle" id="wkToggle" aria-pressed="true">выходные</button>
-        <button class="btn sm ghost" id="csvBtn">CSV</button>
-        <button class="btn sm ghost" id="svgBtn">SVG</button>
-      </div>
-    </div>
-    <div class="chart-wrap">
-      <div id="chart"></div>
-      <div class="tip" id="tip"></div>
-    </div>
+
+  <h2>Бизнес-эффект</h2>
+  <div class="grid">
+    <div class="card"><div class="icon">₽</div><div class="tag">Выручка</div><h3>Фиксация прибыли</h3><p>Контур доводит до «подписанный УТД + продажа» — момента признания выручки — без ручных операций.</p></div>
+    <div class="card"><div class="icon">⛴</div><div class="tag">Логистика</div><h3>Без простоя на границе</h3><p>Маркировка и документы готовы раньше груза. Простои и складские издержки не успевают начаться.</p></div>
+    <div class="card"><div class="icon">⚡</div><div class="tag">Скорость</div><h3>Секунды вместо часов</h3><p>1200 кодов — за ~3 сек, файл УПД — за ~0,6 сек. Отказов в учётных статусах нет.</p></div>
   </div>
-  <p class="note" data-t="metrics.note"></p>
-</section>
-<!-- ================= CASES ================= -->
-<section id="cases">
-  <div class="kicker">03 · расследования</div>
-  <h2 data-t="cases.title"></h2>
-  <p class="lead" data-t="cases.lead"></p>
-  <div class="cases" id="caseList"></div>
-  <button class="btn sm amber add-item" data-add="cases">+ кейс</button>
-</section>
 
-<!-- ================= STACK ================= -->
-<section id="stack">
-  <div class="kicker">04 · инженерия и стек</div>
-  <h2 data-t="stack.title"></h2>
-  <div class="pillars" id="pillars"></div>
-  <div class="stack" id="stackChips"></div>
-  <button class="btn sm amber add-item" data-add="stack">+ технология</button>
-</section>
-
-<!-- ================= HOW ================= -->
-<section id="how">
-  <div class="kicker">05 · как править этот сайт</div>
-  <h2 data-t="how.title"></h2>
-  <div class="how-grid">
-    <div class="how reveal"><div class="n">1</div><h3 data-t="how.a.t"></h3><p data-t="how.a.p"></p></div>
-    <div class="how reveal"><div class="n">2</div><h3 data-t="how.b.t"></h3><p data-t="how.b.p"></p></div>
-    <div class="how reveal"><div class="n">3</div><h3 data-t="how.c.t"></h3><p data-t="how.c.p"></p></div>
+  <h2>Инженерные опоры</h2>
+  <div class="grid">
+    <a class="card" href="infrastructure.html"><div class="icon">▦</div><div class="tag">Инфраструктура</div><h3>Платформа</h3><p>Linux, K3s, nginx, Redis, PostgreSQL. GitOps через ArgoCD, секреты в Vault.</p></a>
+    <a class="card" href="integrations.html"><div class="icon">⧉</div><div class="tag">Интеграции</div><h3>Интеграции</h3><p>Внешние системы, УПД, batch-ETL: контракты, идемпотентность, чанкинг.</p></a>
+    <a class="card" href="incidents.html"><div class="icon">⚠</div><div class="tag">Инциденты</div><h3>Разбор инцидентов</h3><p>Реальные сбои: симптом → первопричина → исправление. С детективным вайбом.</p></a>
   </div>
-  <button class="btn primary" id="howEditBtn">✎ Открыть правки прямо сейчас</button>
-</section>
 
-<!-- ================= AGENT ================= -->
-<section id="agent">
-  <div class="kicker">06 · агенту</div>
-  <h2 data-t="agent.title"></h2>
-  <p class="lead" data-t="agent.lead"></p>
-  <div class="prompt-box">
-    <div class="prompt-head">
-      <span class="t">agent-prompt.md · ежедневное обновление data.json</span>
-      <span style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn sm" id="copyPrompt">Скопировать промпт</button>
-        <button class="btn sm" id="dlPrompt">Скачать .md</button>
-        <button class="btn sm ghost" id="dlData2">Скачать data.json</button>
-      </span>
-    </div>
-    <pre class="prompt" id="promptPre"></pre>
+  <h2>Стек</h2>
+  <div class="badges">
+    <img src="https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white" alt="Kubernetes">
+    <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
+    <img src="https://img.shields.io/badge/GitLab%20CI-FC6D26?style=for-the-badge&logo=gitlab&logoColor=white" alt="GitLab CI">
+    <img src="https://img.shields.io/badge/ArgoCD-EF7B4D?style=for-the-badge&logo=argo&logoColor=white" alt="ArgoCD">
+    <img src="https://img.shields.io/badge/Vault-FFEC6E?style=for-the-badge&logo=vault&logoColor=black" alt="Vault">
+    <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" alt="Prometheus">
+    <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white" alt="Grafana">
+    <img src="https://img.shields.io/badge/Loki-3D5A62?style=for-the-badge&logo=grafana&logoColor=white" alt="Loki">
+    <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+    <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+    <img src="https://img.shields.io/badge/Terraform-844FBA?style=for-the-badge&logo=terraform&logoColor=white" alt="Terraform">
   </div>
-  <div class="cron">Расписание: <b>0 6 * * *</b> · агент читает bare-metal корпоративный сервер (read-only) → добавляет строку за день в <b>metrics.daily</b> → коммит <b>data: daily metrics YYYY-MM-DD</b> → CI публикует. Источник недоступен → цифры не выдумывать, оставить meta.note.</div>
-</section>
 
-<!-- ================= CONTACT ================= -->
-<section id="contact">
-  <div class="kicker">07 · контакты</div>
-  <h2 data-t="contact.title"></h2>
-  <p class="lead" data-t="contact.lead"></p>
-  <div class="contact-grid" id="contactGrid"></div>
-  <div class="cron" style="margin-top:18px">Plain-text резюме: <b id="curlLine"></b> <button class="btn sm ghost" id="copyCurl" style="margin-left:8px">copy</button></div>
-</section>
+  <h2>Глубокие разборы</h2>
+  <p><a href="business.html">Эффективность в цифрах</a> · <a href="database.html">База данных</a> · <a href="mlops.html">MLOps</a> · <a href="articles.html">Статьи</a> · <a href="playbook.html">Playbook</a> · <a href="lessons.html">Уроки</a></p>
+  <p><strong>Курсы:</strong> <a href="https://github.com/BobinRobin/lesson-08-code-review">MLOps-интенсив</a> (37 тестов, 88% покрытия) · <a href="https://github.com/BobinRobin/mlops_lesson_8">MLOps-курс</a></p>
+  <p><strong>Репозитории:</strong> <a href="https://github.com/BobinRobin/infrastructure-playbook">infrastructure-playbook</a> · <a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> · <a href="https://github.com/BobinRobin/mlops_lesson_8">mlops_lesson_8</a></p>
+
+  <section id="contact">
+    <h2>Контакты</h2>
+    <ul>
+      <li>Email: <a href="mailto:rdmurashkin@xmail.ru">rdmurashkin@xmail.ru</a></li>
+      <li>Telegram: <a href="https://t.me/RodionMurashkin">@RodionMurashkin</a></li>
+      <li>GitHub: <a href="https://github.com/BobinRobin">BobinRobin</a></li>
+      <li>Резюме текстом: <code>curl https://bobinrobin.github.io/portfolio/resume.txt</code></li>
+    </ul>
+  </section>
+  <div class="note">Топология, адреса и конфигурация намеренно обобщены: детали не раскрываю.</div>
 </main>
-
-<footer>
-  <span data-t="footer"></span>
-</footer>
-
-<!-- ================= EDITOR DRAWER ================= -->
-<aside class="drawer" id="drawer" aria-label="Панель правок">
-  <div class="drawer-head">
-    <span class="t">Панель правок</span>
-    <button class="btn sm ghost" id="drawerClose">✕</button>
-  </div>
-  <div class="drawer-tabs">
-    <button class="tab active" data-tab="days" style="--tc:var(--blue)">Дни</button>
-    <button class="tab" data-tab="json" style="--tc:var(--cyan)">JSON</button>
-    <button class="tab" data-tab="export" style="--tc:var(--green)">Экспорт</button>
-  </div>
-  <div class="drawer-body">
-    <div class="d-panel active" id="panel-days">
-      <p class="d-hint">Суточные строки. Добавь день, поправь цифры — карточки и график обновятся сразу. Удаление можно отменить.</p>
-      <div class="d-row">
-        <input type="text" id="dateFilter" placeholder="фильтр: 2026-11" style="flex:1">
-        <button class="btn sm ghost" id="sortBtn">дата ↓</button>
-        <label style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center"><input type="checkbox" id="errFilter"> с ошибками</label>
-      </div>
-      <table class="days"><thead><tr><th>дата</th><th>коды</th><th>УПД</th><th>сбои</th><th>p95</th><th>очередь</th><th></th></tr></thead><tbody id="daysBody"></tbody></table>
-      <div class="add-form">
-        <div class="grid">
-          <div><label>дата</label><input type="date" id="aDate"></div>
-          <div><label>коды</label><input type="number" id="aCodes" value="550000" min="0"></div>
-          <div><label>УПД</label><input type="number" id="aUpd" value="5" min="0"></div>
-          <div><label>сбои</label><input type="number" id="aFail" value="0" min="0"></div>
-          <div><label>p95, мс</label><input type="number" id="aP95" value="3100" min="0"></div>
-          <div><label>очередь</label><input type="number" id="aQueue" value="120" min="0"></div>
-        </div>
-        <button class="btn sm primary" id="addDay" style="width:100%">Добавить день</button>
-      </div>
-    </div>
-    <div class="d-panel" id="panel-json">
-      <p class="d-hint">Весь сайт — этот JSON. Правишь руками или применяешь то, что прислал агент.</p>
-      <textarea class="json" id="jsonArea" spellcheck="false"></textarea>
-      <div class="err" id="jsonErr"></div>
-      <div class="d-row" style="margin-top:10px">
-        <button class="btn sm" id="jsonShow">Показать текущий</button>
-        <button class="btn sm primary" id="jsonApply">Применить JSON</button>
-      </div>
-    </div>
-    <div class="d-panel" id="panel-export">
-      <p class="d-hint">Экспортируй data.json, положи рядом с index.html в репозитории, закоммить — CI опубликует. Черновик автосохраняется в браузере.</p>
-      <div class="d-row"><button class="btn primary" id="dlData" style="width:100%">⬇ Скачать data.json</button></div>
-      <div class="d-row"><button class="btn" id="copyJson" style="flex:1">Скопировать JSON</button><button class="btn" id="importBtn" style="flex:1">Импорт файла</button></div>
-      <input type="file" id="importFile" accept=".json,application/json" hidden>
-      <div class="d-row"><button class="btn ghost" id="resetBtn" style="width:100%">Сбросить к опубликованной версии</button></div>
-      <div class="d-hint" id="exportStatus" style="margin-top:14px"></div>
-    </div>
-  </div>
-  <div class="drawer-foot" id="drawerFoot">источник: —</div>
-</aside>
-
-<div class="toast-wrap" id="toasts"></div>
-<noscript><p style="padding:100px 22px;text-align:center">Сайту нужен JavaScript для графика и редактора. Тексты и контакты — в data.json.</p></noscript>
-
-<!-- ================= SEED DATA ================= -->
-<script type="application/json" id="seed">
-{
-  "meta": { "updated": "2026-11-11", "version": 3 },
-  "hero": {
-    "kicker": "Родион Мурашкин · DevOps / Platform Engineer · часть команды",
-    "title": "От ETL-скриптов на коленке — до платформы. Командой.",
-    "lead": "Два года мы овертаймили каждую неделю — команда таких же трудоголиков. В четвёртом мы переломили ход событий и с тех пор строим инфраструктуру как профессионалы, а не латаем скрипты.",
-    "honest": "До этого были простые ETL-скрипты: без воркеров, без очередей, без знания TBase, без серверной интеграции. Мы не притворяемся, что сразу знали, как надо. Разобрались.",
-    "chips": ["K3s · GitOps", "Redis Streams · воркеры", "TBase · PostgreSQL", "Prometheus · Grafana · Loki"]
-  },
-  "path": {
-    "title": "Как мы сюда пришли",
-    "lead": "Без легенд про «сразу построил правильно». Вот честная последовательность.",
-    "side": "еженедельных овертаймов. Не доблесть — факт. Гордимся тем, что построили, и тем, что инцидент теперь расследование, а не паника.",
-    "items": [
-      { "era": "До перелома", "title": "Простые ETL-скрипты", "text": "Cron, файлы и надежда. Без воркеров и очередей. Про TBase и серверную интеграцию мы тогда не знали — учились на своих же ошибках." },
-      { "era": "В четвёртом", "title": "Мы переломили ход событий", "text": "Перестали чинить скрипты по одному и начали строить систему: контракты, очереди, воркеры, идемпотентность. Дальше — только вперёд." },
-      { "era": "Потом", "title": "Очереди и воркеры", "text": "Redis Streams как транспорт событий. Воркеры читают, обрабатывают, ретраят. Пики нагрузки сглаживаются, а не роняют конвейер." },
-      { "era": "Потом", "title": "Данные: TBase и схемы", "text": "Распределённый PostgreSQL для бизнес-данных, отдельный инстанс для инструментов. Прод и тест разведены по схемам, переключение — в коде." },
-      { "era": "Сейчас", "title": "Платформа, а не набор скриптов", "text": "K3s, GitOps через ArgoCD, секреты в Vault, CI собирает и тестирует. Откат — git revert. Правда — в Git." },
-      { "era": "Честно", "title": "Про овертаймы", "text": "Два года еженедельных овертаймов — цена, которую мы заплатили за рост. Сейчас строим так, чтобы следующая команда платила меньше." }
-    ]
-  },
-  "metrics": {
-    "title": "Нагрузка — в сутках, не в totals",
-    "note": "Здесь суточные показатели. Накопительные цифры за всё время врут о реальной нагрузке, поэтому мы их не показываем. Агент добавляет строку в data.json каждый день; если данные устарели — сайт скажет об этом сам.",
-    "static": { "loops": 2, "upd_file_ms": 600, "batch_codes": 1200 },
-    "daily": []
-  },
-  "cases": {
-    "title": "Когда всё горит — нам нравится",
-    "lead": "Любим разбираться в хаосе как детективы: симптом, гипотезы, улики, первопричина. Иногда всё, что есть под рукой — логи, psql и шаловливые ручки. Дальше начинается заварушка.",
-    "items": [
-      { "tag": "FTP · данные", "title": "Коды не уходили на FTP", "symptom": "Записи в базе есть, XML не отправляется, в логе skip_no_pd=1000.", "trace": "Первая гипотеза — сломан пайплайн. Не подтвердилась: воркеры живы, очередь пустая. Пошли в данные.", "root": "Дата продукта бралась только из существующих строк, а новые коды вставлялись без неё — даты лежали в другой таблице.", "fix": "Дополнили batch-процессор: дата берётся из правильного источника.", "rule": "«Всё работает, а данные не едут» — сначала данные, потом код." },
-      { "tag": "Наблюдаемость", "title": "Grafana не видела Loki", "symptom": "Дашборд не отдаёт логи. Первое желание — чинить Grafana или Loki.", "trace": "Оба сервиса живы. Копали сеть и конфиг — и нашли улику.", "root": "Конфликт прокси на сервере: datasource стучался не туда.", "fix": "Grafana на host network, datasource через loopback.", "rule": "Прежде чем чинить сервис — проверь сеть, прокси и адреса." },
-      { "tag": "Интеграции", "title": "Дубли при ретрае", "symptom": "Повторная обработка плодила одинаковые записи.", "trace": "Ключ идемпотентности казался уникальным. Не был.", "root": "Атрибут повторялся внутри одного документа — ретрай вставлял дубли.", "fix": "Бизнес-уникальный ключ и проверка до вставки, в одной транзакции.", "rule": "Идемпотентность — с первого дня, а не когда прижмёт." }
-    ]
-  },
-  "stack": {
-    "title": "Чем это построено",
-    "pillars": [
-      { "icon": "▦", "title": "Платформа", "text": "Linux, K3s, nginx, GitOps. Секреты в Vault, контейнеры не от root, requests/limits заданы." },
-      { "icon": "⧉", "title": "Интеграции", "text": "Контракты внешних систем — закон. Идемпотентность, чанкинг, dry-run, сверка по точным идентификаторам." },
-      { "icon": "⌁", "title": "Данные", "text": "TBase для бизнеса, PostgreSQL 16 для инструментов, Redis Streams между приёмом и обработкой." },
-      { "icon": "◉", "title": "Наблюдаемость", "text": "RED-метрики и бизнес-каунтеры. Дашборд отвечает: что готово, что падает, что ждёт." }
-    ],
-    "chips": ["Kubernetes (K3s)","Docker","GitLab CI/CD","ArgoCD · GitOps","Vault","Prometheus","Grafana","Loki","Redis Streams","TBase · PostgreSQL 16","Python","Bash","MLflow · KServe (PoC)","Terraform · Ansible"]
-  },
-  "how": {
-    "title": "Правки за две минуты, без сборки",
-    "a": { "t": "Прямо на странице", "p": "Кнопка «✎ Правки» в шапке. Кликни любой текст — правь как в документе. В панели «Дни» добавь строку метрик. «Скачать data.json» → замени файл в репозитории → commit." },
-    "b": { "t": "Руками в JSON", "p": "data.json — единственный источник текстов и цифр. index.html — движок, его трогать не нужно. Открыл, поправил, закоммитил." },
-    "c": { "t": "Черновик не потеряется", "p": "Правки автосохраняются в браузере, пока не экспортируешь. «Сбросить» вернёт опубликованную версию. Удаление дня или кейса можно отменить." }
-  },
-  "agent": {
-    "title": "Промпт, которым агент обновляет сайт ежедневно",
-    "lead": "Агент меняет только data.json: тянет суточные цифры с bare-metal корпоративного сервера (read-only), обезличивает, коммитит. Дизайн и голос зашиты в промпт — ниже он целиком, копируй как есть."
-  },
-  "contact": {
-    "title": "Написать нам обо мне",
-    "lead": "Открыт к командам, где инцидент — повод для разбора, а не для поиска виноватых.",
-    "email": "rdmurashkin@xmail.ru",
-    "telegram": "@RodionMurashkin",
-    "github": "BobinRobin",
-    "resume": "https://bobinrobin.github.io/portfolio/resume.txt"
-  },
-  "footer": "Сайт собирается и публикуется через CI/CD. Тексты помогал писать AI — решения, код и ревью делали люди. Публичная версия обезличена: без внутренних адресов, хостов, схем БД и секретов."
-}
-</script><script>
-"use strict";
-/* ================= helpers ================= */
-const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const clone=o=>JSON.parse(JSON.stringify(o));
-const pad=n=>String(n).padStart(2,"0");
-const iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-const fmtInt=v=>Number(v).toLocaleString("ru-RU");
-const fmtC=v=>new Intl.NumberFormat("ru-RU",{notation:"compact",maximumFractionDigits:1}).format(v);
-const getPath=(o,p)=>p.split(".").reduce((a,k)=>a==null?a:a[k],o);
-function setPath(o,p,v){const ks=p.split(".");let c=o;for(let i=0;i<ks.length-1;i++){const k=ks[i];if(c[k]==null)c[k]=/^\d+$/.test(ks[i+1])?[]:{};c=c[k];}c[ks[ks.length-1]]=v;}
-const DRAFT="portfolio-draft-v3", CHARTPREF="portfolio-chart-v3";
-const state={data:null,base:null,editing:false,source:"seed",dirty:false,chart:{metric:"codes",range:30,avg:true,weekends:true},sortDesc:true,lastUndo:null};
-
-/* ================= seeded daily data ================= */
-function rng(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296;};}
-function genDaily(endISO,n){const end=new Date(endISO+"T12:00:00");const rows=[];for(let i=n-1;i>=0;i--){const d=new Date(end);d.setDate(end.getDate()-i);const s=iso(d);const r=rng(parseInt(s.replace(/-/g,""),10));const dow=d.getDay();const wk=(dow===0||dow===6)?0.62:1;rows.push({date:s,codes:Math.round((515000+r()*75000)*wk),upd:Math.max(1,Math.round((3+r()*5)*wk)),failures:0,p95_ms:Math.round(2800+r()*600+(1-wk)*250),queue:Math.round(40+r()*180)});}return rows;}
-function ensureDaily(d){if(!d.metrics)d.metrics={static:{loops:2,upd_file_ms:600,batch_codes:1200},daily:[]};if(!d.metrics.daily||!d.metrics.daily.length)d.metrics.daily=genDaily(d.meta.updated||iso(new Date()),30);d.metrics.daily.sort((a,b)=>a.date<b.date?-1:1);}
-function daily(){return state.data.metrics.daily;}
-function avg(arr){return arr.length?arr.reduce((s,x)=>s+x,0)/arr.length:0;}
-function slice(metric,n){return daily().slice(-n).map(r=>({date:r.date,v:Number(r[metric])||0}));}
-
-/* ================= agent prompt ================= */
-const AGENT_PROMPT=`# Промпт для агента: ежедневное обновление портфолио (data.json)
-
-Ты — инженерный агент команды. Обновляешь публичное портфолио: меняешь ТОЛЬКО data.json.
-Дизайн и index.html не трогаешь. Все тексты и цифры живут в data.json.
-
-## Голос (обязательно)
-- Пиши от «мы». Это результат команды, а не одного человека.
-  Запрещено: «я построил сам», «самостоятельно прошёл полный цикл», «я — единственный».
-- Честная история: начинали с простых ETL-скриптов без воркеров, без очередей,
-  без знания TBase, без серверной интеграции. В четвёртом мы переломили ход событий.
-  Два года овертаймов каждую неделю, команда трудоголиков.
-  Переработки — факт и цена роста, не доблесть. Не романтизируй.
-- Характер: любим разбираться в хаосе как детективы — симптом, гипотезы, улики,
-  первопричина. Лёгкая ирония допустима («заварушка», «раскрутили клубок»,
-  «шаловливые ручки»). Мат на публичных страницах — нет.
-- Короткие предложения. Без канцелярита («доводить до состояния», «осуществлять»),
-  без тройных глаголов подряд, без конструкции «не X, а Y» в каждом абзаце, без воды.
-  Конкретика: цифры, версии, ограничения. Ограничения признавай честно
-  (single-node, нет проверенного restore — если это всё ещё так).
-
-## Ежедневные данные (главное)
-1. Источник — bare-metal корпоративный сервер, ТОЛЬКО read-only:
-   - TBase/PostgreSQL: суточные counts по таблицам кодов и УПД
-     (GROUP BY date_trunc('day', created_at)).
-   - Redis: XLEN / XINFO GROUPS — длина очереди и лаг потребителей.
-   - Grafana/Prometheus: p95 длительности партии, ошибки, аптайм.
-   - Документация, runbook'и и postmortem'ы — для текстов и кейсов.
-2. В metrics.daily добавь строку за закрытый день:
-   {"date":"YYYY-MM-DD","codes":N,"upd":N,"failures":N,"p95_ms":N,"queue":N}
-   Если дата уже есть — обнови строку, не дублируй.
-3. Храни последние 90 дней, старые строки удаляй. Сортируй по дате.
-4. Все публичные заголовки — суточные: «кодов в день», «УПД в день»,
-   «сбоев за 30 дней». Накопительные totals в hero не выносить.
-5. meta.updated = дата последней строки. Сайт сам покажет свежесть
-   и предупредит, если данные старше двух дней.
-6. Источник недоступен или цифры не подтверждены — НЕ выдумывай.
-   Оставь данные как есть, запиши причину в meta.note.
-
-## Безопасность (жёстко)
-- Никаких внутренних IP (10.x.x.x), имён хостов, реальных URL, токенов,
-  appkey, схем БД, имён сотрудников и контрагентов.
-- Названия сервисов — только публичные или обезличенные.
-- Числа округляй до разумной точности. Перед коммитом проверь diff
-  на секреты (grep по шаблонам ключей, паролей, адресов).
-
-## Тексты и кейсы
-- Истории бери из реальных инцидентов (документация, логи, postmortem), обезличивай.
-- Кейс оформляй: симптом → что проверили → первопричина → фикс → правило.
-  От «мы». Не выдумывай достижения и не приписывай команде чужие результаты.
-- Если метрика не подтверждена источником — не публикуй её.
-
-## Коммит и проверка
-- Меняешь только data.json. JSON обязан парситься без ошибок.
-- Сообщение коммита: data: daily metrics YYYY-MM-DD
-- CI сам соберёт и опубликует сайт.
-- Самопроверка: тексты звучат как рассказ команды, а не пресс-релиз?
-  Все цифры суточные и подтверждённые? Дата обновлена? Секретов нет? JSON валиден?
-
-## Как человек правит сайт сам (не ломай этот поток)
-- Кнопка «Правки» на сайте → инлайн-редактирование текстов и панель «Дни».
-- Экспорт data.json → коммит. Черновик хранится в localStorage браузера.
-- Твои изменения не должны затирать человеческие правки: перед записью
-  сравнивай с текущим data.json и меняй только метрики и meta, если тексты
-  правились людьми после последнего агентского коммита.`;
-
-/* ================= load ================= */
-async function loadData(){
-  let d=null;
-  try{const r=await fetch("data.json",{cache:"no-store"});if(r.ok){d=await r.json();state.source="data.json";}}catch(e){}
-  if(!d){d=JSON.parse($("#seed").textContent);state.source="встроенные данные (data.json не найден)";}
-  ensureDaily(d);
-  state.base=clone(d);state.data=d;
-  try{const p=localStorage.getItem(CHARTPREF);if(p)Object.assign(state.chart,JSON.parse(p));}catch(e){}
-  renderAll();
-  let draft=null;try{draft=JSON.parse(localStorage.getItem(DRAFT));}catch(e){}
-  if(draft&&draft.data){$("#draftBanner").classList.add("show");$("#draftRestore").onclick=()=>{state.data=draft.data;ensureDaily(state.data);state.dirty=true;renderAll();$("#draftBanner").classList.remove("show");toast("Черновик восстановлен");};$("#draftDiscard").onclick=()=>{localStorage.removeItem(DRAFT);$("#draftBanner").classList.remove("show");};}
-}
-
-/* ================= render ================= */
-function refreshBindings(){
-  $$("[data-t]").forEach(el=>{const v=getPath(state.data,el.dataset.t);if(v!=null&&el.textContent!==String(v))el.textContent=v;
-    if(state.editing)el.setAttribute("contenteditable","true");else el.removeAttribute("contenteditable");});
-}
-function itemCtrl(list,i){return state.editing?`<span class="item-ctrl"><button class="btn sm ghost" data-act="up" data-list="${list}" data-i="${i}" title="Выше">↑</button><button class="btn sm ghost" data-act="down" data-list="${list}" data-i="${i}" title="Ниже">↓</button><button class="btn sm ghost" data-act="del" data-list="${list}" data-i="${i}" style="color:var(--red)">× удалить</button></span>`:"";}
-function renderTimeline(){
-  $("#timeline").innerHTML=state.data.path.items.map((it,i)=>`<div class="t-item reveal in"><span class="era" data-t="path.items.${i}.era"></span><h3 data-t="path.items.${i}.title"></h3><p data-t="path.items.${i}.text"></p>${itemCtrl("path.items",i)}</div>`).join("");
-}
-function renderCases(){
-  $("#caseList").innerHTML=state.data.cases.items.map((c,i)=>`<article class="case reveal in"><span class="tag" data-t="cases.items.${i}.tag"></span><h3 data-t="cases.items.${i}.title"></h3><dl>
-  <dt>Симптом</dt><dd data-t="cases.items.${i}.symptom"></dd>
-  <dt>Что проверили</dt><dd data-t="cases.items.${i}.trace"></dd>
-  <dt>Улика · первопричина</dt><dd data-t="cases.items.${i}.root"></dd>
-  <dt>Фикс</dt><dd data-t="cases.items.${i}.fix"></dd>
-  <dt>Правило</dt><dd class="rule" data-t="cases.items.${i}.rule"></dd></dl>${itemCtrl("cases.items",i)}</article>`).join("");
-}
-function renderPillars(){$("#pillars").innerHTML=state.data.stack.pillars.map((p,i)=>`<div class="pillar reveal in"><div class="ic">${p.icon}</div><h3 data-t="stack.pillars.${i}.title"></h3><p data-t="stack.pillars.${i}.text"></p></div>`).join("");}
-function renderStack(){$("#stackChips").innerHTML=state.data.stack.chips.map((c,i)=>`<span class="chip"><span data-t="stack.chips.${i}"></span>${state.editing?`<button class="x" data-act="del" data-list="stack.chips" data-i="${i}">×</button>`:""}</span>`).join("");}
-function renderHeroChips(){$("#heroChips").innerHTML=state.data.hero.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("");}
-function esc(s){return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));}
-function renderContacts(){
-  const c=state.data.contact;
-  $("#contactGrid").innerHTML=[
-    ["✉",c.email,"mailto:"+c.email],
-    ["tg",c.telegram,"https://t.me/"+c.telegram.replace("@","")],
-    ["gh",c.github,"https://github.com/"+c.github],
-    ["txt","resume.txt",c.resume]
-  ].map(([ic,t,h])=>`<a class="c-link" href="${esc(h)}" target="_blank" rel="noopener"><span class="ic">${ic}</span>${esc(t)}</a>`).join("");
-  $("#curlLine").textContent="curl "+c.resume;
-}
-function freshness(){
-  const upd=new Date(state.data.meta.updated+"T12:00:00");const now=new Date();
-  const days=Math.max(0,Math.round((new Date(iso(now)+"T12:00:00")-upd)/864e5));
-  return {days,label:days===0?"сегодня":days===1?"вчера":days+" дн. назад",stale:days>2};
-}
-function renderFreshness(){
-  const f=freshness();const d=daily();const last=d[d.length-1];
-  $("#freshDot").className="dot"+(f.stale?" stale":"");
-  $("#freshText").innerHTML=`Данные за <b>${last.date}</b> · обновлено ${f.label}`;
-  $("#freshHint").textContent=f.stale?"— данные устарели, запусти агента (раздел «Агенту»)":"— агент обновляет ежедневно";
-  const codes7=avg(d.slice(-7).map(r=>r.codes));
-  const lines=[
-    `<span class="ln cmd" style="animation-delay:.5s">$ portfolio status --daily</span>`,
-    `<span class="ln" style="animation-delay:.65s">voice: <b>team</b> · totals: <b>false</b></span>`,
-    `<span class="ln" style="animation-delay:.8s">loops in production: <b>${state.data.metrics.static.loops}</b></span>`,
-    `<span class="ln" style="animation-delay:.95s">codes/day (7d avg): <b>~${fmtC(codes7)}</b></span>`,
-    `<span class="ln" style="animation-delay:1.1s">failures (30d): <b class="ok">${d.slice(-30).reduce((s,r)=>s+r.failures,0)}</b></span>`,
-    `<span class="ln ${f.stale?"warn":"ok"}" style="animation-delay:1.25s">updated: ${state.data.meta.updated} ${f.stale?"⚠ stale":"✓ fresh"}</span>`
-  ];
-  $("#termLines").innerHTML=lines.join("");
-}
-function spark(vals,color){
-  if(!vals.length)return"";const w=104,h=30,max=Math.max(...vals,1),min=Math.min(...vals,0);
-  const pts=vals.map((v,i)=>`${(i/(vals.length-1||1))*w},${h-3-((v-min)/(max-min||1))*(h-6)}`).join(" ");
-  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round"/></svg>`;
-}
-function deltaBadge(cur,prev,goodUp){
-  if(!prev)return`<span class="delta flat">—</span>`;
-  const p=(cur-prev)/prev*100;const up=p>=0;const good=up===goodUp;
-  return `<span class="delta ${Math.abs(p)<0.5?"flat":good?"good":"bad"}">${up?"▲":"▼"} ${Math.abs(p).toFixed(1)}%</span>`;
-}
-function renderCards(){
-  const d=daily();const last7=d.slice(-7),prev7=d.slice(-14,-7);
-  const a7=k=>avg(last7.map(r=>r[k])),p7=k=>avg(prev7.map(r=>r[k]));
-  const fails=d.slice(-30).reduce((s,r)=>s+r.failures,0);
-  const st=state.data.metrics.static;
-  const cards=[
-    {lbl:"Коды в день",val:"~"+fmtC(a7("codes")),sub:"среднее за 7 суток",delta:deltaBadge(a7("codes"),p7("codes"),true),spark:spark(d.slice(-14).map(r=>r.codes),"#4D7CFE")},
-    {lbl:"УПД в день",val:a7("upd").toFixed(1).replace(".",","),sub:"подписано, без ручных шагов",delta:deltaBadge(a7("upd"),p7("upd"),true),spark:spark(d.slice(-14).map(r=>r.upd),"#3DDC84")},
-    {lbl:"Сбои статусов",val:String(fails),sub:"за последние 30 дней",delta:`<span class="delta ${fails===0?"good":"bad"}">${fails===0?"чисто":"разбор"}</span>`,spark:spark(d.slice(-14).map(r=>r.failures),"#FF5C5C")},
-    {lbl:`Партия ${fmtInt(st.batch_codes)} кодов`,val:(a7("p95_ms")/1000).toFixed(1).replace(".",",")+" с",sub:"p95, суточные замеры",delta:deltaBadge(a7("p95_ms"),p7("p95_ms"),false),spark:spark(d.slice(-14).map(r=>r.p95_ms),"#FFB020")},
-    {lbl:"Файл УПД",val:(st.upd_file_ms/1000).toFixed(1).replace(".",",")+" с",sub:"формирование и отправка",delta:`<span class="delta good">стабильно</span>`,spark:""},
-    {lbl:"Контуры в проде",val:String(st.loops),sub:"приём документов + маркировка",delta:`<span class="delta good">работают</span>`,spark:""}
-  ];
-  $("#cards").innerHTML=cards.map(c=>`<div class="card"><div class="lbl"><span>${c.lbl}</span>${c.delta}</div><div class="val">${c.val}</div><div class="sub">${c.sub}</div>${c.spark}</div>`).join("");
-}
-
-/* ================= chart ================= */
-const METRICS={
-  codes:{label:"Коды / день",color:"#4D7CFE",fmt:fmtC},
-  upd:{label:"УПД / день",color:"#3DDC84",fmt:v=>fmtInt(Math.round(v))},
-  failures:{label:"Сбои",color:"#FF5C5C",fmt:v=>fmtInt(Math.round(v))},
-  p95_ms:{label:"p95 партии, с",color:"#FFB020",fmt:v=>(v/1000).toFixed(1).replace(".",",")},
-  queue:{label:"Очередь",color:"#FF5CA8",fmt:v=>fmtInt(Math.round(v))}
-};
-function niceMax(v){if(v<=0)return 1;const p=Math.pow(10,Math.floor(Math.log10(v)));const n=v/p;return (n<=1?1:n<=2?2:n<=5?5:10)*p;}
-function renderChart(){
-  const m=METRICS[state.chart.metric];const rows=slice(state.chart.metric,state.chart.range);
-  const W=860,H=280,PL=56,PR=16,PT=16,PB=30;
-  const max=niceMax(Math.max(...rows.map(r=>r.v),1)*1.05);
-  const step=(W-PL-PR)/(rows.length-1||1);
-  const X=i=>PL+i*step, Y=v=>PT+(1-v/max)*(H-PT-PB);
-  let g="";
-  for(let i=0;i<=4;i++){const v=max*i/4,y=Y(v);g+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#24304E" stroke-width="1"/><text x="${PL-8}" y="${y+4}" text-anchor="end" font-size="10" fill="#9AA4BB" font-family="monospace">${m.fmt(v)}</text>`;}
-  let wk="";if(state.chart.weekends)rows.forEach((r,i)=>{const dow=new Date(r.date+"T12:00:00").getDay();if(dow===0||dow===6)wk+=`<rect x="${X(i)-step/2}" y="${PT}" width="${step}" height="${H-PT-PB}" fill="rgba(233,230,220,0.035)"/>`;});
-  const line=rows.map((r,i)=>`${i?"L":"M"}${X(i).toFixed(1)},${Y(r.v).toFixed(1)}`).join(" ");
-  const area=line+` L${X(rows.length-1).toFixed(1)},${Y(0)} L${X(0).toFixed(1)},${Y(0)} Z`;
-  let avgEl="";if(state.chart.avg){const a=avg(rows.map(r=>r.v));avgEl=`<line x1="${PL}" y1="${Y(a)}" x2="${W-PR}" y2="${Y(a)}" stroke="#F2E9D8" stroke-width="1" stroke-dasharray="5 5" opacity=".55"/><text x="${W-PR}" y="${Y(a)-6}" text-anchor="end" font-size="10" fill="#F2E9D8" opacity=".8" font-family="monospace">среднее ${m.fmt(a)}</text>`;}
-  let xl="";const every=Math.ceil(rows.length/8);rows.forEach((r,i)=>{if(i%every===0)xl+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#9AA4BB" font-family="monospace">${r.date.slice(5)}</text>`;});
-  $("#chart").innerHTML=`<svg id="chartSvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${m.label} за ${rows.length} дней">
-    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${m.color}" stop-opacity=".35"/><stop offset="1" stop-color="${m.color}" stop-opacity="0"/></linearGradient></defs>
-    ${wk}${g}<path d="${area}" fill="url(#ag)"/><path d="${line}" fill="none" stroke="${m.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${avgEl}${xl}
-    <line id="cross" x1="0" y1="${PT}" x2="0" y2="${H-PB}" stroke="#F2E9D8" stroke-width="1" opacity="0"/>
-    <circle id="cdot" r="4.5" fill="${m.color}" stroke="#0A0D14" stroke-width="2" opacity="0"/>
-    <rect id="hit" x="${PL}" y="${PT}" width="${W-PL-PR}" height="${H-PT-PB}" fill="transparent"/>
-  </svg>`;
-  const svg=$("#chartSvg"),tip=$("#tip"),cross=$("#cross"),dot=$("#cdot");
-  svg.addEventListener("pointermove",e=>{
-    const r=svg.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*W;
-    let i=Math.round((x-PL)/step);i=Math.max(0,Math.min(rows.length-1,i));
-    const px=X(i),py=Y(rows[i].v);
-    cross.setAttribute("x1",px);cross.setAttribute("x2",px);cross.setAttribute("opacity",".4");
-    dot.setAttribute("cx",px);dot.setAttribute("cy",py);dot.setAttribute("opacity","1");
-    tip.innerHTML=`<b>${rows[i].date}</b> · ${m.label}: <b>${m.fmt(rows[i].v)}</b>`;
-    tip.style.opacity="1";const left=px/W*100;tip.style.left=(left>62?left-30:left+2)+"%";
-  });
-  svg.addEventListener("pointerleave",()=>{tip.style.opacity="0";cross.setAttribute("opacity","0");dot.setAttribute("opacity","0");});
-  $$("#metricTabs .tab").forEach(t=>{t.classList.toggle("active",t.dataset.m===state.chart.metric);t.setAttribute("aria-selected",t.dataset.m===state.chart.metric);});
-}
-function saveChartPref(){try{localStorage.setItem(CHARTPREF,JSON.stringify(state.chart));}catch(e){}}
-
-/* ================= editor: days table ================= */
-function renderTable(){
-  let idx=daily().map((r,i)=>i);
-  if(state.sortDesc)idx.reverse();
-  const f=$("#dateFilter").value.trim();const ef=$("#errFilter").checked;
-  idx=idx.filter(i=>{const r=daily()[i];return(!f||r.date.includes(f))&&(!ef||r.failures>0);});
-  $("#daysBody").innerHTML=idx.map(i=>{const r=daily()[i];return `<tr>
-    <td><input type="date" value="${r.date}" data-i="${i}" data-k="date"></td>
-    <td><input type="number" value="${r.codes}" data-i="${i}" data-k="codes" min="0"></td>
-    <td><input type="number" value="${r.upd}" data-i="${i}" data-k="upd" min="0"></td>
-    <td><input type="number" value="${r.failures}" data-i="${i}" data-k="failures" min="0"></td>
-    <td><input type="number" value="${r.p95_ms}" data-i="${i}" data-k="p95_ms" min="0"></td>
-    <td><input type="number" value="${r.queue}" data-i="${i}" data-k="queue" min="0"></td>
-    <td><button class="del" data-delday="${i}" title="Удалить день">×</button></td></tr>`;}).join("");
-  $("#sortBtn").textContent=state.sortDesc?"дата ↓":"дата ↑";
-}
-function syncMeta(){const d=daily();d.sort((a,b)=>a.date<b.date?-1:1);state.data.meta.updated=d.length?d[d.length-1].date:state.data.meta.updated;}
-let liveTimer=null;
-function liveMetricRefresh(){clearTimeout(liveTimer);liveTimer=setTimeout(()=>{syncMeta();renderCards();renderChart();renderFreshness();},250);}
-
-/* ================= draft / export ================= */
-let draftTimer=null;
-function markDirty(){state.dirty=true;clearTimeout(draftTimer);draftTimer=setTimeout(()=>{try{localStorage.setItem(DRAFT,JSON.stringify({data:state.data,savedAt:Date.now()}));}catch(e){}updateExportStatus();},400);updateExportStatus();}
-function updateExportStatus(){
-  let saved="—";try{const p=JSON.parse(localStorage.getItem(DRAFT));if(p)saved=new Date(p.savedAt).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});}catch(e){}
-  $("#exportStatus").innerHTML=`строк метрик: <b>${daily().length}</b> · черновик: <b>${state.dirty?"сохранён в "+saved:"нет"}</b>`;
-  $("#drawerFoot").textContent="источник: "+state.source+(state.dirty?" · есть несохранённые правки":"");
-}
-function download(name,text,type){const b=new Blob([text],{type:type||"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
-function exportData(){download("data.json",JSON.stringify(state.data,null,2));toast("data.json скачан — замени файл в репозитории и закоммить");}
-async function copyText(t,msg){try{await navigator.clipboard.writeText(t);toast(msg||"Скопировано");}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();toast(msg||"Скопировано");}}
-function applyJson(text){
-  try{const d=JSON.parse(text);if(!d.meta||!d.metrics)throw new Error("нужны поля meta и metrics");
-    ensureDaily(d);state.data=d;state.dirty=true;renderAll();markDirty();$("#jsonErr").textContent="";toast("JSON применён");return true;}
-  catch(e){$("#jsonErr").textContent="Ошибка JSON: "+e.message;return false;}
-}
-function toast(msg,undo){
-  const t=document.createElement("div");t.className="toast";t.innerHTML=`<span>${esc(msg)}</span>`;
-  if(undo){const b=document.createElement("button");b.textContent="Отменить";b.onclick=()=>{undo();t.remove();};t.appendChild(b);}
-  $("#toasts").appendChild(t);setTimeout(()=>t.remove(),6500);
-}
-
-/* ================= render all / editing ================= */
-function renderAll(){
-  refreshBindings();renderHeroChips();renderTimeline();renderCases();renderPillars();renderStack();renderContacts();
-  renderFreshness();renderCards();renderChart();renderTable();updateExportStatus();
-  $("#promptPre").textContent=AGENT_PROMPT;
-}
-function setEditing(on){
-  state.editing=on;document.body.classList.toggle("editing",on);
-  const b=$("#editBtn");b.setAttribute("aria-pressed",on);b.textContent=on?"✓ Готово":"✎ Правки";
-  renderAll();
-  if(on){openDrawer();toast("Режим правок: кликни любой текст. Цифры — в панели «Дни». Esc — выход.");}
-  else closeDrawer();
-}
-function openDrawer(){$("#drawer").classList.add("open");$("#jsonArea").value=JSON.stringify(state.data,null,2);}
-function closeDrawer(){$("#drawer").classList.remove("open");}
-
-/* ================= events ================= */
-function initEvents(){
-  $("#editBtn").onclick=()=>setEditing(!state.editing);
-  $("#howEditBtn").onclick=()=>setEditing(true);
-  $("#drawerClose").onclick=closeDrawer;
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#drawer").classList.contains("open"))closeDrawer();else if(state.editing)setEditing(false);}});
-  document.addEventListener("input",e=>{
-    const el=e.target.closest("[data-t]");
-    if(el&&state.editing){setPath(state.data,el.dataset.t,el.textContent);markDirty();}
-  });
-  document.addEventListener("click",e=>{
-    const act=e.target.closest("[data-act]");
-    if(act){const list=act.dataset.list,i=+act.dataset.i,a=act.dataset.act;const arr=getPath(state.data,list);
-      if(a==="del"){const item=arr[i];arr.splice(i,1);renderAll();markDirty();toast("Удалено",()=>{arr.splice(i,0,item);renderAll();markDirty();});}
-      if(a==="up"&&i>0){[arr[i-1],arr[i]]=[arr[i],arr[i-1]];renderAll();markDirty();}
-      if(a==="down"&&i<arr.length-1){[arr[i+1],arr[i]]=[arr[i],arr[i+1]];renderAll();markDirty();}
-      return;}
-    const add=e.target.closest("[data-add]");
-    if(add){const l=add.dataset.add;
-      if(l==="timeline")state.data.path.items.push({era:"Новый этап",title:"Заголовок этапа",text:"Что happened и что это дало команде."});
-      if(l==="cases")state.data.cases.items.push({tag:"новый кейс",title:"Название расследования",symptom:"Что увидели.",trace:"Что проверили.",root:"Что нашли.",fix:"Как починили.",rule:"Правило на будущее."});
-      if(l==="stack")state.data.stack.chips.push("Новая технология");
-      renderAll();markDirty();return;}
-    const dd=e.target.closest("[data-delday]");
-    if(dd){const i=+dd.dataset.delday;const item=daily()[i];daily().splice(i,1);syncMeta();renderCards();renderChart();renderFreshness();renderTable();markDirty();
-      toast("День "+item.date+" удалён",()=>{daily().splice(i,0,item);syncMeta();renderCards();renderChart();renderFreshness();renderTable();markDirty();});}
-  });
-  /* drawer tabs */
-  $$(".drawer-tabs .tab").forEach(t=>t.onclick=()=>{
-    $$(".drawer-tabs .tab").forEach(x=>x.classList.toggle("active",x===t));
-    $$(".d-panel").forEach(p=>p.classList.toggle("active",p.id==="panel-"+t.dataset.tab));
-    if(t.dataset.tab==="json")$("#jsonArea").value=JSON.stringify(state.data,null,2);
-    if(t.dataset.tab==="export")updateExportStatus();
-  });
-  /* days table */
-  $("#daysBody").addEventListener("input",e=>{
-    const inp=e.target.closest("input[data-k]");if(!inp)return;
-    const i=+inp.dataset.i,k=inp.dataset.k;
-    daily()[i][k]=k==="date"?inp.value:Math.max(0,Number(inp.value)||0);
-    liveMetricRefresh();markDirty();
-  });
-  $("#daysBody").addEventListener("change",e=>{if(e.target.dataset.k==="date"){syncMeta();renderTable();renderFreshness();}});
-  $("#sortBtn").onclick=()=>{state.sortDesc=!state.sortDesc;renderTable();};
-  $("#dateFilter").oninput=renderTable;$("#errFilter").onchange=renderTable;
-  $("#addDay").onclick=()=>{
-    const date=$("#aDate").value;if(!date){toast("Укажи дату");return;}
-    const row={date,codes:+$("#aCodes").value||0,upd:+$("#aUpd").value||0,failures:+$("#aFail").value||0,p95_ms:+$("#aP95").value||0,queue:+$("#aQueue").value||0};
-    const ex=daily().findIndex(r=>r.date===date);
-    if(ex>=0){daily()[ex]=row;toast("День "+date+" обновлён");}else{daily().push(row);toast("День "+date+" добавлен");}
-    syncMeta();renderCards();renderChart();renderFreshness();renderTable();markDirty();
-  };
-  /* json */
-  $("#jsonShow").onclick=()=>{$("#jsonArea").value=JSON.stringify(state.data,null,2);$("#jsonErr").textContent="";};
-  $("#jsonApply").onclick=()=>applyJson($("#jsonArea").value);
-  /* export */
-  $("#dlData").onclick=exportData;$("#dlData2").onclick=exportData;
-  $("#copyJson").onclick=()=>copyText(JSON.stringify(state.data,null,2),"JSON скопирован");
-  $("#importBtn").onclick=()=>$("#importFile").click();
-  $("#importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>applyJson(r.result);r.readAsText(f);e.target.value="";};
-  $("#resetBtn").onclick=()=>{const snap=clone(state.data);state.data=clone(state.base);state.dirty=false;try{localStorage.removeItem(DRAFT);}catch(e){}renderAll();toast("Сброшено к опубликованной версии",()=>{state.data=snap;state.dirty=true;renderAll();markDirty();});};
-  /* prompt */
-  $("#copyPrompt").onclick=()=>copyText(AGENT_PROMPT,"Промпт скопирован — отдай агенту целиком");
-  $("#dlPrompt").onclick=()=>download("agent-prompt.md",AGENT_PROMPT,"text/markdown");
-  $("#copyCurl").onclick=()=>copyText("curl "+state.data.contact.resume,"Команда скопирована");
-  /* chart controls */
-  $("#metricTabs").innerHTML=Object.entries(METRICS).map(([k,m])=>`<button class="tab" role="tab" data-m="${k}" style="--tc:${m.color}">${m.label}</button>`).join("");
-  $("#metricTabs").addEventListener("click",e=>{const t=e.target.closest("[data-m]");if(!t)return;state.chart.metric=t.dataset.m;saveChartPref();renderChart();});
-  $("#rangeSel").value=String(state.chart.range);
-  $("#rangeSel").onchange=e=>{state.chart.range=+e.target.value;saveChartPref();renderChart();};
-  $("#avgToggle").setAttribute("aria-pressed",state.chart.avg);
-  $("#avgToggle").onclick=e=>{state.chart.avg=!state.chart.avg;e.currentTarget.setAttribute("aria-pressed",state.chart.avg);saveChartPref();renderChart();};
-  $("#wkToggle").setAttribute("aria-pressed",state.chart.weekends);
-  $("#wkToggle").onclick=e=>{state.chart.weekends=!state.chart.weekends;e.currentTarget.setAttribute("aria-pressed",state.chart.weekends);saveChartPref();renderChart();};
-  $("#csvBtn").onclick=()=>{const rows=slice(state.chart.metric,state.chart.range);download(state.chart.metric+".csv","date,"+state.chart.metric+"\n"+rows.map(r=>r.date+","+r.v).join("\n"),"text/csv");toast("CSV скачан");};
-  $("#svgBtn").onclick=()=>{const svg=$("#chartSvg").cloneNode(true);svg.setAttribute("xmlns","http://www.w3.org/2000/svg");svg.setAttribute("width","860");svg.setAttribute("height","280");const bg=document.createElementNS("http://www.w3.org/2000/svg","rect");bg.setAttribute("width","860");bg.setAttribute("height","280");bg.setAttribute("fill","#121829");svg.insertBefore(bg,svg.firstChild);download("chart.svg",new XMLSerializer().serializeToString(svg),"image/svg+xml");toast("SVG скачан");};
-  $("#aDate").value=iso(new Date());
-}
-
-/* ================= scroll: spy, reveal, parallax ================= */
-function initScroll(){
-  const links=$$("#navLinks a");
-  const spy=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(l=>l.classList.toggle("active",l.getAttribute("href")==="#"+en.target.id));}});},{rootMargin:"-40% 0px -55% 0px"});
-  $$("main section[id]").forEach(s=>spy.observe(s));
-  const rev=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");rev.unobserve(en.target);}});},{threshold:.12});
-  $$(".reveal").forEach(el=>rev.observe(el));
-  let tick=false;
-  window.addEventListener("scroll",()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{const y=window.scrollY;$("#aurora").style.transform=`translateY(${y*0.06}px)`;tick=false;});},{passive:true});
-}
-
-/* ================= boot ================= */
-document.addEventListener("DOMContentLoaded",()=>{initEvents();loadData().then(initScroll);});
-</script>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<script src="assets/js/main.js"></script>
 </body>
 </html>
