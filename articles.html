@@ -209,6 +209,164 @@ psql -c "SELECT ..."                        # состояние данных</c
     <h3>Побочный эффект</h3>
     <p>Обязательная проверка заставляет держать документацию в порядке: иначе агенту нечего скормить и не с чем сверять результат. В итоге агент не «делает работу за меня», а заставляет меня делать её дисциплинированнее.</p>
   </article>
+
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Практика · ~30 мин</div>
+    <h2 style="margin-top:.2rem">Как развернуть такую платформу с нуля: пошаговый гайд</h2>
+    <p>Это не теория, а порядок, в котором мы поднимали платформу. Если идти по шагам, на любом сервере (даже одной машине) получится рабочая среда, на которую сервисы встают за дни. Всё ниже — обобщённо: имена, адреса и креденшилы замените на свои.</p>
+
+    <h3>Шаг 0. Железо и система</h3>
+    <pre><code># Диски под отказоустойчивость: RAID1/RAID10 (аппаратный или mdadm)
+# Установка Ubuntu Server LTS, статический IP, SSH-доступ
+sudo useradd -m -s /bin/bash deployer
+sudo usermod -aG sudo deployer
+sudo apt update && sudo apt install -y curl git htop jq</code></pre>
+    <p>Что важно на этом шаге: решить, кто и откуда подключается, под каким пользователем, где логи. Дальше от этого зависит вся безопасность.</p>
+
+    <h3>Шаг 1. Оркестратор</h3>
+    <pre><code># K3s одной командой тянет containerd, etcd и контроллеры
+curl -sfL https://get.k3s.io | sh -
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+kubectl get nodes          # должно быть Ready
+# Если предпочитаете чистый Docker — поставьте его отдельно,
+# но K3s уже включает рантайм и управляющую плоскость.</code></pre>
+
+    <h3>Шаг 2. Базовые инструменты</h3>
+    <pre><code>curl https://get.helm.sh/helm-v3.x.y-linux-amd64.tar.gz | tar xz
+sudo mv linux-amd64/helm /usr/local/bin/helm
+kubectl create namespace apps</code></pre>
+
+    <h3>Шаг 3. Redis — очереди и события</h3>
+    <pre><code>helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install redis bitnami/redis --namespace apps
+redis-cli -h redis.apps.svc ping   # PONG</code></pre>
+    <p>Сразу включите auth и bind на локальный адрес. Redis без пароля на 0.0.0.0 — это открытая дверь.</p>
+
+    <h3>Шаг 4. nginx — edge</h3>
+    <pre><code>sudo apt install -y nginx
+# пример upstream на сервис внутри кластера
+# /etc/nginx/conf.d/app.conf
+upstream app { server 127.0.0.1:31080; }
+server { listen 80; server_name app.example.local;
+  location / { proxy_pass http://app; } }</code></pre>
+
+    <h3>Шаг 5. CI/CD — GitLab + runner</h3>
+    <pre><code># GitLab Omnibus или docker; затем регистрация runner
+gitlab-runner register \
+  --url https://gitlab.example.local \
+  --token &lt;RUNNER_TOKEN&gt; \
+  --executor shell --tag-list deploy</code></pre>
+    <p>Runner на той же машине — просто и работает. Деплой из CI не делайте императивным — дальше будет GitOps.</p>
+
+    <h3>Шаг 6. Private registry</h3>
+    <pre><code>docker run -d --name registry -p 5000:5000 \
+  -v /data/registry:/var/lib/registry registry:2
+# включите basic-auth (htpasswd) и TLS, иначе секреты будут летать открыто</code></pre>
+
+    <h3>Шаг 7. GitOps — ArgoCD</h3>
+    <pre><code>kubectl create namespace argocd
+helm repo add argo https://argoproj.github.io/argo-helm
+helm install argocd argo/argo-cd --namespace argocd
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 -d</code></pre>
+    <pre><code># Пример Application: кластер сам приводит себя к Git
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: app, namespace: argocd }
+spec:
+  destination: { namespace: apps, server: https://kubernetes.default.svc }
+  source:
+    repoURL: https://gitlab.example.local/app/config.git
+    path: deploy/helm
+    targetRevision: main
+  syncPolicy: { automated: { prune: true } }</code></pre>
+
+    <h3>Шаг 8. Секреты — Vault</h3>
+    <pre><code>helm repo add hashicorp https://helm.releases.hashicorp.com
+helm install vault hashicorp/vault --namespace vault --set server.dev.enabled=true
+# для прода: standalone/Raft + unseal, не dev-режим
+export VAULT_ADDR=http://127.0.0.1:8200
+vault kv put secret/app password=CHANGE_ME</code></pre>
+    <p>Правило: секреты не в Git. В CI и в K8s — только ссылки на Vault или Secret.</p>
+
+    <h3>Шаг 9. Хранилище — MinIO</h3>
+    <pre><code>helm install minio minio --namespace apps \
+  --set rootUser=minio --set rootPassword=CHANGE_ME \
+  --set service.type=ClusterIP</code></pre>
+    <p>S3-совместимое хранилище: артефакты, бэкапы, веса моделей.</p>
+
+    <h3>Шаг 10. Наблюдаемость — Prometheus + Grafana + Loki</h3>
+    <pre><code># Prometheus + экспортёры (например kube-prometheus-stack)
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prom prometheus-community/kube-prometheus-stack --namespace monitoring
+
+# Loki (single-binary режим — просто и дёшево)
+helm install loki grafana/loki --namespace monitoring --set singleBinary.replicas=1</code></pre>
+    <pre><code># Promtail: читает journald, метка unit — чтобы фильтровать по воркеру
+server: { http_listen_port: 9080 }
+clients: [{ url: http://loki.monitoring:3100/loki/api/v1/push }]
+scrape_configs:
+- job_name: system
+  journal: { path: /var/log/journal, labels: { job: systemd } }
+  relabel_configs:
+  - source_labels: [__journal__systemd_unit]
+    target_label: unit</code></pre>
+    <p>Урок из практики: если Grafana не видит Loki — проверьте прокси и адрес datasource, а не чините сервисы вслепую.</p>
+
+    <h3>Шаг 11. Pushgateway — метрики batch-джобов</h3>
+    <pre><code># Короткоживущие CronJob'ы сами пушат метрики
+curl -X POST --data-binary "job_duration_seconds 42" \
+  http://pushgateway.monitoring:9091/metrics/job/app</code></pre>
+
+    <h3>Шаг 12. Алертинг</h3>
+    <pre><code># systemd timer каждые 5 минут: health-check + два канала
+# короткий алерт — в Telegram, подробный — в корпоративный мессенджер
+# статусы запоминаются: алерт уходит только при переходе ок → не ок
+0/5 * * * * /opt/ops-alerts/healthcheck.sh</code></pre>
+
+    <h3>Шаг 13. Слой данных</h3>
+    <pre><code>sudo apt install -y postgresql
+sudo -u postgres createdb app
+psql -c "CREATE SCHEMA prod; CREATE SCHEMA test;"   # мультиокружение на схемах</code></pre>
+    <p>Для роста объёмов — распределённый форк PostgreSQL (шардинг без отказа от SQL). Начните с обычного инстанса.</p>
+
+    <h3>Шаг 14. Шаблон сервиса: CI → GitOps</h3>
+    <pre><code># Dockerfile: многоступенчатый, непривилегированный пользователь
+FROM python:3.12-slim
+RUN groupadd -r app && useradd -r -g app app
+COPY --from=build /app/.venv /app/.venv
+COPY --from=build /app /app
+USER app
+CMD ["python", "main.py"]</code></pre>
+    <pre><code># .gitlab-ci.yml: CI собирает образ и двигает тег, ArgoCD применяет
+stages: [test, build, gitops]
+variables: { IMAGE_TAG: "$CI_COMMIT_SHORT_SHA" }
+test:  { script: [ "uv sync --frozen", "uv run pytest -q" ] }
+build: { script:
+  - docker build -t "registry.example.local/app:$IMAGE_TAG" .
+  - docker push "registry.example.local/app:$IMAGE_TAG" }
+gitops: { stage: gitops, only: [main], script:
+  - sed -i "s|^  tag: .*|  tag: \"$IMAGE_TAG\"|" deploy/helm/values.yaml
+  - git commit -m "ci: deploy $IMAGE_TAG" || true
+  - git push origin HEAD:main }</code></pre>
+
+    <h3>Шаг 15. Операционный веб-монитор</h3>
+    <pre><code># Лёгкий FastAPI с /health: статусы, очереди, свежие события
+# Это не замена Grafana, а быстрый операционный срез «что сейчас»</code></pre>
+
+    <h3>Шаг 16. Чек-лист перед «боем»</h3>
+    <ul>
+      <li>Идемпотентность на входе — ключ действительно уникальный.</li>
+      <li>Dry-run: внешние каналы включаются по одному.</li>
+      <li>Gate перед записью в БД.</li>
+      <li>requests/limits и непривилегированный контейнер — с первого дня.</li>
+      <li>Секреты в Vault/Secret, не в Git.</li>
+      <li>RED-метрики и алерты — до инцидента, а не после.</li>
+    </ul>
+
+    <h3>Что дальше</h3>
+    <p>Один узел — стартовая точка. Дальше: multi-node, PDB/anti-affinity, регулярные backup/restore-проверки. Но даже на одном узле по этому гайду получается управляемая платформа — а не набор скриптов на удаче.</p>
+  </article>
 </main>
 <footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
 <script src="assets/js/main.js"></script>
