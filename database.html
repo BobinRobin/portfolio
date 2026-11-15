@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>База данных</title>
+<title>Слой данных: TBase, Qdrant RAG, Redis Streams и Lock-Redis</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -11,48 +11,43 @@
   <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
   <nav class="links">
     <a href="index.html">Главная</a>
-    <a href="infrastructure.html">Инфраструктура</a>
-    <a href="integrations.html">Интеграции</a>
-    <a href="database.html">База данных</a>
-    <a href="incidents.html">Инциденты</a>
-    <a href="mlops.html">MLOps</a>
-    <a href="articles.html">Статьи</a>
-    <a href="playbook.html">Playbook</a>
-    <a href="lessons.html">Уроки</a>
+    <a href="business.html">Эффективность</a>
+    <a href="incidents.html">Кейсы</a>
+    <a href="infrastructure.html">Стек</a>
+    <a href="index.html#contact">Контакты</a>
   </nav>
 </header>
 <main>
   <section class="hero">
-    <h1>Слой данных</h1>
-    <p>Два PostgreSQL с разными ролями, Redis как транспорт событий, отдельные схемы для продуктива и теста.</p>
+    <h1>Слой данных, векторный поиск и очереди</h1>
+    <p>Чёткое разделение ролей: распределённая СУБД TBase для высокообъёмных бизнес-данных, локальный PostgreSQL 16 для CI/CD, векторная БД Qdrant для RAG-знаний и два изолированных контура Redis (стримы событий + межпроцессные замки).</p>
   </section>
 
-  <h2>PostgreSQL: две разные задачи</h2>
   <div class="grid">
-    <div class="card"><div class="tag">Бизнес-данные</div><h3>TBase — распределённый PostgreSQL</h3>
-      <p>Основные данные маркировки и документооборота лежат на TBase — форке PostgreSQL, который добавляет распределённые таблицы и горизонтальное масштабирование.</p>
-      <ul>
-        <li>База: распределённый форк на базе PostgreSQL 10.0 (64-bit)</li>
-        <li>Причина выбора: рост объёма таблиц, шардинг с сохранением классического SQL-интерфейса</li>
-      </ul>
+    <div class="card"><div class="tag">Distributed SQL · Business</div><h3>TBase (PostgreSQL 10 · Sharded)</h3>
+      <p>Распределённая Greenplum-подобная СУБД (<code>max_connections=2500</code>). Хранит реестры кодов маркировки, УПД, витрины продаж и прайс-мониторинга. Таблицы шардируются по ключу идемпотентности (например, <code>DISTRIBUTE BY SHARD(file_md5)</code>), чтобы <code>DELETE + INSERT</code> выполнялся строго внутри одного шарда без кросс-узловых блокировок.</p>
     </div>
-    <div class="card"><div class="tag">Инструменты</div><h3>PostgreSQL 16 (локально)</h3>
-      <p>Отдельный локальный инстанс обслуживает GitLab и внутренние CI/CD-инструменты.</p>
-      <ul>
-        <li>Версия: PostgreSQL 16 (Ubuntu)</li>
-        <li>Изоляция: отказ инструментов не влияет на бизнес-контур</li>
-      </ul>
+    <div class="card"><div class="tag">Vector DB · AIOps RAG</div><h3>Qdrant (infra-knowledge · 779 векторов)</h3>
+      <p>Хранилище векторных эмбеддингов <code>BAAI/bge-m3</code> (1024d, Cosine, on-disk payload). Индексирует архитектуру, постмортемы, runbook-и и скиллы всех 6 контуров; отдаёт релевантный контекст за миллисекунды при срабатывании алертов.</p>
+    </div>
+    <div class="card"><div class="tag">Streams &amp; Distributed Locks</div><h3>Два изолированных инстанса Redis 7</h3>
+      <p>Основной <code>Redis</code> обслуживает асинхронные стримы (<code>utd:uploads</code>, <code>utd:ingest</code>, аудит) с персистентностью AOF+RDB. Выделенный <code>lock-redis (:6378)</code> отвечает за межпроцессные распределённые блокировки (<code>SET NX EX</code> + Lua release) для RPA-сессий.</p>
+    </div>
+    <div class="card"><div class="tag">Tooling &amp; Object Storage</div><h3>PostgreSQL 16 + MinIO (S3)</h3>
+      <p>Локальный PostgreSQL 16 изолирован под нужды GitLab и CI/CD. Два инстанса MinIO хранят S3-артефакты, дампы и веса моделей MLflow.</p>
     </div>
   </div>
 
-  <h2>Redis — очередь и события</h2>
-  <p>Redis используется не как кэш, а как транспорт асинхронных событий (Streams). Входные сообщения пишутся в stream, воркеры читают и обрабатывают. Это даёт буфер между приёмом и обработкой и сглаживает пики нагрузки.</p>
-
-  <h2>Мультиокружение на уровне схем</h2>
-  <p>Продуктив и тест живут в разных схемах одной базы: отдельные схемы для продуктива и теста. Переключение реализовано на уровне кода (через contextvars и middleware в Python) — тестировать интеграции можно без дублирования инфраструктуры БД.</p>
-
+  <h2>Практические особенности работы с TBase</h2>
+  <table>
+    <tr><th>Особенность СУБД TBase</th><th>Инженерное решение в коде</th></tr>
+    <tr><td><code>UNIQUE</code> индекс обязан включать колонку шардирования</td><td>Выбор колонки дистрибуции по provenance-ключу (<code>file_md5</code>) и идемпотентная перезапись батча в одной транзакции</td></tr>
+    <tr><td><code>CREATE TABLE AS SELECT</code> не принимает bind-параметры (<code>$1</code>)</td><td>Использование явных схем таблиц и параметризованных <code>INSERT ... SELECT</code></td></tr>
+    <tr><td><code>SET statement_timeout = $1</code> не поддерживает плейсхолдеры</td><td>Установка таймаутов через <code>SELECT set_config('statement_timeout', %s, false)</code></td></tr>
+    <tr><td>Изоляция окружений без дублирования кластера БД</td><td>Разделение продуктивных и тестовых схем с переключением через <code>contextvars</code> и middleware</td></tr>
+  </table>
 </main>
-<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">обновлено 15.11.2026</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

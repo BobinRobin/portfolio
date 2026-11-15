@@ -3,67 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MLOps</title>
+<title>MLOps &amp; AIOps: Qdrant RAG, Autoheal &amp; MLflow</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>
+  <nav class="links">
     <a href="index-en.html">Home</a>
-    <a href="infrastructure-en.html">Infrastructure</a>
-    <a href="integrations-en.html">Integrations</a>
-    <a href="database-en.html">Database</a>
-    <a href="incidents-en.html">Incidents</a>
-    <a href="mlops-en.html">MLOps</a>
-    <a href="articles-en.html">Articles</a>
-    <a href="playbook-en.html">Playbook</a>
-    <a href="lessons-en.html">Lessons</a>
-  </nav></header>
+    <a href="business-en.html">Impact</a>
+    <a href="incidents-en.html">Cases</a>
+    <a href="infrastructure-en.html">Stack</a>
+    <a href="index-en.html#contact">Contact</a>
+  </nav>
+</header>
 <main>
   <section class="hero">
-    <h1>MLOps</h1>
-    <p>What has been built by hand, and where the next stage is. Production model serving is still ahead.</p>
+    <h1>MLOps &amp; AIOps in Production</h1>
+    <p>Practical ML infrastructure in action: a live Qdrant vector knowledge base (779 chunks indexed with BAAI/bge-m3), a hybrid self-healing orchestrator, a running MLflow server in K3s, and a reproducible ML pipeline with 88% test coverage.</p>
   </section>
-  <h2>Model pipeline</h2>
-  <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MLOps pipeline" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
-    <defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
-    <g font-family="sans-serif" font-size="12" fill="#e7f2ec">
-      <rect x="10" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="65" y="81" text-anchor="middle">Data (ETL)</text>
-      <rect x="150" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="205" y="81" text-anchor="middle">Train / CI</text>
-      <rect x="290" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#34d399"/><text x="345" y="81" text-anchor="middle">MLflow (Registry)</text>
-      <rect x="430" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="485" y="81" text-anchor="middle">MinIO (S3)</text>
-      <rect x="570" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="625" y="81" text-anchor="middle">KServe (CD)</text>
-      <line x1="120" y1="77" x2="148" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar3)"/>
-      <line x1="260" y1="77" x2="288" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar3)"/>
-      <line x1="400" y1="77" x2="428" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar3)"/>
-      <line x1="540" y1="77" x2="568" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#ar3)"/>
-      <rect x="570" y="115" width="110" height="28" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="625" y="133" text-anchor="middle">Monitoring</text>
-      <line x1="625" y1="99" x2="625" y2="113" stroke="#8aa89a" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar3)"/>
+
+  <h2>AIOps &amp; MLOps Architecture</h2>
+  <svg viewBox="0 0 760 175" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AIOps RAG and MLOps diagram" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px;margin-bottom:1.5rem">
+    <defs><marker id="arr3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
+    <g font-family="sans-serif" font-size="11.5" fill="#e7f2ec">
+      <rect x="12" y="25" width="130" height="48" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="77" y="47" text-anchor="middle">Docs · Postmortems</text><text x="77" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">Runbooks · Skills</text>
+      <rect x="168" y="25" width="130" height="48" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="233" y="47" text-anchor="middle">BAAI/bge-m3</text><text x="233" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">1024d · cortex :6335</text>
+      <rect x="324" y="25" width="135" height="48" rx="6" fill="#0e2019" stroke="#34d399"/><text x="391" y="47" text-anchor="middle">Qdrant Vector DB</text><text x="391" y="62" text-anchor="middle" font-size="9.5" fill="#34d399">infra-knowledge (779)</text>
+      <rect x="485" y="25" width="130" height="48" rx="6" fill="#0e2019" stroke="#34d399"/><text x="550" y="47" text-anchor="middle">Hybrid Autoheal</text><text x="550" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">Watcher + Runbooks</text>
+      <rect x="640" y="25" width="108" height="48" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="694" y="47" text-anchor="middle">eLink &amp; TG</text><text x="694" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">Metrics :9310</text>
+      <line x1="142" y1="49" x2="166" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="298" y1="49" x2="322" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="459" y1="49" x2="483" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="615" y1="49" x2="638" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+
+      <rect x="12" y="105" width="180" height="46" rx="6" fill="#0a1a14" stroke="#1c3328"/><text x="102" y="126" text-anchor="middle">ML Pipeline (uv + pytest)</text><text x="102" y="141" text-anchor="middle" font-size="9.5" fill="#8aa89a">37 tests · 88% coverage</text>
+      <rect x="220" y="105" width="180" height="46" rx="6" fill="#0a1a14" stroke="#34d399"/><text x="310" y="126" text-anchor="middle">MLflow Server + DB</text><text x="310" y="141" text-anchor="middle" font-size="9.5" fill="#34d399">Running in K3s + MinIO S3</text>
+      <rect x="428" y="105" width="320" height="46" rx="6" fill="#0a1a14" stroke="#1c3328"/><text x="588" y="126" text-anchor="middle">Safe LLM Guardrails</text><text x="588" y="141" text-anchor="middle" font-size="9.5" fill="#8aa89a">pre-check → dry-run → backup → whitelist apply → verify</text>
     </g>
   </svg>
+
   <div class="grid">
-    <div class="card"><div class="tag">ML project</div><h3>Taxi fare prediction</h3>
-      <p>A complete ML pipeline: data loading, preprocessing, features, model, inference.</p>
-      <ul><li>37 tests, 88% coverage</li><li>Reproducibility: uv + lockfile</li><li>flake8, pylint, src/tests/docs layout</li><li>Documentation: mkdocs</li></ul>
-      <p>A course project taken to production-coding quality.</p>
+    <div class="card">
+      <div class="tag">Production RAG · Qdrant</div>
+      <h3>Infrastructure Vector Knowledge Base (779 chunks)</h3>
+      <p><code>index_rag.py</code> splits all architecture docs, postmortems, runbooks, and skills across all 6 services into semantic sections (up to 900 chars with 100-char overlap), encodes them with <code>BAAI/bge-m3</code> (1024d, Cosine), and upserts into <code>infra-knowledge</code>. Re-indexed daily via cron at 06:10 MSK; dashboard protected behind nginx basic-auth.</p>
     </div>
-    <div class="card"><div class="tag">ML platform</div><h3>Foundation: MLflow, MinIO, KServe</h3>
-      <p>The model-lifecycle stack is deployed: experiment tracking (MLflow), object storage (MinIO), serving (KServe). Going live is the next step.</p>
+    <div class="card">
+      <div class="tag">AIOps · Hybrid Orchestrator</div>
+      <h3>Deterministic Autoheal + RAG Context Enrichment</h3>
+      <p>On any alert, <code>rag_context.py</code> (stdlib-only with safe fallback) embeds the symptom via <code>cortex (:6335)</code> and retrieves the top-3 matching incidents and runbooks from Qdrant. Known issues run whitelisted scripts (<code>dry-run → backup → apply → verify</code>); unknown issues deliver RAG-enriched context to eLink.</p>
     </div>
-    <div class="card"><div class="tag">AI-assisted</div><h3>Working with AI agents</h3>
-      <p>I use corporate AI agents as a tool: task decomposition, review and debugging of generated code, tests. The decision is human.</p>
+    <div class="card">
+      <div class="tag">ML Platform · K3s</div>
+      <h3>MLflow + MinIO + Tested ML Pipeline</h3>
+      <p><code>mlflow-server</code>, <code>mlflow-db</code>, and <code>MinIO</code> object storage run in K3s. The public repository <a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> demonstrates a production-grade ML pipeline: 37 unit tests, 88% coverage, strict reproducibility via <code>uv.lock</code>, <code>flake8/pylint</code>, and <code>mkdocs</code>.</p>
     </div>
   </div>
-  <h2>Maturity levels (my own yardstick)</h2>
-  <p>I use the public MLOps maturity framework: manual process → automated training → full model CI/CD. Current state: DevOps foundation done, ML project at production-coding quality, platform deployed. The next level is end-to-end automation and production model monitoring.</p>
-  <h2>Roadmap</h2>
-  <div class="timeline">
-    <div class="step"><b>DevOps foundation</b><span>Infrastructure, CI/CD, observability, secrets.</span></div>
-    <div class="step"><b>ML project</b><span>Pipeline with tests and coverage, repo on GitHub.</span></div>
-    <div class="step"><b>ML platform in production</b><span>MLflow/MinIO/KServe, experiments, model registry.</span></div>
-    <div class="step"><b>Model monitoring</b><span>Drift, production quality, alerts.</span></div>
-  </div>
-</main><footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+</main>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">updated 2026-11-15</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

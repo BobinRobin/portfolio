@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rodion Murashkin — DevOps / Platform Engineer</title>
-<meta name="description" content="DevOps / Platform Engineer: platform from scratch, GitOps, integrations, incidents, MLOps, alerting.">
-<meta property="og:title" content="Rodion Murashkin — DevOps / Platform Engineer">
-<meta property="og:description" content="Platform, integrations, incidents, MLOps. Platform engineer portfolio.">
+<title>Rodion Murashkin — Platform, DevOps &amp; MLOps Engineer</title>
+<meta name="description" content="Engineering portfolio of Rodion Murashkin: 6 production contours on K3s &amp; systemd, GitOps (ArgoCD + Vault), Qdrant RAG knowledge base (779 bge-m3 vectors), Hybrid Autoheal Orchestrator, distributed TBase PostgreSQL.">
+<meta property="og:title" content="Rodion Murashkin — Platform, DevOps &amp; MLOps Engineer">
+<meta property="og:description" content="6 production contours, GitOps, Qdrant RAG + Autoheal, high-volume enterprise integrations, distributed TBase.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bobinrobin.github.io/portfolio/index-en.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/91057948?v=4">
@@ -14,61 +14,259 @@
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>
+  <nav class="links">
     <a href="index-en.html">Home</a>
     <a href="business-en.html">Impact</a>
     <a href="incidents-en.html">Cases</a>
     <a href="infrastructure-en.html">Stack</a>
     <a href="index-en.html#contact">Contact</a>
-  </nav></header>
+  </nav>
+</header>
 <main>
-  <section class="hero">
-    <img class="avatar" src="https://avatars.githubusercontent.com/u/91057948?v=4" alt="Rodion Murashkin" width="104" height="104">
-    <div class="badge">Open to opportunities · DevOps / Platform Engineer</div>
-    <h1>Rodion Murashkin</h1>
-    <div class="sub">DevOps / Platform Engineer</div>
-    <p>I build and operate platforms and integrations: from bare metal to alerting. Broad profile — development, MLOps, analytics, business processes from logistics to finance, retail and GTM.</p>
-    <a class="btn" href="resume.pdf">Download resume (PDF)</a>
+  <section class="hero hero-split">
+    <div>
+      <div class="badge"><span class="pulse-dot"></span>6 Production Contours · Qdrant RAG · Autoheal Live</div>
+      <div class="hero-head">
+        <img class="avatar" src="https://avatars.githubusercontent.com/u/91057948?v=4" alt="Rodion Murashkin" width="76" height="76">
+        <div>
+          <h1>Rodion Murashkin</h1>
+          <div class="sub">Platform, DevOps &amp; MLOps Engineer · Data &amp; Enterprise Integrations</div>
+        </div>
+      </div>
+      <p>I build and operate a production server platform (112 CPU cores, 376 GiB RAM, K3s, Docker, systemd, GitOps via ArgoCD and HashiCorp Vault) running 6 business contours, a vector knowledge base in <strong>Qdrant (779 bge-m3 chunks)</strong>, and a hybrid self-healing orchestrator. Bridging infrastructure, Python/SQL code, distributed TBase PostgreSQL, and end-to-end business flows across customs marking, e-invoicing, Retail, GTM, and Finance in 4 countries.</p>
+      <div class="hero-actions">
+        <a class="btn" href="resume.pdf">Download Resume (PDF)</a>
+        <a class="btn-secondary" href="#architecture">Architecture &amp; 6 Contours ↓</a>
+      </div>
+    </div>
+
+    <div class="arch-card" aria-label="Live Platform Topology">
+      <div class="arch-card-head">
+        <span>Platform Topology · Bare-Metal 112C / 376G</span>
+        <span class="live">● LIVE TELEMETRY</span>
+      </div>
+      <svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Five-layer platform architecture" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:10px">
+        <g font-family="sans-serif" font-size="10.5" fill="#e7f2ec">
+          <rect x="10" y="10" width="440" height="44" rx="6" fill="#0a1a14" stroke="#1c3328"/>
+          <text x="20" y="25" font-size="9" fill="#34d399" font-weight="bold">01 · GITOPS &amp; IAC</text>
+          <text x="20" y="42" fill="#8aa89a">GitLab CI (uv · ruff · mypy · pytest) → Registry → ArgoCD + Vault + Terraform mirror</text>
+
+          <rect x="10" y="62" width="440" height="72" rx="6" fill="#0e2019" stroke="#34d399"/>
+          <text x="20" y="77" font-size="9" fill="#34d399" font-weight="bold">02 · 6 PRODUCTION CONTOURS (K3S + SYSTEMD)</text>
+          <rect x="20" y="84" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="86" y="98" text-anchor="middle">State Marking</text>
+          <rect x="164" y="84" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="230" y="98" text-anchor="middle">E-Invoicing / UPD</text>
+          <rect x="308" y="84" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="374" y="98" text-anchor="middle">Sellout ETL (10m)</text>
+          <rect x="20" y="108" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="86" y="122" text-anchor="middle">Delivery Allocation</text>
+          <rect x="164" y="108" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="230" y="122" text-anchor="middle">Price Monitoring</text>
+          <rect x="308" y="108" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="374" y="122" text-anchor="middle">Mail Relay Poller</text>
+
+          <rect x="10" y="142" width="440" height="46" rx="6" fill="#0a1a14" stroke="#1c3328"/>
+          <text x="20" y="157" font-size="9" fill="#6ee7b7" font-weight="bold">03 · DATA, STREAMS &amp; DISTRIBUTED LOCKS</text>
+          <text x="20" y="175" fill="#8aa89a">TBase (Distributed PG10 · shard by md5) · Redis Streams · Lock-Redis (SET NX EX) · MinIO</text>
+
+          <rect x="10" y="196" width="440" height="46" rx="6" fill="#0e2019" stroke="#34d399"/>
+          <text x="20" y="211" font-size="9" fill="#34d399" font-weight="bold">04 · AIOPS: QDRANT RAG + HYBRID AUTOHEAL (:9310)</text>
+          <text x="20" y="229" fill="#e7f2ec">Qdrant infra-knowledge (779 vectors bge-m3) → Watcher (5m) → Dry-Run Runbooks → eLink/TG</text>
+
+          <rect x="10" y="250" width="440" height="40" rx="6" fill="#0a1a14" stroke="#1c3328"/>
+          <text x="20" y="265" font-size="9" fill="#8aa89a" font-weight="bold">05 · OBSERVABILITY &amp; SRE METRICS</text>
+          <text x="20" y="281" fill="#8aa89a">Prometheus · Grafana · Loki (4 Promtail) · Pushgateway · RED Exporters (:9300/:9301/:9302)</text>
+        </g>
+      </svg>
+    </div>
   </section>
 
-  <section class="stats">
-    <div class="stat"><b>2</b><span>data-exchange loops in production</span></div>
-    <div class="stat"><b>~550k</b><span>codes per day processed automatically</span></div>
-    <div class="stat"><b>0</b><span>failures in accounting statuses</span></div>
-    <div class="stat"><b>220+</b><span>signed UPDs without manual steps</span></div>
+  <section class="stats-6" aria-label="Key Platform Metrics">
+    <div class="stat-box"><span class="stat-tag">Platform</span><b>6 contours</b><span>in production (K3s + systemd + GitOps)</span></div>
+    <div class="stat-box"><span class="stat-tag">Marking</span><b>~550k</b><span>code events per day processed unattended</span></div>
+    <div class="stat-box"><span class="stat-tag">E-Invoicing → Sales</span><b>654k+</b><span>units carried to the final sales stage</span></div>
+    <div class="stat-box"><span class="stat-tag">Documents</span><b>223 UPDs</b><span>signed automatically (~0.6s per XML build)</span></div>
+    <div class="stat-box"><span class="stat-tag">AIOps &amp; RAG</span><b>779 chunks</b><span>in Qdrant (BAAI/bge-m3, 1024d) for auto-triage</span></div>
+    <div class="stat-box"><span class="stat-tag">Reliability</span><b>0 losses</b><span>in accounting failure statuses &amp; idempotent retries</span></div>
   </section>
 
-  <h2>Experience</h2>
-  <div class="experience">
-    <div class="exp"><div class="exp-head">Honor · DevOps / Platform Engineer</div><div class="exp-meta">March 2024 — present</div><p>Platform from scratch (Linux, K3s), GitOps, CI/CD, observability, Telegram+eLink alerting, external integrations, ETL, MLOps foundation, incident investigation.</p></div>
-    <div class="exp"><div class="exp-head">Shchusev Museum of Architecture · IT Specialist</div><div class="exp-meta">April 2023 — February 2024</div><p>Servers, networks and switches, 1C, e-signatures.</p></div>
-  </div>
+  <section id="architecture">
+    <h2>Architecture &amp; 6 Contours in Detail</h2>
+    <p>Switch tabs below to inspect the engineering mechanisms, failure guards, and diagnostic commands inside each layer.</p>
+    <div class="tabs-bar" role="tablist">
+      <button class="tab-btn active" data-tab-target="tab-aiops-en" type="button">01 · AIOps: Qdrant RAG &amp; Autoheal</button>
+      <button class="tab-btn" data-tab-target="tab-edo-en" type="button">02 · State Marking &amp; E-Invoicing</button>
+      <button class="tab-btn" data-tab-target="tab-locks-en" type="button">03 · Lock-Redis, Price Monitoring &amp; Relay</button>
+      <button class="tab-btn" data-tab-target="tab-platform-en" type="button">04 · Platform, TBase &amp; Hardening</button>
+    </div>
 
-  <h2>Areas</h2>
+    <div class="tab-pane active" id="tab-aiops-en">
+      <div class="tab-pane-grid">
+        <div>
+          <h3>Qdrant Vector Knowledge Base &amp; Hybrid Autoheal Orchestrator</h3>
+          <p>All architecture docs, postmortems, runbooks, and operational skills are indexed into a local <strong>Qdrant</strong> instance and wired directly into health checks and automated remediation.</p>
+          <ul>
+            <li><strong>Knowledge Corpus (`infra-knowledge`, 779 vectors):</strong> Markdown section chunking with overlap (`900 / 100` chars), multilingual <code>BAAI/bge-m3</code> embeddings (1024d) via local <code>cortex (:6335)</code>, daily cron re-indexing at 06:10 MSK, UI protected behind nginx basic-auth (<code>:8085/dashboard</code>).</li>
+            <li><strong>Detection &amp; Triage (`devops_alert` + `autoheal`, metrics `:9310`):</strong> probes all K8s namespaces, systemd workers, Redis streams, export freshness, and nightly CronJob statuses every 5 minutes.</li>
+            <li><strong>Safe Autoheal Guardrails:</strong> known issues trigger deterministic, idempotent <code>runbooks/*.sh</code> along a strict <code>pre-check → dry-run → backup → apply (whitelist) → verify → rollback</code> chain. Unknown anomalies attach top-3 Qdrant RAG chunks and route a short alert to Telegram and full context to corporate eLink.</li>
+          </ul>
+        </div>
+        <div>
+          <pre><code># Semantic search across incidents &amp; runbooks in Qdrant
+python3 query_rag.py "QR_STUCK_NOPD empty export" 3 \
+  --service marking-qr --type incident
+
+# Health check &amp; self-healing telemetry
+python3 /opt/ops-alerts/devops_alert.py check
+python3 /opt/ops-alerts/autoheal.py check
+curl -s http://127.0.0.1:9310/metrics | grep autoheal_</code></pre>
+          <div class="kv-list">
+            <div class="kv-item"><div class="kv-k">Embedding Model</div><div class="kv-v">BAAI/bge-m3 · 1024d · Cosine</div></div>
+            <div class="kv-item"><div class="kv-k">Autoheal Policy</div><div class="kv-v">Dry-run default · Whitelist apply</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab-edo-en">
+      <div class="tab-pane-grid">
+        <div>
+          <h3>State Marking &amp; E-Invoicing / UPD Pipeline</h3>
+          <p>Two tightly coupled high-volume loops that directly govern customs clearance speed, shipment release, and revenue recognition.</p>
+          <ul>
+            <li><strong>Strict XML Contracts &amp; 29,999-Code Chunking:</strong> deterministic splitting of large batches (order, sticker, import, SSCC aggregation) preserving code order so retries remain idempotent.</li>
+            <li><strong>Two-Stage Intake (`logs-only` → Redis Streams → TBase):</strong> non-blocking API intake writes raw JSONL and streams events; workers enforce the <code>WAIT_MARKING</code> gate, merge deliveries in a 30-minute window (preserving every item row and customs declaration), and trigger sales recognition after UPD signing.</li>
+            <li><strong>Bilingual RPA Exporter Guard (EN / CN-локаль):</strong> when the overseas portal silently switched UI locales between English and Chinese, selectors and date-filter reset buttons (<code>Reset / Clear / CN-Reset</code>) broke. Added bilingual selectors and column mapping (<code>QrCode / Product Date</code> для обеих локалей), unblocking 4,000 codes automatically.</li>
+          </ul>
+        </div>
+        <div>
+          <pre><code># Live loop metrics (Prometheus exporters)
+curl -s http://127.0.0.1:9300/metrics | grep marking_qr_
+curl -s http://127.0.0.1:9301/metrics | grep edo_upd_
+
+# Queue &amp; worker inspection
+systemctl status marking-sticker-pool edo-ingest-worker
+journalctl -u edo-ingest-worker -n 50 --no-pager</code></pre>
+          <div class="kv-list">
+            <div class="kv-item"><div class="kv-k">Batch Latency</div><div class="kv-v">1,200 codes in ~3s · UPD in 0.6s</div></div>
+            <div class="kv-item"><div class="kv-k">Scale</div><div class="kv-v">654,000+ units in sales_done · 223 UPDs</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab-locks-en">
+      <div class="tab-pane-grid">
+        <div>
+          <h3>Distributed Locks, Price Monitoring &amp; Mail Relay</h3>
+          <p>Four Kubernetes contours built on a unified engineering template (<code>uv</code>, <code>ruff</code>, <code>mypy --strict</code>, <code>pytest</code>, Helm, ArgoCD, Pushgateway).</p>
+          <ul>
+            <li><strong>Cross-Process Distributed Lock (`lock-redis`, `SET NX EX`):</strong> two RPA contours shared one overseas portal account and kicked out each other's sessions on overlap. Deployed a dedicated <code>lock-redis (127.0.0.1:6378)</code> with password auth, 180s TTL, 60s background heartbeat, atomic Lua token release, and an <code>O_EXCL</code> file fallback.</li>
+            <li><strong>Competitive Price Monitoring (Telegram → TBase):</strong> continuous listener + hourly <code>--catch-up</code> ingests Excel reports from groups (MTProto + Bot API, 3600s session recycling), parses target sheets, and performs shard-local idempotent replacement in TBase (<strong>56,697 rows across 783 files</strong>).</li>
+            <li><strong>Mail Forwarder (`mail-forwarder`) &amp; Sellout ETL:</strong> fault-tolerant IMAP→SMTP poller (RFC-2047 filename decoding, attachment filtering, offline stdlib-only image build) and a 10-minute Sellout Inventory CronJob.</li>
+          </ul>
+        </div>
+        <div>
+          <pre><code># Shard-local idempotent model in TBase
+CREATE TABLE analytics.retail_prices (...)
+DISTRIBUTE BY SHARD(file_md5);
+-- DELETE by file_md5 executes inside a single shard
+
+# Check Kubernetes contours &amp; lock state
+kubectl -n delivery-allocation get cronjob,jobs
+kubectl -n dns-price-monitoring get deploy,cronjob
+kubectl -n mail-forwarder get deploy,pods</code></pre>
+          <div class="kv-list">
+            <div class="kv-item"><div class="kv-k">Distributed Lock</div><div class="kv-v">TTL 180s · Heartbeat 60s · Lua release</div></div>
+            <div class="kv-item"><div class="kv-k">Price Monitoring</div><div class="kv-v">56,697 rows · 783 files · 0 duplicates</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab-platform-en">
+      <div class="tab-pane-grid">
+        <div>
+          <h3>Platform, Distributed TBase &amp; Infrastructure Hardening</h3>
+          <p>Evolution from ad-hoc scripts to a reproducible platform with strict security and observability standards.</p>
+          <ul>
+            <li><strong>Eliminating GitOps Drift &amp; Split-Brain Runtimes:</strong> retired legacy K8s worker duplicates that clashed with canonical systemd workers; moved secrets out of Git manifests into <strong>HashiCorp Vault</strong> (with a 2-minute auto-unseal timer), restoring <code>Synced / Healthy</code> state in ArgoCD.</li>
+            <li><strong>Distributed TBase (PostgreSQL 10, `max_connections=2500`):</strong> engineered around sharded table rules (UNIQUE indexes must include the shard key, CTAS rejects bind parameters, timeouts via <code>set_config</code>), separating business schemas from local PostgreSQL 16 for GitLab/CI.</li>
+            <li><strong>Terraform Geoblock Bypass &amp; Proxy Routing:</strong> configured a local provider mirror <code>~/.terraform.d/mirror</code> (18 cluster resources under IaC without reaching blocked <code>releases.hashicorp.com</code>) and removed the conflicting <code>172.21.0.0/16</code> Docker bridge that shadowed the corporate proxy.</li>
+          </ul>
+        </div>
+        <div>
+          <pre><code># Hardening &amp; platform health verification
+kubectl -n argocd get applications -o wide
+systemctl status vault-unseal.timer devops-alert.timer
+kubectl -n mlflow get pods   # mlflow-server 1/1 Running</code></pre>
+          <div class="kv-list">
+            <div class="kv-item"><div class="kv-k">Node Capacity</div><div class="kv-v">112 CPU · 376 GiB RAM · 9.5 TB</div></div>
+            <div class="kv-item"><div class="kv-k">IaC &amp; Security</div><div class="kv-v">Vault auto-unseal · Terraform mirror · 0640</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <h2>Selected Investigations (Postmortems)</h2>
   <div class="grid">
-    <a class="card" href="infrastructure-en.html"><div class="tag">Infrastructure</div><h3>Platform</h3><p>Linux, K3s, nginx, Redis, PostgreSQL. GitOps via ArgoCD, secrets in Vault.</p></a>
-    <a class="card" href="integrations-en.html"><div class="tag">Integrations</div><h3>Integrations</h3><p>External systems, e-invoicing, batch ETL: contracts, idempotency, chunking.</p></a>
-    <a class="card" href="incidents-en.html"><div class="tag">Incidents</div><h3>Incidents</h3><p>Real failures: symptom, root cause, fix, prevention.</p></a>
-    <a class="card" href="mlops-en.html"><div class="tag">MLOps</div><h3>MLOps</h3><p>ML pipeline with tests and coverage; MLflow, MinIO, KServe.</p></a>
+    <div class="card">
+      <div class="tag">INC-040 / 040b · Locale Drift</div>
+      <h3>Portal switched UI to Chinese — exporter stalled on 4,000 codes</h3>
+      <p>An unannounced switch of the overseas portal to Chinese (CN) broke English selectors, and switching back to EN left date filters stuck on <code>Reset</code> vs <code>Clear</code>. Built a bilingual selector and column adapter — all 4,000 codes flowed automatically.</p>
+    </div>
+    <div class="card">
+      <div class="tag">INC-16 / Lock · Concurrency</div>
+      <h3>Nightly browser session clashes &amp; SPA login timeout</h3>
+      <p>Two contours sharing one portal account invalidated each other's sessions, while <code>wait_for_url(load)</code> hung on the SPA. Coordinated runs via a distributed TTL lock in <code>lock-redis</code> and URL polling — nightly runs now ingest 22,000+ rows reliably.</p>
+    </div>
+    <div class="card">
+      <div class="tag">INC-17 / 22 · GitOps &amp; Runtime</div>
+      <h3>Perpetual ArgoCD OutOfSync, zombie port :9310 &amp; logrotate self-kill</h3>
+      <p>Moved base64 secrets from Git to Vault (clearing ArgoCD drift), removed a legacy K8s worker duplicate, replaced <code>logrotate pkill -USR1</code> (which read <code>*.bak</code> and killed itself) with a systemd archive timer, and added <code>NRestarts</code> delta alerts.</p>
+    </div>
+    <div class="card">
+      <div class="tag">INC-13 / Network · IaC &amp; Proxy</div>
+      <h3>HashiCorp geoblock &amp; Docker subnet shadowing the proxy</h3>
+      <p><code>terraform init</code> failed on HashiCorp regional blocks while a <code>172.21.0.0/16</code> Docker bridge hijacked traffic to the European proxy. Built a local <code>filesystem_mirror</code> (18 resources under IaC) and removed the conflicting bridge.</p>
+    </div>
   </div>
 
-  <h2>More</h2>
-  <p><a href="business-en.html">Impact in numbers</a> · <a href="articles-en.html">Articles</a> · <a href="playbook-en.html">Playbook</a> · <a href="lessons-en.html">Lessons</a> · <a href="database-en.html">Database</a></p>
-  <p><strong>Courses:</strong> <a href="https://github.com/BobinRobin/lesson-08-code-review">MLOps intensive</a> · <a href="https://github.com/BobinRobin/mlops_lesson_8">MLOps course</a></p>
-  <p><strong>Repositories:</strong> <a href="https://github.com/BobinRobin/infrastructure-playbook">infrastructure-playbook</a> · <a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> · <a href="https://github.com/BobinRobin/mlops_lesson_8">mlops_lesson_8</a></p>
+  <h2>Work Experience</h2>
+  <div class="experience">
+    <div class="exp">
+      <div class="exp-head">Honor · IT Engineer (DevOps / Platform / Data &amp; MLOps)</div>
+      <div class="exp-meta">March 2024 — present · 2 years 9 months</div>
+      <p>Built and operate the server platform from scratch (Linux, K3s, Docker, systemd, GitOps via ArgoCD and Vault), 6 production contours (State Marking, E-Invoicing/UPD, Sellout ETL, Delivery Allocation, Price Monitoring, Mail Relay), Qdrant RAG knowledge base + Hybrid Autoheal Orchestrator, observability (Prometheus/Grafana/Loki), distributed TBase optimization, and multi-country BI/ETL analytics (Russia, Turkey, Belarus, Uzbekistan).</p>
+    </div>
+    <div class="exp">
+      <div class="exp-head">Shchusev State Museum of Architecture · IT Specialist</div>
+      <div class="exp-meta">April 2023 — February 2024 · 11 months</div>
+      <p>HPE ProLiant DL380 servers, VMware ESXi virtualization, Windows Server 2012 &amp; Ubuntu Server, Cisco/MikroTik/D-Link networking, 1C &amp; Bitrix synchronization, e-signature infrastructure (CryptoPRO).</p>
+    </div>
+  </div>
+
+  <h2>Engineering Knowledge Base</h2>
+  <div class="grid">
+    <a class="card" href="infrastructure-en.html"><div class="tag">K3s · ArgoCD · Vault · Qdrant</div><h3>Platform Architecture</h3><p>5 infrastructure layers, evolution from bash scripts to GitOps, RAG knowledge base, and auto-remediation.</p></a>
+    <a class="card" href="integrations-en.html"><div class="tag">Marking · EDO · Lock-Redis · MTProto</div><h3>6 Integration Contours</h3><p>Contracts, idempotency, 29,999-code chunking, distributed TTL locks, and bilingual RPA parsers.</p></a>
+    <a class="card" href="incidents-en.html"><div class="tag">STAR · Postmortems</div><h3>Incident Casebook</h3><p>Real production investigations: from symptom and false hypotheses to root cause and permanent guards.</p></a>
+    <a class="card" href="database-en.html"><div class="tag">TBase · PG16 · Redis Streams</div><h3>Data &amp; Queue Layer</h3><p>Sharding in distributed TBase, distribution keys, event streams, and schema-level environment isolation.</p></a>
+    <a class="card" href="mlops-en.html"><div class="tag">Qdrant · bge-m3 · MLflow</div><h3>MLOps &amp; AIOps in Production</h3><p>Live 779-vector RAG contour, hybrid autoheal dispatcher, running MLflow server, and tested ML pipeline.</p></a>
+    <a class="card" href="articles-en.html"><div class="tag">Longreads · 17-Step Guide</div><h3>Articles &amp; Deployment Guide</h3><p>7 in-depth write-ups, including a step-by-step guide to building the entire platform on bare metal.</p></a>
+    <a class="card" href="playbook-en.html"><div class="tag">Terraform · Ansible · CI</div><h3>Playbook &amp; Code Templates</h3><p>Sanitized GitLab CI, Terraform, Ansible, and incident triage checklists ready for reuse.</p></a>
+    <a class="card" href="business-en.html"><div class="tag">ROI · SLA · Throughput</div><h3>Business Impact in Numbers</h3><p>How pipeline speed and zero code losses protect customs timelines and revenue recognition.</p></a>
+  </div>
 
   <section id="contact">
-    <h2>Contact</h2>
-    <ul>
-      <li>Email: <a href="mailto:rdmurashkin@xmail.ru">rdmurashkin@xmail.ru</a></li>
-      <li>Telegram: <a href="https://t.me/RodionMurashkin">@RodionMurashkin</a></li>
-      <li>GitHub: <a href="https://github.com/BobinRobin">BobinRobin</a></li>
-      <li>Resume: <a href="resume.pdf">resume.pdf</a></li>
-    </ul>
+    <h2>Contact &amp; Repositories</h2>
+    <div class="kv-list">
+      <div class="kv-item"><div class="kv-k">Direct Contact</div><div class="kv-v"><a href="mailto:rdmurashkin@xmail.ru">rdmurashkin@xmail.ru</a> · <a href="https://t.me/RodionMurashkin">@RodionMurashkin</a></div></div>
+      <div class="kv-item"><div class="kv-k">GitHub &amp; IaC Playbook</div><div class="kv-v"><a href="https://github.com/BobinRobin">BobinRobin</a> · <a href="https://github.com/BobinRobin/infrastructure-playbook">infrastructure-playbook</a></div></div>
+      <div class="kv-item"><div class="kv-k">MLOps Repositories</div><div class="kv-v"><a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> (37 tests, 88% cov) · <a href="https://github.com/BobinRobin/mlops_lesson_8">mlops_lesson_8</a></div></div>
+      <div class="kv-item"><div class="kv-k">Terminal Resume</div><div class="kv-v"><code>curl -sL https://bobinrobin.github.io/portfolio/resume.txt</code></div></div>
+    </div>
   </section>
-  <div class="note">Topology, addresses and configuration are intentionally generalized.</div>
+  <div class="note">All architectural diagrams, metrics, and postmortems reflect real production experience and are fully sanitized: no internal IPs, passwords, or confidential business data.</div>
 </main>
-<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">updated 2026-11-15</span></footer>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <a href="lessons-en.html">Lessons &amp; Anti-Patterns</a> · <span style="opacity:.65">updated 2026-11-15</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

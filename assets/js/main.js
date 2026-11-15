@@ -115,3 +115,17 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
 
 // Год в футере
 (function(){ var y = new Date().getFullYear(); document.querySelectorAll('[data-year]').forEach(function(el){ el.textContent = y; }); })();
+// Интерактивные вкладки контуров (data-tab-target)
+(function(){
+  var btns = document.querySelectorAll('.tab-btn[data-tab-target]');
+  if(!btns.length) return;
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var target = btn.getAttribute('data-tab-target');
+      btns.forEach(function(b){ b.classList.toggle('active', b === btn); });
+      document.querySelectorAll('.tab-pane').forEach(function(p){
+        p.classList.toggle('active', p.id === target);
+      });
+    });
+  });
+})();

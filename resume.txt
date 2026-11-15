@@ -1,37 +1,43 @@
-Родион Мурашкин — DevOps / Platform Engineer
-=============================================
-Email: rdmurashkin@xmail.ru | Telegram: @RodionMurashkin
-GitHub: https://github.com/BobinRobin | Сайт: https://bobinrobin.github.io/portfolio/
-Английский: C1
+МУРАШКИН РОДИОН ДЕНИСОВИЧ
+DevOps / Platform & MLOps Engineer (Data & Enterprise Integrations)
+Москва / Люберцы · +7 (926) 140-08-89 · rdmurashkin@xmail.ru · Telegram: @RodionMurashkin
+GitHub: https://github.com/BobinRobin · Портфолио: https://bobinrobin.github.io/portfolio/
+PDF-резюме (формат hh.ru): https://bobinrobin.github.io/portfolio/resume.pdf
 
-Коротко
-Строю и эксплуатирую инфраструктуру и интеграционные сервисы: от подготовки
-сервера и CI/CD до диагностики production-инцидентов и документации.
-Вёл два боевых контура обмена данными с внешними системами на Kubernetes.
+ПРОФИЛЬ
+Инженер платформы, интеграций и автоматизации (DevOps / Platform / MLOps / Data).
+Спроектировал и развиваю серверную платформу (Ubuntu 24.04 LTS, 112 CPU, 376 GiB RAM, K3s, Docker, systemd,
+GitLab CI/CD, ArgoCD, HashiCorp Vault, Prometheus/Grafana/Loki), на которой работают 6 продуктивных контуров,
+векторная RAG-база знаний в Qdrant (779 векторов BAAI/bge-m3) и гибридный оркестратор самовосстановления (Autoheal).
 
-Стек
-Kubernetes (K3s), Docker, GitLab CI/CD, ArgoCD (GitOps), Vault, Terraform,
-Ansible, nginx, Redis (Streams), PostgreSQL (включая распределённый форк TBase),
-Prometheus / Grafana / Loki, Python, Bash, Git. MLOps: MLflow, MinIO, KServe (PoC).
+КЛЮЧЕВЫЕ ДОСТИЖЕНИЯ (HONOR, МАРТ 2024 — НАСТОЯЩЕЕ ВРЕМЯ)
+1. Платформа и GitOps (Bare-Metal -> K3s -> ArgoCD):
+   - Поднял платформу с нуля, перевёл доставку с ручных скриптов и kubectl patch на GitOps (GitLab CI test/build/gitops + ArgoCD, откат через git revert).
+   - Вынес секреты из Git-манифестов в HashiCorp Vault (с авто-unseal по таймеру и устранением OutOfSync-дрейфа).
+   - Внедрил Terraform (ResourceQuota/LimitRange через локальное зеркало провайдеров filesystem_mirror) и Ansible.
 
-Опыт
-Honor — IT-инженер / DevOps (март 2024 — н.в.)
-- Построил платформу с нуля: Linux, K3s, nginx, Redis, PostgreSQL.
-- Внедрил GitOps: CI собирает образ, ArgoCD применяет, откат = git revert.
-- Собрал наблюдаемость: Prometheus + Grafana + Loki, RED-метрики.
-- Вынес секреты в Vault; контейнеры от непривилегированного пользователя.
-- Обслуживал интеграции с внешними системами: XML-контракты, идемпотентность,
-  чанкинг, dry-run, сверка. Устранял production-инциденты (P0).
-- ETL-пайплайны (Python + SQL), автоматизация отчётности для команд в
-  России, Турции, Беларуси, Узбекистане.
+2. AIOps: RAG-база знаний в Qdrant и Hybrid Autoheal Orchestrator:
+   - Развернул Qdrant (коллекция infra-knowledge, 779 чанков архитектуры, постмортемов и runbook-ов, эмбеддинги BAAI/bge-m3 1024d через локальный сервис cortex, ежедневная переиндексация по cron, защищённый дашборд за nginx basic-auth).
+   - Реализовал оркестратор devops_alert + autoheal (метрики :9310): проверка каждые 5 минут всех namespaces, systemd-воркеров, очередей и свежести выгрузок; обогащение алертов RAG-контекстом; безопасный запуск идемпотентных runbook-ов (dry-run -> backup -> apply -> verify); двухканальные уведомления (Telegram кратко + eLink подробно).
 
-Музей архитектуры им. Щусева — Специалист по ИТ (апрель 2023 — февраль 2024)
-- Серверы (HP ProLiant, VMware ESXi, Windows Server 2012, Ubuntu), сети,
-  коммутаторы, 1С, ЭЦП.
+3. Высоконагруженные интеграции (Маркировка «Честный знак» и конвейер ЭДО / УПД):
+   - ~550 000 событий кодов в сутки, 654 000+ единиц товара доведено до финальной стадии продажи, 223 подписанных УПД, 0 отказов в учётных статусах.
+   - Двухконтурный приём (logs-only -> Redis Streams -> воркеры -> TBase), чанкинг по 29 999 кодов, гейт WAIT_MARKING, 30-минутное окно агрегации доставок, билингвальная защита RPA-экспортёров (EN/CN селекторы).
 
-Образование
-МГУ им. М.В. Ломоносова — магистр, «Историческая информатика» (2024).
+4. Распределённые блокировки и 4 новых контура в Kubernetes:
+   - Delivery Allocation: ночной CronJob с межпроцессным распределённым TTL-замком в выделенном lock-redis (SET NX EX, TTL 180с, heartbeat 60с, Lua-release + файловый фолбэк O_EXCL) против конфликта браузерных сессий.
+   - Конкурентный прайс-мониторинг: сбор из Telegram (MTProto + Bot API) -> парсинг -> шард-локальная перезапись в TBase DISTRIBUTE BY SHARD(file_md5) (56 700+ строк из 783 файлов).
+   - Mail Forwarder: отказоустойчивый IMAP->SMTP poller с декодированием RFC-2047 и офлайн-сборкой образа.
+   - Sellout Inventory ETL: эталонный CronJob каждые 10 минут (uv, ruff, mypy --strict, pytest).
 
-MLOps-направление
-- ML-пайплайн с 37 тестами и покрытием 88% (uv, mkdocs, flake8/pylint).
-- Развёрнут MLOps-стек: MLflow, MinIO, KServe (как основа / PoC).
+5. Наблюдаемость и распределённая СУБД TBase (PostgreSQL 10):
+   - Prometheus + Grafana + Loki + 4 Promtail + Pushgateway + node-exporter + веб-монитор (:8180), RED-экспортёры (:9300/:9301/:9302/:9310).
+   - Оптимизация запросов и шард-локальной идемпотентности в TBase (max_connections=2500, изоляция prod/test схем).
+
+ОПЫТ ДО HONOR
+ФГБУК Государственный музей архитектуры им. А.В. Щусева — Специалист по ИТ (Апрель 2023 — Февраль 2024)
+- Серверы HPE ProLiant DL380, VMware ESXi, Windows Server 2012, Ubuntu Server; сети Cisco/MikroTik/D-Link; 1С и 1С-Битрикс; КриптоПРО.
+
+ОБРАЗОВАНИЕ И ЯЗЫКИ
+МГУ им. М.В. Ломоносова — Магистр, «Историческая информатика» (2024).
+Русский — родной · Английский — C1 (Advanced).

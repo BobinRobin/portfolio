@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MLOps</title>
+<title>MLOps и AIOps: Qdrant RAG, Autoheal и MLflow</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -11,79 +11,65 @@
   <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
   <nav class="links">
     <a href="index.html">Главная</a>
-    <a href="infrastructure.html">Инфраструктура</a>
-    <a href="integrations.html">Интеграции</a>
-    <a href="database.html">База данных</a>
-    <a href="incidents.html">Инциденты</a>
-    <a href="mlops.html">MLOps</a>
-    <a href="articles.html">Статьи</a>
-    <a href="playbook.html">Playbook</a>
-    <a href="lessons.html">Уроки</a>
+    <a href="business.html">Эффективность</a>
+    <a href="incidents.html">Кейсы</a>
+    <a href="infrastructure.html">Стек</a>
+    <a href="index.html#contact">Контакты</a>
   </nav>
 </header>
 <main>
   <section class="hero">
-    <h1>MLOps: Инфраструктура для ML</h1>
-    <p>Переход от ручных скриптов к воспроизводимым пайплайнам и непрерывному обучению. Опираюсь на классическую архитектуру уровней зрелости MLOps.</p>
+    <h1>MLOps и AIOps в эксплуатации</h1>
+    <p>Практическое применение ML-инфраструктуры: живая векторная база знаний в Qdrant (779 чанков с эмбеддингами BAAI/bge-m3), гибридный оркестратор самовосстановления, поднятый MLflow-сервер и воспроизводимый ML-пайплайн с 88% покрытием тестами.</p>
   </section>
 
-  <h2>Уровни зрелости MLOps (Архитектурный подход)</h2>
-  <div class="grid">
-    <div class="card">
-      <div class="tag">Level 0</div><h3>Ручной процесс</h3>
-      <p>Скрипты в Jupyter Notebooks. Данные собираются вручную, модель обучается и деплоится вручную. Это уровень дата-сайентистов до прихода DevOps.</p>
-    </div>
-    <div class="card">
-      <div class="tag">Level 1</div><h3>Автоматизация ML-пайплайна</h3>
-      <p>Обучение модели автоматизировано. Пайплайн сам собирает данные, валидирует их, обучает модель и сохраняет артефакты в Model Registry (MLflow).</p>
-      <p><em>Статус: Реализовано в курсовом проекте (lesson-08).</em></p>
-    </div>
-    <div class="card">
-      <div class="tag">Level 2</div><h3>CI/CD для Machine Learning</h3>
-      <p>Полная автоматизация деплоя моделей. При пуше нового кода или данных автоматически запускается переобучение, тестирование и выкатка модели в прод (через KServe).</p>
-      <p><em>Статус: PoC инфраструктуры развёрнут.</em></p>
-    </div>
-  </div>
-
-  <h2>Схема ML-конвейера (Level 1-2)</h2>
-  <svg viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MLOps-конвейер" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px;margin-bottom:1.5rem">
+  <h2>Архитектура AIOps &amp; MLOps контура</h2>
+  <svg viewBox="0 0 760 175" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Схема AIOps RAG и MLOps" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px;margin-bottom:1.5rem">
     <defs><marker id="arr3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
-    <g font-family="sans-serif" font-size="12" fill="#e7f2ec">
-      <rect x="10" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="65" y="81" text-anchor="middle">Данные (ETL)</text>
-      <rect x="150" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="205" y="81" text-anchor="middle">Обучение / CI</text>
-      <rect x="290" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#34d399"/><text x="345" y="81" text-anchor="middle">MLflow (Registry)</text>
-      <rect x="430" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="485" y="81" text-anchor="middle">MinIO (S3 Bucket)</text>
-      <rect x="570" y="55" width="110" height="44" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="625" y="81" text-anchor="middle">KServe (CD)</text>
-      <line x1="120" y1="77" x2="148" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
-      <line x1="260" y1="77" x2="288" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
-      <line x1="400" y1="77" x2="428" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
-      <line x1="540" y1="77" x2="568" y2="77" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
-      <rect x="570" y="115" width="110" height="28" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="625" y="133" text-anchor="middle">Monitoring</text>
-      <line x1="625" y1="99" x2="625" y2="113" stroke="#8aa89a" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr3)"/>
+    <g font-family="sans-serif" font-size="11.5" fill="#e7f2ec">
+      <rect x="12" y="25" width="130" height="48" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="77" y="47" text-anchor="middle">Docs · Postmortems</text><text x="77" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">Runbooks · Skills</text>
+      <rect x="168" y="25" width="130" height="48" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="233" y="47" text-anchor="middle">BAAI/bge-m3</text><text x="233" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">1024d · cortex :6335</text>
+      <rect x="324" y="25" width="135" height="48" rx="6" fill="#0e2019" stroke="#34d399"/><text x="391" y="47" text-anchor="middle">Qdrant Vector DB</text><text x="391" y="62" text-anchor="middle" font-size="9.5" fill="#34d399">infra-knowledge (779)</text>
+      <rect x="485" y="25" width="130" height="48" rx="6" fill="#0e2019" stroke="#34d399"/><text x="550" y="47" text-anchor="middle">Hybrid Autoheal</text><text x="550" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">Watcher + Runbooks</text>
+      <rect x="640" y="25" width="108" height="48" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="694" y="47" text-anchor="middle">eLink &amp; TG</text><text x="694" y="62" text-anchor="middle" font-size="9.5" fill="#8aa89a">Metrics :9310</text>
+      <line x1="142" y1="49" x2="166" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="298" y1="49" x2="322" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="459" y1="49" x2="483" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+      <line x1="615" y1="49" x2="638" y2="49" stroke="#34d399" stroke-width="2" marker-end="url(#arr3)"/>
+
+      <rect x="12" y="105" width="180" height="46" rx="6" fill="#0a1a14" stroke="#1c3328"/><text x="102" y="126" text-anchor="middle">ML Pipeline (uv + pytest)</text><text x="102" y="141" text-anchor="middle" font-size="9.5" fill="#8aa89a">37 tests · 88% coverage</text>
+      <rect x="220" y="105" width="180" height="46" rx="6" fill="#0a1a14" stroke="#34d399"/><text x="310" y="126" text-anchor="middle">MLflow Server + DB</text><text x="310" y="141" text-anchor="middle" font-size="9.5" fill="#34d399">Running in K3s + MinIO S3</text>
+      <rect x="428" y="105" width="320" height="46" rx="6" fill="#0a1a14" stroke="#1c3328"/><text x="588" y="126" text-anchor="middle">Safe LLM Guardrails</text><text x="588" y="141" text-anchor="middle" font-size="9.5" fill="#8aa89a">pre-check → dry-run → backup → whitelist apply → verify</text>
     </g>
   </svg>
 
-  <h2>Реализованные проекты</h2>
   <div class="grid">
-    <div class="card"><div class="tag">Пайплайн (Level 1)</div><h3>Предсказание цены поездки</h3>
-      <p>Основа любого ML-деплоя — качественный и тестируемый код. В этом проекте реализован полный цикл.</p>
-      <ul>
-        <li>37 unit-тестов, покрытие кода 88%.</li>
-        <li>Жёсткая воспроизводимость зависимостей (uv + lock-файл).</li>
-        <li>Контроль качества: flake8, pylint.</li>
-      </ul>
+    <div class="card">
+      <div class="tag">Production RAG · Qdrant</div>
+      <h3>Векторная база знаний инфраструктуры (779 чанков)</h3>
+      <p>Индексатор <code>index_rag.py</code> разбивает всю документацию, архитектурные карты, постмортемы и скиллы всех 6 сервисов на смысловые секции (до 900 символов с перекрытием 100), строит эмбеддинги <code>BAAI/bge-m3</code> (1024d, Cosine) и сохраняет в коллекцию <code>infra-knowledge</code>. Переиндексация идёт ежедневно по cron в 06:10 MSK; веб-панель закрыта через nginx basic-auth.</p>
     </div>
-    <div class="card"><div class="tag">Платформа (PoC)</div><h3>Стек для Level 2</h3>
-      <p>Инфраструктура подготовлена к автоматизации:</p>
-      <ul>
-        <li><strong>MLflow:</strong> Поднят для логирования метрик и версионирования моделей.</li>
-        <li><strong>MinIO:</strong> S3-хранилище для больших артефактов и весов.</li>
-        <li><strong>KServe:</strong> Сервинг-слой в Kubernetes для автоматического API-доступа к моделям.</li>
-      </ul>
+    <div class="card">
+      <div class="tag">AIOps · Hybrid Orchestrator</div>
+      <h3>Детерминированный Autoheal + RAG-обогащение</h3>
+      <p>Модуль <code>rag_context.py</code> (stdlib-only, с таймаутами и фолбэком) при любом сбое запрашивает эмбеддинг через <code>cortex (:6335)</code> и вытягивает топ-3 похожих инцидента и runbook из Qdrant. Для известных проблем <code>autoheal.py</code> выполняет whitelisted-скрипт (<code>dry-run → backup → apply → verify</code>), для новых — отдаёт инженеру готовый контекст в eLink.</p>
+    </div>
+    <div class="card">
+      <div class="tag">ML Platform · K3s</div>
+      <h3>MLflow + MinIO + тестируемый ML-конвейер</h3>
+      <p>В кластере K3s запущены <code>mlflow-server</code>, <code>mlflow-db</code> и объектное хранилище <code>MinIO</code>. В публичном репозитории <a href="https://github.com/BobinRobin/lesson-08-code-review">lesson-08-code-review</a> представлен эталонный ML-пайплайн прогнозирования: 37 unit-тестов, покрытие 88%, строгая воспроизводимость через <code>uv.lock</code>, линтинг <code>flake8/pylint</code> и документация <code>mkdocs</code>.</p>
     </div>
   </div>
+
+  <h2>Уровни зрелости MLOps и критерий «не навредить»</h2>
+  <table>
+    <tr><th>Уровень / Слой</th><th>Что реализовано на платформе</th></tr>
+    <tr><td>Level 1 · Воспроизводимый пайплайн</td><td>Модульная структура <code>src/tests/docs</code>, 37 автотестов (88% coverage), фиксация окружения в <code>uv.lock</code>, реестр экспериментов в MLflow + MinIO</td></tr>
+    <tr><td>Production RAG (Qdrant)</td><td>779 векторов эксплуатационных знаний (<code>BAAI/bge-m3</code>), фильтрация по <code>service</code> и <code>source_type</code>, ежедневное обновление индекса</td></tr>
+    <tr><td>Safe LLM / Autoheal Architecture</td><td>LLM и RAG никогда не выполняют произвольный shell-код напрямую: авто-применение разрешено только для детерминированных идемпотентных runbook-ов из белого списка после успешного <code>dry-run</code> и бэкапа</td></tr>
+  </table>
 </main>
-<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">обновлено 15.11.2026</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

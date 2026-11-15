@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Интеграции</title>
+<title>6 интеграционных контуров и паттерны надёжности</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -11,45 +11,51 @@
   <a class="brand" href="index.html">Родион <span>Мурашкин</span></a>
   <nav class="links">
     <a href="index.html">Главная</a>
-    <a href="infrastructure.html">Инфраструктура</a>
-    <a href="integrations.html">Интеграции</a>
-    <a href="database.html">База данных</a>
-    <a href="incidents.html">Инциденты</a>
-    <a href="mlops.html">MLOps</a>
-    <a href="articles.html">Статьи</a>
-    <a href="playbook.html">Playbook</a>
-    <a href="lessons.html">Уроки</a>
+    <a href="business.html">Эффективность</a>
+    <a href="incidents.html">Кейсы</a>
+    <a href="infrastructure.html">Стек</a>
+    <a href="index.html#contact">Контакты</a>
   </nav>
 </header>
 <main>
   <section class="hero">
-    <h1>Интеграции</h1>
-    <p>Сквозные контуры обмена данными с внешними системами. В приоритете — надёжность: идемпотентность, сверка, обработка ошибок, наблюдаемость.</p>
+    <h1>6 интеграционных контуров в продакшене</h1>
+    <p>Сквозные контуры обмена данными между зарубежными корпоративными порталами, государственной системой маркировки, ЭДО, Telegram-источниками и распределённым хранилищем TBase.</p>
   </section>
+
   <div class="grid">
-    <div class="card"><div class="tag">Маркировка</div><h3>«Честный знак»</h3>
-      <p>Заказы, стикеры, импорт, SSCC. XML-контракты внешней системы, чанкинг до 29999 кодов, FTP-обмен, callback в HQ, прод/тест схемы.</p>
+    <div class="card"><div class="tag">01 · Государственная маркировка</div><h3>Контур «Честный знак» + билингвальный RPA</h3>
+      <p>Заказы (order), нанесение (sticker), импорт (import) и агрегация (SSCC). Жёсткие XML-контракты, чанкинг по 29 999 кодов с сохранением порядка, сверка по точным именам файлов ответа и билингвальный адаптер селекторов (EN/CN) при смене языка зарубежного портала.</p>
     </div>
-    <div class="card"><div class="tag">Документооборот</div><h3>Приём УПД</h3>
-      <p>Конвейер: logs-only → Redis stream → worker → БД. Идемпотентность на входе, gate перед записью, dry-run: внешние каналы включаются по одному.</p>
+    <div class="card"><div class="tag">02 · Электронный документооборот</div><h3>Конвейер приёма и слияния УПД</h3>
+      <p>Двухконтурный приём: <code>logs-only</code> фиксация → Redis Streams → воркеры → гейт <code>WAIT_MARKING</code> → 30-минутное окно агрегации по доставкам (с сохранением всех строк <code>&lt;СведТов&gt;</code> и ГТД) → триггер подписания ЭДО → автоматический <code>sales callback</code> (654 000+ единиц, 223 подписанных УПД).</p>
     </div>
-    <div class="card"><div class="tag">Batch ETL</div><h3>ETL продаж / инвентарь</h3>
-      <p>Разовый Python-ETL по расписанию (CronJob). GitLab CI, многоступенчатый Dockerfile, Helm, ArgoCD.</p>
+    <div class="card"><div class="tag">03 · Аллокация и Distributed Lock</div><h3>Delivery Allocation + Lock-Redis</h3>
+      <p>Ночной Kubernetes CronJob выгрузки распределений поставок (order / inventory / AATP, 22 000+ строк за прогон). Координируется через межпроцессный TTL-замок в выделенном <code>lock-redis (SET NX EX, TTL 180с, heartbeat 60с, Lua-release + O_EXCL fallback)</code>, исключая пересечение браузерных сессий одной учётки.</p>
+    </div>
+    <div class="card"><div class="tag">04 · Ритейл-аналитика</div><h3>Конкурентный прайс-мониторинг (Telegram → TBase)</h3>
+      <p>Постоянный MTProto/Bot API слушатель + часовой <code>--catch-up</code> забирают Excel-отчёты из закрытых групп, фильтруют целевой лист <code>ДетализацияУчастниковРынка</code> и выполняют идемпотентную шард-локальную перезапись в TBase (<code>DISTRIBUTE BY SHARD(file_md5)</code>, 56 697 строк из 783 файлов).</p>
+    </div>
+    <div class="card"><div class="tag">05 · Почтовая автоматизация</div><h3>Mail Forwarder (IMAP → SMTP Poller)</h3>
+      <p>Отказоустойчивый Kubernetes Deployment-poller: декодирование RFC-2047 заголовков вложений, фильтрация по бизнес-правилам (исключение суффикса <code>03</code>), идемпотентный перенос обработанных писем, офлайн-сборка stdlib-only образа и метрики свежести в Pushgateway.</p>
+    </div>
+    <div class="card"><div class="tag">06 · Эталонный GitOps Batch</div><h3>Sellout Inventory Manager</h3>
+      <p>Канонический конвейер на Python 3.12 (<code>uv</code>, <code>ruff</code>, <code>mypy --strict</code>, <code>pytest</code>): многоступенчатый non-root Docker, GitLab CI <code>test → build → gitops</code>, ArgoCD CronJob каждые 10 минут и DAG-планировщик.</p>
     </div>
   </div>
-  <h2>Паттерны надёжности</h2>
+
+  <h2>Инженерные паттерны надёжности</h2>
   <table>
-    <tr><th>Паттерн</th><th>Зачем</th></tr>
-    <tr><td>Идемпотентность с первого дня</td><td>Ретраи безопасны; ключ — действительно уникальный</td></tr>
-    <tr><td>Dry-run перед боем</td><td>Сначала без внешних каналов, включение по одному</td></tr>
-    <tr><td>Gate перед записью</td><td>В БД только то, что прошло нужную стадию</td></tr>
-    <tr><td>Чанкинг по контракту</td><td>Лимиты внешней системы соблюдаются, порядок сохраняется</td></tr>
-    <tr><td>Сверка и трассировка</td><td>Статус на уровне данных, путь кода от входа до результата</td></tr>
-    <tr><td>Наблюдаемость</td><td>Инцидент виден по метрикам и логам</td></tr>
+    <tr><th>Паттерн</th><th>Как реализован в контурах</th></tr>
+    <tr><td>Идемпотентность по provenance-ключу</td><td>Дедупликация по уникальному ключу строки заказа (<code>orderlineno</code>) или хешу файла (<code>file_md5</code>) до записи в БД</td></tr>
+    <tr><td>Межпроцессный Distributed Lock</td><td>Выделенный <code>lock-redis</code> с TTL 180с, фоновым heartbeat 60с и атомарным Lua-скриптом освобождения + файловый <code>O_EXCL</code> фолбэк</td></tr>
+    <tr><td>Билингвальная устойчивость (EN / CN-локаль)</td><td>Все селекторы, статусы и заголовки колонок RPA-парсеров поддерживают обе локали и оба варианта кнопки сброса (<code>Reset / Clear / CN-Reset</code>)</td></tr>
+    <tr><td>Строгий гейт перед коммитом</td><td><code>WAIT_MARKING</code> не пропускает УПД в сборку, пока все коды поставки не подтверждены в реестре маркировки</td></tr>
+    <tr><td>Dry-run и поэтапное включение</td><td>Внешние каналы (FTP, ЭДО, Sales callback) включаются по одному после проверки метрик на реальном потоке</td></tr>
   </table>
-  <div class="note">Детали контрактов и имена систем обобщены.</div>
+  <div class="note">Детали контрактов и внутренние адреса обобщены.</div>
 </main>
-<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">обновлено 15.11.2026</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

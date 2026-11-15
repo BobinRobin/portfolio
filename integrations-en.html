@@ -3,50 +3,59 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Integrations</title>
+<title>6 Integration Contours &amp; Reliability Patterns</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>
+  <nav class="links">
     <a href="index-en.html">Home</a>
-    <a href="infrastructure-en.html">Infrastructure</a>
-    <a href="integrations-en.html">Integrations</a>
-    <a href="database-en.html">Database</a>
-    <a href="incidents-en.html">Incidents</a>
-    <a href="mlops-en.html">MLOps</a>
-    <a href="articles-en.html">Articles</a>
-    <a href="playbook-en.html">Playbook</a>
-    <a href="lessons-en.html">Lessons</a>
-  </nav></header>
+    <a href="business-en.html">Impact</a>
+    <a href="incidents-en.html">Cases</a>
+    <a href="infrastructure-en.html">Stack</a>
+    <a href="index-en.html#contact">Contact</a>
+  </nav>
+</header>
 <main>
   <section class="hero">
-    <h1>Enterprise integrations</h1>
-    <p>End-to-end data-exchange loops with external systems. The priority is reliability: idempotency, reconciliation, error handling, observability.</p>
+    <h1>6 Production Integration Contours</h1>
+    <p>End-to-end data-exchange loops connecting overseas corporate portals, state marking systems, e-invoicing, Telegram feeds, and distributed TBase PostgreSQL.</p>
   </section>
+
   <div class="grid">
-    <div class="card"><div class="tag">Marking</div><h3>State marking system</h3>
-      <p>Orders, stickers, imports, SSCC. Strict XML contracts, chunking up to the per-document limit, FTP exchange, callback to HQ, prod/test schemas.</p>
+    <div class="card"><div class="tag">01 · State Marking</div><h3>Marking Loop + Bilingual RPA</h3>
+      <p>Orders, stickers, imports, and SSCC aggregation. Strict XML schemas, deterministic 29,999-code chunking, exact response filename matching, and a bilingual selector adapter (EN/CN) resilient to portal locale switches.</p>
     </div>
-    <div class="card"><div class="tag">E-invoicing</div><h3>Incoming documents</h3>
-      <p>Pipeline: logs-only intake → Redis stream → worker → DB. Idempotency on input, a gate before writes, dry-run: external channels enabled one at a time.</p>
+    <div class="card"><div class="tag">02 · E-Invoicing</div><h3>UPD Intake &amp; Delivery Merge Pipeline</h3>
+      <p>Two-stage intake: <code>logs-only</code> capture → Redis Streams → workers → <code>WAIT_MARKING</code> gate → 30-minute delivery merge window (preserving all item rows and customs declarations) → e-signature trigger → automated <code>sales callback</code> (654,000+ units, 223 signed UPDs).</p>
     </div>
-    <div class="card"><div class="tag">Batch ETL</div><h3>Sales / inventory</h3>
-      <p>Scheduled Python ETL (CronJob). GitLab CI, multi-stage Dockerfile, Helm, ArgoCD.</p>
+    <div class="card"><div class="tag">03 · Allocation &amp; Distributed Lock</div><h3>Delivery Allocation + Lock-Redis</h3>
+      <p>Nightly Kubernetes CronJob exporting supply allocations (order / inventory / AATP, 22,000+ rows per run). Coordinated via a cross-process TTL lock in a dedicated <code>lock-redis (SET NX EX, 180s TTL, 60s heartbeat, Lua release + O_EXCL fallback)</code> to prevent concurrent browser session clashes.</p>
+    </div>
+    <div class="card"><div class="tag">04 · Retail Intelligence</div><h3>Competitive Price Monitoring (Telegram → TBase)</h3>
+      <p>Continuous MTProto/Bot API listener + hourly <code>--catch-up</code> ingests Excel reports from groups, filters target sheets, and performs shard-local idempotent replacement in TBase (<code>DISTRIBUTE BY SHARD(file_md5)</code>, 56,697 rows across 783 files).</p>
+    </div>
+    <div class="card"><div class="tag">05 · Mail Automation</div><h3>Mail Forwarder (IMAP → SMTP Poller)</h3>
+      <p>Fault-tolerant Kubernetes Deployment poller: RFC-2047 attachment filename decoding, business-rule filtering (excluding suffix <code>03</code>), idempotent folder move, offline stdlib-only image build, and freshness gauges in Pushgateway.</p>
+    </div>
+    <div class="card"><div class="tag">06 · Reference GitOps Batch</div><h3>Sellout Inventory Manager</h3>
+      <p>Reference Python 3.12 pipeline (<code>uv</code>, <code>ruff</code>, <code>mypy --strict</code>, <code>pytest</code>): multi-stage non-root Docker, GitLab CI <code>test → build → gitops</code>, ArgoCD 10-minute CronJob, and DAG scheduler.</p>
     </div>
   </div>
-  <h2>Reliability patterns</h2>
+
+  <h2>Reliability Engineering Patterns</h2>
   <table>
-    <tr><th>Pattern</th><th>Why</th></tr>
-    <tr><td>Idempotency from day one</td><td>Retries are safe; the key must be truly unique</td></tr>
-    <tr><td>Dry-run before go-live</td><td>Run without external channels first, then enable one by one</td></tr>
-    <tr><td>Gate before writes</td><td>Only validated data reaches the database</td></tr>
-    <tr><td>Contract-driven chunking</td><td>Respect external limits, preserve ordering</td></tr>
-    <tr><td>Reconciliation &amp; tracing</td><td>Status at the data level, end-to-end code path</td></tr>
-    <tr><td>Observability</td><td>Incidents are visible in metrics and logs</td></tr>
+    <tr><th>Pattern</th><th>Production Implementation</th></tr>
+    <tr><td>Provenance-Key Idempotency</td><td>Deduplication by unique order line (<code>orderlineno</code>) or file hash (<code>file_md5</code>) before database commit</td></tr>
+    <tr><td>Cross-Process Distributed Lock</td><td>Dedicated <code>lock-redis</code> with 180s TTL, 60s background heartbeat, atomic Lua token release + <code>O_EXCL</code> file fallback</td></tr>
+    <tr><td>Bilingual Resilience (EN / CN-локаль)</td><td>All RPA selectors, status checks, and column headers handle both locales and all reset button variants (<code>Reset / Clear / CN-Reset</code>)</td></tr>
+    <tr><td>Strict Pre-Commit Gate</td><td><code>WAIT_MARKING</code> blocks UPD assembly until every code in the delivery is confirmed in the marking registry</td></tr>
+    <tr><td>Dry-Run &amp; Staged Rollout</td><td>External channels (FTP, EDO, Sales callback) are enabled one by one after validating metrics on live traffic</td></tr>
   </table>
-  <div class="note">Contract details and counterparty names are generalized.</div>
-</main><footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+  <div class="note">Contract details and internal addresses are generalized.</div>
+</main>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">updated 2026-11-15</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

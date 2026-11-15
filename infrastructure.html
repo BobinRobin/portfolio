@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Инфраструктура</title>
+<title>Архитектура платформы и стек</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -19,72 +19,68 @@
 </header>
 <main>
   <section class="hero">
-    <h1>Инфраструктура</h1>
-    <p>Платформа, которую собирал с нуля и довёл до GitOps. Потом прикрутил алерты, мониторинг и планировщик ETL — теперь на всё есть глаза.</p>
+    <h1>Архитектура серверной платформы</h1>
+    <p>Единый выделенный сервер (112 CPU, 376 GiB RAM, 9,5 ТБ на 5 дисках, Ubuntu 24.04 LTS), на котором работают K3s v1.36, 6 продуктивных контуров, GitOps-доставка через ArgoCD и Vault, векторная база знаний Qdrant RAG и система автовосстановления.</p>
   </section>
 
-  <h2>Схема</h2>  <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Архитектура платформы" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
-    <defs>
-      <marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker>
-    </defs>
-    <g font-family="sans-serif" font-size="12" fill="#e7f2ec">
-      <text x="14" y="30" font-size="11" fill="#8aa89a">CI/CD</text>
-      <rect x="14" y="40" width="90" height="40" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="59" y="64" text-anchor="middle">Git push</text>
-      <rect x="130" y="40" width="110" height="40" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="185" y="64" text-anchor="middle">GitLab CI</text>
-      <rect x="266" y="40" width="110" height="40" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="321" y="64" text-anchor="middle">registry</text>
-      <rect x="402" y="40" width="110" height="40" rx="6" fill="#0e2019" stroke="#34d399"/><text x="457" y="64" text-anchor="middle">ArgoCD</text>
-      <line x1="104" y1="60" x2="128" y2="60" stroke="#34d399" stroke-width="2" marker-end="url(#arr2)"/>
-      <line x1="240" y1="60" x2="264" y2="60" stroke="#34d399" stroke-width="2" marker-end="url(#arr2)"/>
-      <line x1="376" y1="60" x2="400" y2="60" stroke="#34d399" stroke-width="2" marker-end="url(#arr2)"/>
-      <text x="14" y="120" font-size="11" fill="#8aa89a">Runtime (K3s, один узел)</text>
-      <rect x="14" y="130" width="640" height="150" rx="8" fill="#0a1a14" stroke="#1c3328"/>
-      <rect x="30" y="146" width="90" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="75" y="169" text-anchor="middle">nginx</text>
-      <rect x="140" y="146" width="120" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="200" y="169" text-anchor="middle">маркировка</text>
-      <rect x="280" y="146" width="120" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="340" y="169" text-anchor="middle">УПД</text>
-      <rect x="420" y="146" width="110" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="475" y="169" text-anchor="middle">ETL (CronJob)</text>
-      <rect x="550" y="146" width="88" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="594" y="169" text-anchor="middle">MinIO</text>
-      <rect x="30" y="200" width="90" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="75" y="223" text-anchor="middle">Vault</text>
-      <rect x="140" y="200" width="120" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="200" y="223" text-anchor="middle">Redis</text>
-      <rect x="280" y="200" width="180" height="36" rx="6" fill="#0e2019" stroke="#34d399"/><text x="370" y="223" text-anchor="middle">TBase (внешний)</text>
-      <rect x="480" y="200" width="158" height="36" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="559" y="223" text-anchor="middle">Prometheus · Grafana · Loki</text>
+  <h2>Топология платформы</h2>
+  <svg viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Топология платформы" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:8px">
+    <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
+    <g font-family="sans-serif" font-size="11.5" fill="#e7f2ec">
+      <text x="14" y="26" font-size="10.5" fill="#34d399" font-weight="bold">CI/CD &amp; GITOPS</text>
+      <rect x="14" y="34" width="110" height="38" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="69" y="57" text-anchor="middle">GitLab + Runner</text>
+      <rect x="150" y="34" width="135" height="38" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="217" y="57" text-anchor="middle">uv · ruff · mypy · pytest</text>
+      <rect x="311" y="34" width="115" height="38" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="368" y="57" text-anchor="middle">Local Registry</text>
+      <rect x="452" y="34" width="135" height="38" rx="6" fill="#0e2019" stroke="#34d399"/><text x="519" y="57" text-anchor="middle">ArgoCD GitOps</text>
+      <rect x="613" y="34" width="133" height="38" rx="6" fill="#0e2019" stroke="#1c3328"/><text x="679" y="57" text-anchor="middle">Terraform Mirror</text>
+      <line x1="124" y1="53" x2="148" y2="53" stroke="#34d399" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="285" y1="53" x2="309" y2="53" stroke="#34d399" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="426" y1="53" x2="450" y2="53" stroke="#34d399" stroke-width="2" marker-end="url(#arr2)"/>
+
+      <text x="14" y="98" font-size="10.5" fill="#34d399" font-weight="bold">6 ПРОДУКТИВНЫХ КОНТУРОВ (K3S v1.36 + SYSTEMD)</text>
+      <rect x="14" y="106" width="732" height="92" rx="8" fill="#0a1a14" stroke="#1c3328"/>
+      <rect x="26" y="118" width="112" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="82" y="138" text-anchor="middle">Маркировка ЧЗ</text>
+      <rect x="146" y="118" width="112" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="202" y="138" text-anchor="middle">Конвейер ЭДО</text>
+      <rect x="266" y="118" width="112" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="322" y="138" text-anchor="middle">Sellout ETL</text>
+      <rect x="386" y="118" width="116" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="444" y="138" text-anchor="middle">Delivery Alloc</text>
+      <rect x="510" y="118" width="112" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="566" y="138" text-anchor="middle">Price Monitor</text>
+      <rect x="630" y="118" width="104" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="682" y="138" text-anchor="middle">Mail Forward</text>
+
+      <rect x="26" y="156" width="165" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="108" y="176" text-anchor="middle">Vault + Auto-Unseal</text>
+      <rect x="201" y="156" width="175" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="288" y="176" text-anchor="middle">Redis Streams + Lock-Redis</text>
+      <rect x="386" y="156" width="175" height="32" rx="5" fill="#0e2019" stroke="#34d399"/><text x="473" y="176" text-anchor="middle">TBase (Distributed PG10)</text>
+      <rect x="571" y="156" width="163" height="32" rx="5" fill="#0e2019" stroke="#1c3328"/><text x="652" y="176" text-anchor="middle">MinIO S3 + MLflow</text>
+
+      <text x="14" y="222" font-size="10.5" fill="#34d399" font-weight="bold">AIOPS, RAG &amp; OBSERVABILITY</text>
+      <rect x="14" y="230" width="235" height="72" rx="6" fill="#0e2019" stroke="#34d399"/>
+      <text x="131" y="253" text-anchor="middle" font-weight="bold">Qdrant RAG (779 vectors)</text>
+      <text x="131" y="272" text-anchor="middle" font-size="10" fill="#8aa89a">BAAI/bge-m3 1024d · cortex :6335</text>
+      <text x="131" y="289" text-anchor="middle" font-size="10" fill="#8aa89a">daily cron reindex · basic-auth UI</text>
+
+      <rect x="262" y="230" width="235" height="72" rx="6" fill="#0e2019" stroke="#34d399"/>
+      <text x="379" y="253" text-anchor="middle" font-weight="bold">Hybrid Autoheal (:9310)</text>
+      <text x="379" y="272" text-anchor="middle" font-size="10" fill="#8aa89a">Watcher 5m · Dry-Run Runbooks</text>
+      <text x="379" y="289" text-anchor="middle" font-size="10" fill="#8aa89a">Telegram alerts + eLink digests</text>
+
+      <rect x="510" y="230" width="236" height="72" rx="6" fill="#0e2019" stroke="#1c3328"/>
+      <text x="628" y="253" text-anchor="middle" font-weight="bold">Prometheus · Grafana · Loki</text>
+      <text x="628" y="272" text-anchor="middle" font-size="10" fill="#8aa89a">4 Promtail · Pushgateway · node-exporter</text>
+      <text x="628" y="289" text-anchor="middle" font-size="10" fill="#8aa89a">RED Exporters (:9300/:9301/:9302) · Web :8180</text>
     </g>
-  </svg>  <h2>Как это развивалось</h2>
-  <div class="timeline">
-    <div class="step"><b>Подготовка сервера</b><span>Дисковая подсистема (RAID), Linux, сеть и доступ.</span></div>
-    <div class="step"><b>Платформа</b><span>K3s, nginx, Redis (очереди), PostgreSQL.</span></div>
-    <div class="step"><b>Первые сервисы</b><span>Деплой bash-скриптами вручную. Сначала так, потом стало больно.</span></div>
-    <div class="step"><b>CI/CD</b><span>GitLab CI: тесты, сборка, деплой.</span></div>
-    <div class="step"><b>Наблюдаемость</b><span>Prometheus, Grafana, Loki. RED-метрики.</span></div>
-    <div class="step"><b>GitOps</b><span>CI двигает тег в Git, ArgoCD применяет. Откат — git revert.</span></div>
-    <div class="step"><b>Безопасность</b><span>Vault, секреты вне Git, контейнеры не от root, requests/limits.</span></div>
-    <div class="step"><b>Алертинг</b><span>Health-check каждые 5 минут: Telegram (коротко) + eLink (подробно).</span></div>
-    <div class="step"><b>Рост</b><span>Pushgateway для batch-джобов, веб-монитор, планировщик ETL, новые cronjob-контуры.</span></div>
-  </div>
+  </svg>
 
-  <h2>Почему выбрал такой путь</h2>
-  <p>Каждое решение закрывало конкретную боль, а не «потому что модно»:</p>
-  <ul>
-    <li><b>K3s, а не полный K8s</b> — узел один, зачем кормить управляющую плоскость? Тот же API, меньше ресурсов.</li>
-    <li><b>GitOps вместо kubectl patch</b> — иначе «что в Git» и «что в кластере» расходятся. ArgoCD приводит кластер к Git, откат — revert.</li>
-    <li><b>Redis как stream</b> — буфер между приёмом и обработкой. Воркер упал — приём продолжает работать.</li>
-    <li><b>Секреты в Vault</b> — в коде им не место, least privilege.</li>
-    <li><b>RED-метрики, а не только CPU/RAM</b> — дашборд отвечает «что падает и что ждёт», а не рисует абстрактные графики.</li>
-  </ul>
-
-  <h2>Алертинг: Telegram + eLink</h2>
-  <p>Health-check каждые 5 минут: сервисы, эндпоинты, база, очереди. Сломалось — прилетает алерт: коротко в Telegram, подробно с контекстом в eLink. Статусы запоминаются, чтобы не спамить. Мои шаловливые ручки всё это настроили, и теперь о проблемах я узнаю первым.</p>
-
-  <h2>Стек: что выросло</h2>
+  <h2>Слои и компоненты платформы</h2>
   <table>
-    <tr><th>Слой</th><th>Компоненты</th></tr>
-    <tr><td>Алертинг</td><td>Telegram-бот, eLink (корпоративный IM), Alertmanager, Pushgateway (метрики batch-джобов)</td></tr>
-    <tr><td>Мониторинг контура</td><td>Веб-монитор операций (QR Operations Monitor), RED-экспортер контура маркировки</td></tr>
-    <tr><td>Планировщик ETL</td><td>Scheduler каждые 5 минут, DAG-структура (Airflow-подход), docker-compose для ML-стека</td></tr>
+    <tr><th>Слой</th><th>Компоненты и инженерная роль</th></tr>
+    <tr><td>Вычислительный узел</td><td>Ubuntu 24.04.4 LTS · 112 CPU · 376 GiB RAM · 9,5 ТБ (root LVM + 4 дата-тома) · корпоративные прокси CNTLM</td></tr>
+    <tr><td>Оркестрация и рантаймы</td><td>Kubernetes (K3s v1.36.3, 16 namespaces) для сервисов и CronJob + systemd для высокочастотных воркеров ЭДО/маркировки + Docker для мониторинга и Qdrant</td></tr>
+    <tr><td>CI/CD и IaC</td><td>GitLab + Runner · стадии <code>test → build → gitops</code> (<code>uv</code>, <code>ruff</code>, <code>mypy --strict</code>, <code>pytest</code>) · ArgoCD · Terraform (локальное <code>filesystem_mirror</code>, 18 ресурсов) · Ansible</td></tr>
+    <tr><td>Секреты и харденинг</td><td>HashiCorp Vault + Vault Agent Injector + авто-unseal таймер (каждые 2 мин) · права конфигов <code>0640 root:developers</code> · non-root контейнеры (<code>runAsUser: 999</code>)</td></tr>
+    <tr><td>AIOps и база знаний</td><td>Qdrant (<code>infra-knowledge</code>, 779 векторов <code>BAAI/bge-m3</code> 1024d) · локальный эмбеддер <code>cortex (:6335)</code> · оркестратор <code>devops_alert + autoheal (:9310)</code> · идемпотентные <code>runbooks/*.sh</code></td></tr>
+    <tr><td>Наблюдаемость и алерты</td><td>Prometheus v2.54 · Grafana 10 · Loki 3.0 + 4 Promtail · Pushgateway · <code>node-exporter</code> · RED-экспортёры · двухканальные уведомления (Telegram кратко + eLink подробно)</td></tr>
   </table>
-
-  <div class="note">Каналы и детали конфигурации обобщены; учётные данные не раскрываются.</div>
 </main>
-<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">обновлено 15.11.2026</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

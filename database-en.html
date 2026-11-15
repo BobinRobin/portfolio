@@ -3,50 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Database</title>
+<title>Data Layer: TBase, Qdrant RAG, Redis Streams &amp; Lock-Redis</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>
+  <nav class="links">
     <a href="index-en.html">Home</a>
-    <a href="infrastructure-en.html">Infrastructure</a>
-    <a href="integrations-en.html">Integrations</a>
-    <a href="database-en.html">Database</a>
-    <a href="incidents-en.html">Incidents</a>
-    <a href="mlops-en.html">MLOps</a>
-    <a href="articles-en.html">Articles</a>
-    <a href="playbook-en.html">Playbook</a>
-    <a href="lessons-en.html">Lessons</a>
-  </nav></header>
+    <a href="business-en.html">Impact</a>
+    <a href="incidents-en.html">Cases</a>
+    <a href="infrastructure-en.html">Stack</a>
+    <a href="index-en.html#contact">Contact</a>
+  </nav>
+</header>
 <main>
   <section class="hero">
-    <h1>Data layer</h1>
-    <p>Two PostgreSQL instances with different roles, Redis as an event transport, separate schemas for prod and test.</p>
+    <h1>Data Layer, Vector Search &amp; Event Queues</h1>
+    <p>Strict role separation: distributed TBase for high-volume business data, local PostgreSQL 16 for CI/CD tooling, Qdrant for RAG knowledge retrieval, and two isolated Redis instances (event streams + distributed locks).</p>
   </section>
-  <h2>PostgreSQL: two distinct jobs</h2>
+
   <div class="grid">
-    <div class="card"><div class="tag">Business data</div><h3>TBase — distributed PostgreSQL</h3>
-      <p>Marking and document-flow data lives on TBase, a PostgreSQL fork that adds distributed tables and horizontal scaling.</p>
-      <ul>
-        <li>Distributed fork on a PostgreSQL 10.0 base (64-bit)</li>
-        <li>Chosen for table growth: sharding while keeping the classic SQL interface</li>
-      </ul>
+    <div class="card"><div class="tag">Distributed SQL · Business</div><h3>TBase (PostgreSQL 10 · Sharded)</h3>
+      <p>Distributed Greenplum-like RDBMS (<code>max_connections=2500</code>) storing marking registries, UPDs, sales marts, and price monitoring. Tables are sharded by provenance key (e.g. <code>DISTRIBUTE BY SHARD(file_md5)</code>) so <code>DELETE + INSERT</code> runs inside a single shard without cross-node locks.</p>
     </div>
-    <div class="card"><div class="tag">Tooling</div><h3>PostgreSQL 16 (local)</h3>
-      <p>A separate local instance serves GitLab and internal CI/CD tooling.</p>
-      <ul>
-        <li>Version: PostgreSQL 16 (Ubuntu)</li>
-        <li>Isolation: a tooling failure does not touch the business loop</li>
-      </ul>
+    <div class="card"><div class="tag">Vector DB · AIOps RAG</div><h3>Qdrant (infra-knowledge · 779 vectors)</h3>
+      <p>Stores 1024-dim <code>BAAI/bge-m3</code> Cosine embeddings with on-disk payload. Indexes architecture docs, postmortems, runbooks, and skills across all 6 contours, returning top-k context in milliseconds on alert triggers.</p>
+    </div>
+    <div class="card"><div class="tag">Streams &amp; Distributed Locks</div><h3>Two Isolated Redis 7 Instances</h3>
+      <p>Primary <code>Redis</code> powers asynchronous event streams (<code>utd:uploads</code>, <code>utd:ingest</code>) with AOF+RDB persistence. Dedicated <code>lock-redis (:6378)</code> handles cross-process TTL locks (<code>SET NX EX</code> + Lua release) for concurrent RPA sessions.</p>
+    </div>
+    <div class="card"><div class="tag">Tooling &amp; Object Storage</div><h3>PostgreSQL 16 + MinIO (S3)</h3>
+      <p>Local PostgreSQL 16 is isolated for GitLab and CI/CD. Two MinIO instances store S3 artifacts, backups, and MLflow model weights.</p>
     </div>
   </div>
-  <h2>Redis — queues and events</h2>
-  <p>Redis is used as an asynchronous event transport (Streams), not just a cache. Incoming messages are written to a stream; workers read and process them. This buffers intake from processing and smooths load spikes.</p>
-  <h2>Multi-environment via schemas</h2>
-  <p>Prod and test live in separate schemas of the same database. Switching is done in code (contextvars + middleware in Python), so integrations can be tested without duplicating the database infrastructure.</p>
-  <div class="note">The TBase version and topology are described in general terms, without internal addresses or hostnames.</div>
-</main><footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+
+  <h2>Engineering Around Distributed TBase Specifics</h2>
+  <table>
+    <tr><th>TBase Characteristic</th><th>Production Pattern</th></tr>
+    <tr><td><code>UNIQUE</code> index must include the shard key</td><td>Distribute by provenance hash (<code>file_md5</code>) and run transactional shard-local <code>DELETE + INSERT</code></td></tr>
+    <tr><td><code>CREATE TABLE AS SELECT</code> rejects bind parameters (<code>$1</code>)</td><td>Use explicit DDL schemas and parameterized <code>INSERT ... SELECT</code></td></tr>
+    <tr><td><code>SET statement_timeout = $1</code> rejects placeholders</td><td>Apply session timeouts via <code>SELECT set_config('statement_timeout', %s, false)</code></td></tr>
+    <tr><td>Multi-environment isolation on a shared cluster</td><td>Separate prod and test schemas switched dynamically via Python <code>contextvars</code> middleware</td></tr>
+  </table>
+</main>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">updated 2026-11-15</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>

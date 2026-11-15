@@ -3,66 +3,61 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Incidents</title>
+<title>Incident Casebook &amp; Investigations (STAR)</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>  <nav class="links">
+  <a class="brand" href="index-en.html">Rodion <span>Murashkin</span></a>
+  <nav class="links">
     <a href="index-en.html">Home</a>
-    <a href="infrastructure-en.html">Infrastructure</a>
-    <a href="integrations-en.html">Integrations</a>
-    <a href="database-en.html">Database</a>
-    <a href="incidents-en.html">Incidents</a>
-    <a href="mlops-en.html">MLOps</a>
-    <a href="articles-en.html">Articles</a>
-    <a href="playbook-en.html">Playbook</a>
-    <a href="lessons-en.html">Lessons</a>
-  </nav></header>
+    <a href="business-en.html">Impact</a>
+    <a href="incidents-en.html">Cases</a>
+    <a href="infrastructure-en.html">Stack</a>
+    <a href="index-en.html#contact">Contact</a>
+  </nav>
+</header>
 <main>
   <section class="hero">
-    <h1>Incidents</h1>
-    <p>Real production failures. Each one: symptom, cause, fix, what changed.</p>
+    <h1>Incident Casebook &amp; Postmortems</h1>
+    <p>Real production investigations — also indexed into our Qdrant vector knowledge base (<code>infra-knowledge</code>) for automated alert enrichment.</p>
   </section>
+
   <div class="star">
-    <h3>Stickers: new codes were not sent to FTP</h3>
-    <p><span class="sl">Symptom.</span> New records were written to the DB, but XML was not sent. Log line: <code>skip_no_pd=1000</code>.</p>
-    <p><span class="sl">Cause.</span> The product date was taken only from existing rows; new codes were inserted without it, even though dates existed in another table.</p>
-    <p><span class="sl">Fix.</span> Extended the batch processor to look up the date from the correct source for codes without one.</p>
-    <p><span class="sl">Result.</span> Codes flow to FTP again; the "data present, no send" mismatch is gone.</p>
+    <h3>Case 1 (INC-040 / 040b). Overseas portal switched UI to Chinese — exporter stalled on 4,000 codes</h3>
+    <p><span class="sl">Symptom.</span> Codes missing production dates jumped from 1,300 to 4,000 (<code>QR_STUCK_NOPD</code>); exports returned <code>db_rows=0</code> and selector timeouts.</p>
+    <p><span class="sl">Investigation.</span> The portal silently switched its UI to Chinese locale (CN), breaking English selectors. Later, when it reverted to EN, date filters stayed stuck because the button was labeled <code>Reset</code> instead of <code>Clear / CN</code>.</p>
+    <p><span class="sl">Fix &amp; Result.</span> Built bilingual selectors (EN/CN), bilingual column mapping (<code>QrCode / Product Date</code> для обеих локалей), and multi-variant filter reset handling. All 4,000 stalled codes were enriched and sent to FTP automatically (<code>resultCode=0</code>).</p>
   </div>
+
   <div class="star">
-    <h3>Idempotency: a wrong key duplicated records</h3>
-    <p><span class="sl">Symptom.</span> Re-processing created duplicates because the idempotency key was not unique per document.</p>
-    <p><span class="sl">Fix.</span> Switched deduplication to a truly unique key and verified the re-post scenario.</p>
-    <p><span class="sl">Result.</span> Re-posts stop duplicating; retries are safe.</p>
+    <h3>Case 2 (INC-16 + Distributed Lock). Nightly allocation CronJob failed while concurrent browsers kicked out sessions</h3>
+    <p><span class="sl">Symptom.</span> The nightly <code>delivery-allocation</code> job hit <code>BackoffLimitExceeded</code>, ArgoCD turned <code>Degraded</code>, and overlapping runs with hourly code exports invalidated each other's portal sessions.</p>
+    <p><span class="sl">Investigation.</span> Three root causes: (1) a truncated password in Vault after manual editing; (2) <code>wait_for_url(until="load")</code> hanging on the corporate SPA; (3) two RPA contours logging into the same account simultaneously.</p>
+    <p><span class="sl">Fix &amp; Result.</span> Synced credentials in Vault, replaced SPA load waits with URL polling, and deployed a dedicated <code>lock-redis (127.0.0.1:6378)</code> with a cross-process TTL lock (<code>SET key token NX EX 180</code>, 60s heartbeat, atomic Lua release + <code>O_EXCL</code> file fallback). Added <code>kubectl get jobs → Failed</code> detection to <code>devops_alert.py</code>.</p>
   </div>
+
   <div class="star">
-    <h3>Grafana could not reach Loki</h3>
-    <p><span class="sl">Symptom.</span> After assembling the observability stack, Grafana could not fetch logs.</p>
-    <p><span class="sl">Cause.</span> A proxy conflict on the server.</p>
-    <p><span class="sl">Fix.</span> Moved Grafana to host network with a loopback datasource; switched the log agent to journald with a unit label.</p>
-    <p><span class="sl">Result.</span> Logs are visible in Grafana and filterable per worker.</p>
+    <h3>Case 3 (INC-17 / 22). Perpetual ArgoCD OutOfSync, phantom K8s worker &amp; logrotate self-kill</h3>
+    <p><span class="sl">Symptom.</span> The marking app stayed <code>OutOfSync</code> in ArgoCD, a K8s <code>utd-worker</code> pod crash-looped on a missing DB column, and <code>logrotate.service</code> failed daily.</p>
+    <p><span class="sl">Investigation.</span> A legacy base64 Secret in Git clashed with live Vault secrets; the K8s <code>utd-worker</code> was an 8-week-old duplicate of the canonical systemd pipeline; and a <code>*.bak</code> file inside <code>/etc/logrotate.d/</code> was still executed by logrotate, where <code>pkill -USR1 -f</code> killed the rotation process itself.</p>
+    <p><span class="sl">Fix &amp; Result.</span> Removed the hardcoded Secret from Git (restoring <code>Synced</code> in ArgoCD), retired the legacy K8s worker manifest, replaced the broken logrotate rule with a systemd archive timer, and added <code>NRestarts &gt; 5</code> delta alerts.</p>
   </div>
+
   <div class="star">
-    <h3>Go-live blockers (critical defects)</h3>
-    <p><span class="sl">Symptom.</span> A source audit found defects that blocked the production rollout.</p>
-    <p><span class="sl">Fix.</span> Fixed async logic in the FTP poller (races, lost results), a mismatched callback contract, chunking-limit bypass, disabled idempotency, and exposed secrets (moved to a secret store).</p>
-    <p><span class="sl">Result.</span> The loop reached a safe state; external channels are enabled one at a time.</p>
+    <h3>Case 4 (INC-13 + Network). HashiCorp geoblock &amp; Docker subnet shadowing the corporate proxy</h3>
+    <p><span class="sl">Symptom.</span> <code>terraform init</code> failed on blocked <code>releases.hashicorp.com</code>, while requests to the European proxy <code>corp-proxy:8080</code> failed with <code>No route to host</code>.</p>
+    <p><span class="sl">Investigation.</span> HashiCorp blocked provider downloads by region, while a local <code>172.21.0.0/16</code> Docker bridge hijacked routing for the entire <code>172.21.x.x</code> range.</p>
+    <p><span class="sl">Fix &amp; Result.</span> Removed the conflicting Docker bridge (restoring default gateway routing) and built a local <code>~/.terraform.d/mirror</code> in <code>~/.terraformrc</code> — managing all 18 cluster resources via Terraform offline.</p>
   </div>
+
   <div class="star">
-    <h3>Observability from scratch</h3>
-    <p><span class="sl">Symptom.</span> No metrics; worker logs were read manually.</p>
-    <p><span class="sl">Fix.</span> Assembled Prometheus + Grafana + Loki: RED metrics, business status counters, two SRE dashboards.</p>
-    <p><span class="sl">Result.</span> Diagnosis is no longer blind: incidents are visible in metrics and logs.</p>
+    <h3>Case 5. Shard-local idempotency in TBase &amp; duplicate elimination on retries</h3>
+    <p><span class="sl">Symptom.</span> Default distribution in TBase (distributed PostgreSQL 10) caused cross-shard timeouts when replacing price-monitoring files, while non-unique EAN keys produced duplicates on order retries.</p>
+    <p><span class="sl">Fix &amp; Result.</span> Re-distributed the table as <code>DISTRIBUTE BY SHARD(file_md5)</code> (making <code>DELETE + INSERT</code> shard-local across 56,697 rows with 0 duplicates) and enforced <code>orderlineno</code> as the idempotency key.</p>
   </div>
-  <h2>Conclusions</h2>
-  <ul>
-    <li>Idempotency from day one — the key must be unique.</li>
-    <li>Enable external channels one at a time.</li>
-    <li>Observability before the incident, not after.</li>
-  </ul>
-</main><footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a></footer>
+</main>
+<footer>© <span data-year>2026</span> · <a href="https://github.com/BobinRobin">GitHub</a> · <span style="opacity:.65">updated 2026-11-15</span></footer>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
