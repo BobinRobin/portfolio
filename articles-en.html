@@ -25,6 +25,103 @@
   </section>
 
   <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">AIOps &amp; RAG · ~15 min</div>
+    <h2 style="margin-top:.2rem">Qdrant Vector Knowledge Base &amp; Hybrid Autoheal Orchestrator: Turning Postmortems into Self-Healing Operations</h2>
+
+    <h3>Problem: Documentation is dead unless wired into alerting</h3>
+    <p>When a platform runs 6 production contours (state marking, e-invoicing/UPD, delivery allocation, price monitoring, mail relay, and sellout inventory), operational docs, postmortems, and runbooks span dozens of files. During a 3 AM alert, an engineer should not have to hunt through folders to remember a rare error code or runbook flag. Documentation should arrive inside the alert itself — and, where safe, trigger deterministic remediation automatically.</p>
+
+    <div class="slide-card">
+      <div class="slide-title"><span>Architecture Slide: RAG + Safe Autoheal Pipeline</span><span>779 Vectors · 1024d Cosine</span></div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fs-num">01 · Indexing</div><div class="fs-name">index_rag.py</div><div class="fs-desc">Markdown section chunking (900/100 chars) + deterministic UUIDv5</div></div>
+        <div class="flow-step"><div class="fs-num">02 · Embeddings</div><div class="fs-name">BAAI/bge-m3</div><div class="fs-desc">Local cortex (:6335) service on CPU with zero external cloud calls</div></div>
+        <div class="flow-step"><div class="fs-num">03 · Vector Store</div><div class="fs-name">Qdrant :6333</div><div class="fs-desc">infra-knowledge collection filtered by service &amp; source_type</div></div>
+        <div class="flow-step"><div class="fs-num">04 · Orchestration</div><div class="fs-name">autoheal.py :9310</div><div class="fs-desc">Pre-check → Dry-Run → Backup → Whitelist Apply → Verify</div></div>
+      </div>
+    </div>
+
+    <h3>Choosing the Vector Store and Embedding Model</h3>
+    <p>We evaluated four options: <code>pgvector</code> on our existing database, local <code>Chroma/LanceDB</code>, <code>FAISS</code>, and dedicated <strong>Qdrant</strong>. Because our primary business database is distributed TBase (built on PostgreSQL 10), modern <code>pgvector (HNSW)</code> indexes were not an option, while raw <code>FAISS</code> lacked out-of-the-box persistence and metadata filtering. We deployed <strong>Qdrant in Docker</strong> bound to <code>127.0.0.1:6333</code> with on-disk storage and an nginx basic-auth protected dashboard (<code>:8085/dashboard</code>). For bilingual Russian/English technical text and code on CPU, <code>BAAI/bge-m3</code> (1024d, Cosine) delivered the best retrieval quality.</p>
+
+    <pre><code># Excerpt from rag_context.py (stdlib-only, zero-dependency fallback)
+def rag_context(query: str, limit: int = 3, timeout: int = 5) -> str:
+    try:
+        vec = _embed([query])[0]  # local call to cortex :6335/embed
+        body = json.dumps({"query": vec, "limit": limit, "with_payload": True}).encode()
+        req = urllib.request.Request(f"{QDRANT_URL}/collections/infra-knowledge/points/query",
+                                     data=body, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            pts = (json.loads(r.read()).get("result") or {}).get("points") or []
+        return "\n".join(f"- [{p['score']:.3f}] {p['payload']['service']}: {p['payload']['text'][:240]}" for p in pts)
+    except Exception:
+        return ""  # RAG degradation never blocks alert delivery</code></pre>
+
+    <h3>Seven Safety Barriers (Safe Autoheal Architecture)</h3>
+    <ul>
+      <li><strong>No arbitrary shell execution:</strong> only pre-audited scripts under <code>/opt/ops-alerts/runbooks/*.sh</code> can ever run.</li>
+      <li><strong>Mandatory precondition re-check:</strong> the orchestrator verifies live cluster/systemd state before invoking any script.</li>
+      <li><strong>Strict <code>dry-run → backup → apply → verify → rollback</code> chain:</strong> all runbooks default to <code>dry-run</code>; live application is restricted to a whitelist when <code>AUTOHEAL_APPLY=1</code> is set.</li>
+      <li><strong>Self-observability:</strong> exporter on <code>:9310</code> publishes <code>autoheal_problems_total</code>, <code>autoheal_known_total</code>, and <code>autoheal_runbooks_ok_total</code> to Prometheus.</li>
+    </ul>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Concurrency &amp; RPA · ~12 min</div>
+    <h2 style="margin-top:.2rem">Cross-Process Distributed Locks (Lock-Redis) &amp; Bilingual RPA Resilience in Kubernetes</h2>
+
+    <h3>Challenge: Two contours, one shared portal account &amp; unannounced UI locale switches</h3>
+    <p>Our hourly code-export job and nightly Kubernetes CronJob (<code>delivery-allocation</code>) authenticate against the same overseas corporate portal. Whenever a nightly run overlapped with an hourly export, the second browser session invalidated the first session's cookies. Additionally, in November the portal silently switched its UI locale from English to Chinese, stalling 4,000 codes.</p>
+
+    <div class="slide-card">
+      <div class="slide-title"><span>Slide: Lock-Redis Distributed Lock Architecture</span><span>TTL 180s · Heartbeat 60s</span></div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fs-num">Acquire</div><div class="fs-name">SET key token NX EX 180</div><div class="fs-desc">Atomic session token acquisition in dedicated lock-redis :6378</div></div>
+        <div class="flow-step"><div class="fs-num">Renew</div><div class="fs-name">60s Heartbeat</div><div class="fs-desc">Background thread extends TTL while browser worker is alive</div></div>
+        <div class="flow-step"><div class="fs-num">Release</div><div class="fs-name">Atomic Lua EVAL</div><div class="fs-desc">Deletes lock key only if the caller's token matches</div></div>
+        <div class="flow-step"><div class="fs-num">Fallback</div><div class="fs-name">O_EXCL File Lock</div><div class="fs-desc">Local file lock with stale-marker steal if Redis is unreachable</div></div>
+      </div>
+    </div>
+
+    <pre><code># Atomic owner-verified lock release (Redis Lua script)
+RELEASE_LUA = """
+if redis.call('get', KEYS[1]) == ARGV[1] then
+    return redis.call('del', KEYS[1])
+else
+    return 0
+end
+"""</code></pre>
+
+    <h3>Bilingual Selector Adapter (EN / CN)</h3>
+    <p>After <code>INC-040</code> (portal UI switched to Chinese, stalling 4,000 codes) and <code>INC-040b</code> (returning to English changed the filter reset button from <code>Clear</code> to <code>Reset</code>), we equipped every RPA step with bilingual selector dictionaries and bilingual Excel column mappings. Portal locale flips are now completely transparent to the pipeline.</p>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Database &amp; Hardening · ~14 min</div>
+    <h2 style="margin-top:.2rem">Shard-Local Idempotency in Distributed TBase &amp; Eliminating Infrastructure Tech Debt</h2>
+
+    <h3>Distributed TBase (PostgreSQL 10) Traps &amp; Solutions</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>TBase Trap</th><th>What Happened</th><th>Production Fix</th></tr>
+        <tr><td>Default shard key</td><td>Deleting replaced price-monitoring files broadcast across all nodes and caused cross-shard timeouts</td><td>Recreated table with <code>DISTRIBUTE BY SHARD(file_md5)</code> — idempotent <code>DELETE + INSERT</code> executes inside a single shard (56,697 rows across 783 files, 0 duplicates)</td></tr>
+        <tr><td><code>UNIQUE</code> index restriction</td><td><code>Unique index of distributed table must include the distribution column</code></td><td>Included the shard key in composite unique constraints and enforced provenance-key deduplication before insert</td></tr>
+        <tr><td><code>SET</code> &amp; <code>CTAS</code> parameters</td><td><code>SET statement_timeout = <section class="hero">
+    <h1>Articles</h1>
+    <p>Write-ups of what actually happened: decisions, trade-offs, code and lessons. No corporate fluff.</p>
+  </section></code> and parameterized <code>CTAS</code> fail with syntax errors</td><td>Used <code>SELECT set_config('statement_timeout', %s, false)</code> and explicit DDL schemas</td></tr>
+      </table>
+    </div>
+
+    <h3>Eliminating Split-Brain Runtimes, ArgoCD OutOfSync &amp; Terraform Geoblocks</h3>
+    <ul>
+      <li><strong>Clearing perpetual ArgoCD OutOfSync:</strong> removed legacy base64 <code>Secret</code> objects from Git manifests after migrating secrets to HashiCorp Vault, added a 2-minute <code>vault-unseal.timer</code>, and restored clean <code>Synced / Healthy</code> status.</li>
+      <li><strong>Retiring split-brain workers &amp; fixing <code>logrotate</code> self-kill:</strong> removed an 8-week-old K8s <code>utd-worker</code> duplicate that clashed with systemd workers; removed a <code>*.bak</code> file from <code>/etc/logrotate.d/</code> (which logrotate still executed, killing itself via <code>pkill -USR1 -f</code>) and replaced it with a safe systemd archive timer.</li>
+      <li><strong>Bypassing HashiCorp geoblocks &amp; proxy collisions:</strong> built a local provider mirror <code>~/.terraform.d/mirror</code> in <code>~/.terraformrc</code> (18 cluster resources under IaC offline) and removed a conflicting <code>172.21.0.0/16</code> Docker bridge that shadowed the European proxy.</li>
+    </ul>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:2rem">
     <div class="tag">Infrastructure · ~10 min</div>
     <h2 style="margin-top:.2rem">From a legacy server to a maintainable platform</h2>
 

@@ -34,51 +34,67 @@
           <div class="sub">Platform, DevOps &amp; MLOps Engineer · Data &amp; Enterprise Integrations</div>
         </div>
       </div>
-      <p>Строю и держу в продакшене серверную платформу (112 CPU, 376 GiB RAM, K3s, Docker, systemd, GitOps через ArgoCD и Vault), на которой работают 6 бизнес-контуров, векторная база знаний в <strong>Qdrant (779 векторов bge-m3)</strong> и гибридный оркестратор самовосстановления. Соединяю инфраструктуру, код, распределённую СУБД TBase и сквозные процессы — от таможенной маркировки и ЭДО до аналитики Retail, GTM и Finance в 4 странах.</p>
+      <p>Строю и держу в продакшене серверную платформу (112 CPU, 376 GiB RAM, K3s, Docker, systemd, GitOps через ArgoCD и Vault), на которой работают 6 бизнес-контуров, векторная база знаний в <strong>Qdrant (779 векторов bge-m3)</strong> и гибридный оркестратор самовосстановления. Соединяю инфраструктуру, код, распределённую СУБД TBase и сквозные процессы в 4 странах.</p>
       <div class="hero-actions">
         <a class="btn" href="resume.pdf">Скачать резюме (PDF · макет hh.ru)</a>
-        <a class="btn-secondary" href="#architecture">Архитектура и 6 контуров ↓</a>
+        <a class="btn-secondary" href="articles.html">Подробные статьи и гайды →</a>
       </div>
     </div>
 
-    <div class="arch-card" aria-label="Живая схема платформы">
+    <div class="arch-card" aria-label="Адаптивная карта платформы">
       <div class="arch-card-head">
-        <span>Platform Topology · Bare-Metal 112C / 376G</span>
-        <span class="live">● LIVE TELEMETRY</span>
+        <span>Карта платформы · 112 CPU / 376 GiB RAM</span>
+        <span class="live">● 5 СЛОЁВ В ПРОДЕ</span>
       </div>
-      <svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Пятислойная архитектура платформы" style="width:100%;height:auto;background:#06120e;border:1px solid #1c3328;border-radius:10px">
-        <g font-family="sans-serif" font-size="10.5" fill="#e7f2ec">
-          <!-- Layer 1: GitOps & IaC -->
-          <rect x="10" y="10" width="440" height="44" rx="6" fill="#0a1a14" stroke="#1c3328"/>
-          <text x="20" y="25" font-size="9" fill="#34d399" font-weight="bold">01 · GITOPS &amp; IAC</text>
-          <text x="20" y="42" fill="#8aa89a">GitLab CI (uv · ruff · mypy · pytest) → Registry → ArgoCD + Vault + Terraform mirror</text>
-
-          <!-- Layer 2: 6 Contours -->
-          <rect x="10" y="62" width="440" height="72" rx="6" fill="#0e2019" stroke="#34d399"/>
-          <text x="20" y="77" font-size="9" fill="#34d399" font-weight="bold">02 · 6 ПРОДУКТИВНЫХ КОНТУРОВ (K3S + SYSTEMD)</text>
-          <rect x="20" y="84" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="86" y="98" text-anchor="middle">Маркировка ЧЗ</text>
-          <rect x="164" y="84" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="230" y="98" text-anchor="middle">Конвейер ЭДО / УПД</text>
-          <rect x="308" y="84" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="374" y="98" text-anchor="middle">Sellout ETL (10m)</text>
-          <rect x="20" y="108" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="86" y="122" text-anchor="middle">Delivery Allocation</text>
-          <rect x="164" y="108" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="230" y="122" text-anchor="middle">Price Monitoring</text>
-          <rect x="308" y="108" width="132" height="20" rx="4" fill="#06120e" stroke="#1c3328"/><text x="374" y="122" text-anchor="middle">Mail Relay Poller</text>
-
-          <!-- Layer 3: Data & Locks -->
-          <rect x="10" y="142" width="440" height="46" rx="6" fill="#0a1a14" stroke="#1c3328"/>
-          <text x="20" y="157" font-size="9" fill="#6ee7b7" font-weight="bold">03 · ДАННЫЕ, ОЧЕРЕДИ И РАСПРЕДЕЛЁННЫЕ ЗАМКИ</text>
-          <text x="20" y="175" fill="#8aa89a">TBase (Distributed PG10 · shard by md5) · Redis Streams · Lock-Redis (SET NX EX) · MinIO</text>
-
-          <!-- Layer 4: AIOps & RAG -->
-          <rect x="10" y="196" width="440" height="46" rx="6" fill="#0e2019" stroke="#34d399"/>
-          <text x="20" y="211" font-size="9" fill="#34d399" font-weight="bold">04 · AIOPS: QDRANT RAG + HYBRID AUTOHEAL (:9310)</text>
-          <text x="20" y="229" fill="#e7f2ec">Qdrant infra-knowledge (779 vectors bge-m3) → Watcher (5m) → Dry-Run Runbooks → eLink/TG</text>
-
-          <!-- Layer 5: Observability -->
-          <rect x="10" y="250" width="440" height="40" rx="6" fill="#0a1a14" stroke="#1c3328"/>
-          <text x="20" y="265" font-size="9" fill="#8aa89a" font-weight="bold">05 · НАБЛЮДАЕМОСТЬ И SRE-МЕТРИКИ</text>
-          <text x="20" y="281" fill="#8aa89a">Prometheus · Grafana · Loki (4 Promtail) · Pushgateway · RED Exporters (:9300/:9301/:9302)</text>
-        </g>
-      </svg>
+      <div class="bento-arch">
+        <div class="bento-layer">
+          <div class="bento-layer-head"><span>01 · GitOps &amp; IaC</span><span class="sub-tag">git revert rollback</span></div>
+          <div class="bento-pills">
+            <span class="bento-pill"><b>GitLab CI</b> (uv · ruff · mypy · pytest)</span>
+            <span class="bento-pill"><b>ArgoCD</b> Synced</span>
+            <span class="bento-pill"><b>Vault</b> Auto-Unseal</span>
+            <span class="bento-pill"><b>Terraform</b> Mirror (18 res)</span>
+          </div>
+        </div>
+        <div class="bento-layer">
+          <div class="bento-layer-head"><span>02 · 6 Продуктивных контуров</span><span class="sub-tag">K3s v1.36 + systemd</span></div>
+          <div class="bento-pills">
+            <span class="bento-pill"><b>Маркировка ЧЗ</b></span>
+            <span class="bento-pill"><b>Конвейер ЭДО / УПД</b></span>
+            <span class="bento-pill"><b>Sellout ETL</b> (10m)</span>
+            <span class="bento-pill"><b>Delivery Alloc</b></span>
+            <span class="bento-pill"><b>Price Monitor</b></span>
+            <span class="bento-pill"><b>Mail Forwarder</b></span>
+          </div>
+        </div>
+        <div class="bento-layer">
+          <div class="bento-layer-head"><span>03 · Данные и распределённые замки</span><span class="sub-tag">Zero duplicates</span></div>
+          <div class="bento-pills">
+            <span class="bento-pill"><b>TBase</b> (Distributed PG10 · shard by md5)</span>
+            <span class="bento-pill"><b>Redis Streams</b></span>
+            <span class="bento-pill"><b>Lock-Redis</b> (SET NX EX + Lua)</span>
+            <span class="bento-pill"><b>MinIO S3</b></span>
+          </div>
+        </div>
+        <div class="bento-layer">
+          <div class="bento-layer-head"><span>04 · AIOps: Qdrant RAG + Autoheal</span><span class="sub-tag">Metrics :9310</span></div>
+          <div class="bento-pills">
+            <span class="bento-pill"><b>Qdrant</b> (779 чанков bge-m3)</span>
+            <span class="bento-pill"><b>Watcher</b> (5m)</span>
+            <span class="bento-pill"><b>Dry-Run Runbooks</b></span>
+            <span class="bento-pill"><b>Telegram + eLink</b></span>
+          </div>
+        </div>
+        <div class="bento-layer">
+          <div class="bento-layer-head"><span>05 · Наблюдаемость и SRE</span><span class="sub-tag">RED Exporters</span></div>
+          <div class="bento-pills">
+            <span class="bento-pill"><b>Prometheus</b> + Pushgateway</span>
+            <span class="bento-pill"><b>Grafana 10</b></span>
+            <span class="bento-pill"><b>Loki 3</b> (4 Promtail)</span>
+            <span class="bento-pill"><b>MLflow Server</b></span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -92,145 +108,150 @@
   </section>
 
   <section id="architecture">
-    <h2>Архитектура и 6 контуров в деталях</h2>
-    <p>Переключай вкладки ниже — внутри каждого слоя приведены реальные инженерные решения, механизмы защиты от сбоев и команды диагностики.</p>
+    <h2>Как устроена платформа (слайды по слоям)</h2>
+    <p>На каждом слайде — краткая суть за 5 секунд. Нужны команды, код и архитектурные тонкости — раскрой блок <strong>«Подробнее ▾»</strong>.</p>
     <div class="tabs-bar" role="tablist">
       <button class="tab-btn active" data-tab-target="tab-aiops" type="button">01 · AIOps: Qdrant RAG &amp; Autoheal</button>
       <button class="tab-btn" data-tab-target="tab-edo" type="button">02 · Маркировка (ЧЗ) и ЭДО / УПД</button>
-      <button class="tab-btn" data-tab-target="tab-locks" type="button">03 · Lock-Redis, Прайс-мониторинг и Релей</button>
+      <button class="tab-btn" data-tab-target="tab-locks" type="button">03 · Lock-Redis, Прайсы и Релей</button>
       <button class="tab-btn" data-tab-target="tab-platform" type="button">04 · Платформа, TBase и Харденинг</button>
     </div>
 
     <div class="tab-pane active" id="tab-aiops">
-      <div class="tab-pane-grid">
-        <div>
-          <h3>Векторная база знаний в Qdrant и гибридный Autoheal-оркестратор</h3>
-          <p>Чтобы инциденты не разбирались каждый раз с чистого листа, вся эксплуатационная документация, архитектурные карты, постмортемы и скиллы проиндексированы в локальный <strong>Qdrant</strong> и подключены к системе мониторинга и самовосстановления.</p>
-          <ul>
-            <li><strong>Корпус знаний (`infra-knowledge`, 779 векторов):</strong> разбиение Markdown по секциям с перекрытием (`900 / 100` символов), мультиязычные эмбеддинги <code>BAAI/bge-m3</code> (1024d) через локальный сервис <code>cortex (:6335)</code>, ежедневная переиндексация по cron в 06:10 MSK, UI закрыт за nginx basic-auth (<code>:8085/dashboard</code>).</li>
-            <li><strong>Детект и классификация (`devops_alert` + `autoheal`, метрики `:9310`):</strong> каждые 5 минут опрашивает все K8s namespaces, systemd-воркеры, очереди Redis, свежесть выгрузок и статус ночных CronJob.</li>
-            <li><strong>Принцип «не навреди» (Safe Autoheal):</strong> для известных инфраструктурных сбоев (например, зависшие джобы или дрейф) запускает идемпотентные <code>runbooks/*.sh</code> строго по цепочке <code>pre-check → dry-run → backup → apply (whitelist) → verify → rollback</code>. Для новых ошибок — прикладывает топ-3 релевантных чанка из Qdrant и отправляет короткий сигнал в Telegram, а полный разбор и дневной дайджест — в корпоративный мессенджер eLink.</li>
-          </ul>
-        </div>
-        <div>
-          <pre><code># Поиск релевантных инцидентов и runbook в Qdrant
-python3 query_rag.py "QR_STUCK_NOPD пустые файлы" 3 \
-  --service marking-qr --type incident
-
-# Проверка контура и метрик самовосстановления
-python3 /opt/ops-alerts/devops_alert.py check
-python3 /opt/ops-alerts/autoheal.py check
-curl -s http://127.0.0.1:9310/metrics | grep autoheal_</code></pre>
-          <div class="kv-list">
-            <div class="kv-item"><div class="kv-k">Embedding-модель</div><div class="kv-v">BAAI/bge-m3 · 1024d · Cosine</div></div>
-            <div class="kv-item"><div class="kv-k">Политика Autoheal</div><div class="kv-v">Dry-run default · Whitelist apply</div></div>
-          </div>
+      <h3>Векторная база знаний в Qdrant и гибридный Autoheal-оркестратор</h3>
+      <p>Вся документация, постмортемы и скиллы всех 6 контуров проиндексированы в локальный <strong>Qdrant (779 векторов BAAI/bge-m3)</strong>. При сбое оркестратор находит релевантный runbook за миллисекунды и либо лечит типовую проблему по цепочке <code>dry-run → backup → apply → verify</code>, либо присылает готовый разбор в eLink.</p>
+      <div class="slide-card">
+        <div class="slide-title"><span>Схема потока: от алерта до самовосстановления</span><span>SLA: проверка каждые 5 мин</span></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="fs-num">Шаг 1 · Watcher</div><div class="fs-name">Детект сбоя</div><div class="fs-desc">K8s pods/jobs, systemd NRestarts, очереди, свежесть выгрузок</div></div>
+          <div class="flow-step"><div class="fs-num">Шаг 2 · Cortex :6335</div><div class="fs-name">Эмбеддинг bge-m3</div><div class="fs-desc">Векторизация симптома (1024d Cosine) локально на CPU</div></div>
+          <div class="flow-step"><div class="fs-num">Шаг 3 · Qdrant :6333</div><div class="fs-name">Поиск в 779 чанках</div><div class="fs-desc">Топ-3 похожих инцидента и проверенный runbook по сервису</div></div>
+          <div class="flow-step"><div class="fs-num">Шаг 4 · Autoheal :9310</div><div class="fs-name">Safe Runbook / Алерт</div><div class="fs-desc">Whitelist dry-run → apply → verify + отчёт в Telegram / eLink</div></div>
         </div>
       </div>
+      <details class="deep-drawer">
+        <summary>Инженерные детали, структура индексации и команды диагностики</summary>
+        <div class="drawer-content">
+          <ul>
+            <li><strong>Индексатор (`index_rag.py`):</strong> режет документацию по заголовкам H1–H3 (чанки до 900 символов с перекрытием 100), генерирует детерминированный UUIDv5 и обновляет Qdrant по расписанию в 06:10 MSK. Веб-панель закрыта через nginx basic-auth (<code>:8085/dashboard</code>).</li>
+            <li><strong>Критерий «не навреди»:</strong> LLM/RAG никогда не исполняют произвольный код — авто-применение разрешено только для детерминированных скриптов из белого списка после проверки прекондиции и создания бэкапа.</li>
+          </ul>
+          <pre><code>python3 query_rag.py "QR_STUCK_NOPD пустые файлы" 3 --service marking-qr --type incident
+python3 /opt/ops-alerts/devops_alert.py check &amp;&amp; python3 /opt/ops-alerts/autoheal.py check
+curl -s http://127.0.0.1:9310/metrics | grep autoheal_</code></pre>
+        </div>
+      </details>
     </div>
 
     <div class="tab-pane" id="tab-edo">
-      <div class="tab-pane-grid">
-        <div>
-          <h3>Маркировка («Честный знак») и конвейер ЭДО / УПД</h3>
-          <p>Два связанных высоконагруженных контура, от которых напрямую зависит скорость прохождения таможни, отгрузки и момент признания выручки.</p>
-          <ul>
-            <li><strong>Строгие XML-контракты и чанкинг 29 999 кодов:</strong> детерминированное разбиение крупных партий (order, sticker, import, aggregation SSCC) с сохранением порядка кодов, чтобы повторная отправка любой части была идемпотентной.</li>
-            <li><strong>Двухконтурный приём (`logs-only` → Redis Streams → TBase):</strong> входящий API мгновенно фиксирует сырой запрос на диск и в стрим, не блокируя отправителя; воркеры проверяют готовность кодов через гейт <code>WAIT_MARKING</code>, склеивают поставки в 30-минутном окне (с сохранением всех строк <code>&lt;СведТов&gt;</code> и ГТД) и после подписания УПД формируют финальный статус продажи.</li>
-            <li><strong>Билингвальная защита RPA-экспортёра (EN / CN-локаль):</strong> когда зарубежный портал без предупреждения переключал интерфейс между английским и китайским, парсер падал на селекторах и кнопках сброса фильтра (<code>Reset / Clear / CN-Reset</code>). Добавлены билингвальные селекторы и маппинг колонок (<code>QrCode / Product Date</code> для обеих локалей) — 4 000 зависших кодов обработаны автоматически.</li>
-          </ul>
-        </div>
-        <div>
-          <pre><code># Живые метрики контуров (Prometheus exporters)
-curl -s http://127.0.0.1:9300/metrics | grep marking_qr_
-curl -s http://127.0.0.1:9301/metrics | grep edo_upd_
-
-# Контроль очередей и воркеров
-systemctl status marking-sticker-pool edo-ingest-worker
-journalctl -u edo-ingest-worker -n 50 --no-pager</code></pre>
-          <div class="kv-list">
-            <div class="kv-item"><div class="kv-k">Скорость партии</div><div class="kv-v">1 200 кодов за ~3 сек · УПД за 0,6 сек</div></div>
-            <div class="kv-item"><div class="kv-k">Масштаб</div><div class="kv-v">654 000+ единиц в sales_done · 223 УПД</div></div>
-          </div>
+      <h3>Маркировка («Честный знак») и конвейер ЭДО / УПД</h3>
+      <p>Сквозной автоматический цикл от заказа кодов маркировки до подписанного УПД и признания выручки: <strong>~550 000 событий кодов в сутки, 654 000+ единиц в финальном статусе продажи, 223 подписанных УПД, 0 потерь</strong>.</p>
+      <div class="slide-card">
+        <div class="slide-title"><span>Схема конвейера: Order → Sticker/Import → УПД → Выручка</span><span>Партия 1 200 кодов ≈ 3 сек</span></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="fs-num">Этап 1 · Intake</div><div class="fs-name">Logs-Only + Redis</div><div class="fs-desc">Мгновенная запись сырого запроса и постановка в стрим без блокировки</div></div>
+          <div class="flow-step"><div class="fs-num">Этап 2 · Билингвальный RPA</div><div class="fs-name">EN / CN адаптер</div><div class="fs-desc">Выгрузка дат производства, устойчивая к смене локали портала</div></div>
+          <div class="flow-step"><div class="fs-num">Этап 3 · Чанкинг 29 999</div><div class="fs-name">Гейт WAIT_MARKING</div><div class="fs-desc">Детерминированная нарезка XML и проверка всех кодов до сборки УПД</div></div>
+          <div class="flow-step"><div class="fs-num">Этап 4 · Merge 30m</div><div class="fs-name">Подписание и Sales</div><div class="fs-desc">Склейка доставок с сохранением ГТД → подпись ЭДО → фиксация продажи</div></div>
         </div>
       </div>
+      <details class="deep-drawer">
+        <summary>Инженерные детали, защита контрактов и команды проверки</summary>
+        <div class="drawer-content">
+          <ul>
+            <li><strong>Идемпотентность:</strong> дедупликация строго по уникальному номеру строки заказа (<code>orderlineno</code>), исключающая дубли при сетевых ретраях.</li>
+            <li><strong>Билингвальная защита:</strong> селекторы и маппинг колонок (<code>QrCode / Product Date</code>) автоматически работают и на английском, и на китайском интерфейсе зарубежного портала, включая все варианты кнопки сброса фильтра (<code>Reset / Clear / CN-Reset</code>).</li>
+          </ul>
+          <pre><code>curl -s http://127.0.0.1:9300/metrics | grep marking_qr_
+curl -s http://127.0.0.1:9301/metrics | grep edo_upd_
+systemctl status marking-sticker-pool edo-ingest-worker</code></pre>
+        </div>
+      </details>
     </div>
 
     <div class="tab-pane" id="tab-locks">
-      <div class="tab-pane-grid">
-        <div>
-          <h3>Распределённые блокировки, Прайс-мониторинг и Почтовый релей</h3>
-          <p>Четыре продуктовых контура в Kubernetes, построенных по единому стандарту качества (<code>uv</code>, <code>ruff</code>, <code>mypy --strict</code>, <code>pytest</code>, Helm, ArgoCD, Pushgateway).</p>
-          <ul>
-            <li><strong>Межпроцессный распределённый замок (`lock-redis`, `SET NX EX`):</strong> два RPA-контура (выгрузка кодов и ночная аллокация поставок) использовали одну учётную запись зарубежного портала и при пересечении по времени выбивали сессии друг друга. Поднят выделенный <code>lock-redis (127.0.0.1:6378)</code> с паролем, TTL 180с, фоновым heartbeat 60с, атомарным Lua-освобождением по токену и файловым фолбэком <code>O_EXCL</code>.</li>
-            <li><strong>Конкурентный прайс-мониторинг (Telegram → TBase):</strong> постоянный слушатель и часовой <code>--catch-up</code> забирают Excel-отчёты из закрытых групп (MTProto + Bot API, рециклинг сессии каждые 3600с без обрывов), парсят целевой лист и выполняют шард-локальную идемпотентную перезапись в TBase (<strong>56 697 строк из 783 файлов</strong>).</li>
-            <li><strong>Почтовый релей-фильтр (`mail-forwarder`) и Sellout ETL:</strong> отказоустойчивый IMAP→SMTP poller (декодирование RFC-2047 имён вложений, фильтрация по бизнес-правилам, офлайн-сборка stdlib-only образа) и 10-минутный CronJob инвентаря продаж.</li>
-          </ul>
+      <h3>Межпроцессные замки (Lock-Redis), Прайс-мониторинг и Почтовый релей</h3>
+      <p>Четыре продуктовых контура в Kubernetes, построенных по единому шаблону качества (<code>uv</code>, <code>ruff</code>, <code>mypy --strict</code>, <code>pytest</code>, Helm, ArgoCD, Pushgateway).</p>
+      <div class="slide-card">
+        <div class="slide-title"><span>Архитектура координации и потоков данных</span><span>4 контура в K3s</span></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="fs-num">Lock-Redis :6378</div><div class="fs-name">SET NX EX 180s</div><div class="fs-desc">Heartbeat 60с + Lua-release + файловый O_EXCL против гонок RPA-сессий</div></div>
+          <div class="flow-step"><div class="fs-num">Delivery Allocation</div><div class="fs-name">22 000+ строк / ночь</div><div class="fs-desc">SSO-поллинг URL + выгрузка Order / Inventory / AATP в витрины</div></div>
+          <div class="flow-step"><div class="fs-num">Price Monitoring</div><div class="fs-name">56 697 строк (783 файла)</div><div class="fs-desc">Telegram MTProto/Bot → парсинг → шард-локальный DELETE+INSERT в TBase</div></div>
+          <div class="flow-step"><div class="fs-num">Mail &amp; Sellout</div><div class="fs-name">IMAP→SMTP &amp; 10m ETL</div><div class="fs-desc">Декодирование RFC-2047, фильтрация суффикса 03, офлайн-образ stdlib</div></div>
         </div>
-        <div>
-          <pre><code># Идемпотентная шард-локальная модель в TBase
-CREATE TABLE analytics.retail_prices (...)
-DISTRIBUTE BY SHARD(file_md5);
--- DELETE по file_md5 выполняется внутри одного шарда
-
-# Проверка Kubernetes-контуров и замка
+      </div>
+      <details class="deep-drawer">
+        <summary>Шардирование в TBase, устройство замка и команды Kubernetes</summary>
+        <div class="drawer-content">
+          <pre><code>CREATE TABLE analytics.retail_prices (...) DISTRIBUTE BY SHARD(file_md5);
 kubectl -n delivery-allocation get cronjob,jobs
 kubectl -n dns-price-monitoring get deploy,cronjob
 kubectl -n mail-forwarder get deploy,pods</code></pre>
-          <div class="kv-list">
-            <div class="kv-item"><div class="kv-k">Distributed Lock</div><div class="kv-v">TTL 180s · Heartbeat 60s · Lua release</div></div>
-            <div class="kv-item"><div class="kv-k">Price Monitoring</div><div class="kv-v">56 697 строк · 783 файла · 0 дублей</div></div>
-          </div>
         </div>
-      </div>
+      </details>
     </div>
 
     <div class="tab-pane" id="tab-platform">
-      <div class="tab-pane-grid">
-        <div>
-          <h3>Платформа, распределённая СУБД TBase и инфраструктурный харденинг</h3>
-          <p>Эволюция от разрозненных скриптов к воспроизводимой платформе с жёсткими правилами безопасности и наблюдаемости.</p>
-          <ul>
-            <li><strong>Устранение GitOps-дрейфа и Split-Brain рантаймов:</strong> выявил и отключил легаси K8s-дубли воркеров, которые конфликтовали с каноничным systemd-конвейером; вынес секреты из Git-манифестов в <strong>HashiCorp Vault</strong> (с авто-unseal таймером каждые 2 минуты), вернув приложениям статус <code>Synced / Healthy</code> в ArgoCD.</li>
-            <li><strong>Специфика распределённой СУБД TBase (PostgreSQL 10, `max_connections=2500`):</strong> учёт ограничений шардированных таблиц (UNIQUE-индекс обязан включать колонку дистрибуции, CTAS не принимает bind-параметры, таймауты задаются через <code>set_config</code>), разделение бизнес-схем и локального PostgreSQL 16 для GitLab/CI.</li>
-            <li><strong>Обход гео-блока Terraform и сетевых коллизий:</strong> настроил локальное зеркало провайдеров <code>~/.terraform.d/mirror</code> (18 ресурсов кластера под IaC без обращения к заблокированному <code>releases.hashicorp.com</code>) и устранил пересечение Docker-сети <code>172.21.0.0/16</code> с маршрутом до корпоративного прокси.</li>
-          </ul>
-        </div>
-        <div>
-          <pre><code># Харденинг и проверка состояния платформы
-kubectl -n argocd get applications -o wide
-systemctl status vault-unseal.timer devops-alert.timer
-kubectl -n mlflow get pods   # mlflow-server 1/1 Running</code></pre>
-          <div class="kv-list">
-            <div class="kv-item"><div class="kv-k">Ресурсы узла</div><div class="kv-v">112 CPU · 376 GiB RAM · 9.5 TB</div></div>
-            <div class="kv-item"><div class="kv-k">IaC &amp; Security</div><div class="kv-v">Vault auto-unseal · Terraform mirror · 0640</div></div>
-          </div>
+      <h3>Платформа, распределённая СУБД TBase и инфраструктурный харденинг</h3>
+      <p>Сведение разрозненных сервисов к единому стандарту безопасности: секреты в Vault с авто-unseal, чистый <code>Synced</code> в ArgoCD, локальное зеркало провайдеров Terraform и развязка сетевых маршрутов.</p>
+      <div class="slide-card">
+        <div class="slide-title"><span>Ключевые инфраструктурные решения</span><span>18 ресурсов под IaC</span></div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="fs-num">GitOps &amp; Vault</div><div class="fs-name">0 секретов в Git</div><div class="fs-desc">Вынос base64-секретов в Vault + таймер auto-unseal каждые 2 минуты</div></div>
+          <div class="flow-step"><div class="fs-num">Runtime Clean-up</div><div class="fs-name">Без Split-Brain</div><div class="fs-desc">Удаление легаси K8s-дублей и замена logrotate pkill на systemd-таймер</div></div>
+          <div class="flow-step"><div class="fs-num">Terraform Mirror</div><div class="fs-name">Обход гео-блока</div><div class="fs-desc">Локальное зеркало ~/.terraform.d/mirror без обращения к внешнему реестру</div></div>
+          <div class="flow-step"><div class="fs-num">Network &amp; Proxy</div><div class="fs-name">Маршрутизация</div><div class="fs-desc">Устранение коллизии Docker 172.21.0.0/16 с корпоративным прокси</div></div>
         </div>
       </div>
+      <details class="deep-drawer">
+        <summary>Команды проверки состояния платформы и харденинга</summary>
+        <div class="drawer-content">
+          <pre><code>kubectl -n argocd get applications -o wide
+systemctl status vault-unseal.timer devops-alert.timer
+kubectl -n mlflow get pods   # mlflow-server 1/1 Running</code></pre>
+        </div>
+      </details>
     </div>
   </section>
 
-  <h2>Избранные расследования (Postmortems)</h2>
+  <h2>Ключевые расследования (срез за 10 секунд)</h2>
   <div class="grid">
     <div class="card">
       <div class="tag">INC-040 / 040b · Locale Drift</div>
-      <h3>Портал сменил язык на китайский — экспортёр встал на 4 000 кодах</h3>
-      <p>Внезапное переключение зарубежного портала на китайскую локаль (CN) сломало английские селекторы, а при возврате на EN фильтр дат не сбрасывался из-за кнопки <code>Reset</code> вместо <code>Clear</code>. Внедрил билингвальный адаптер селекторов и колонок — все 4 000 кодов автоматически ушли в обработку.</p>
+      <h3>Смена языка портала на CN остановила экспорт 4 000 кодов</h3>
+      <p>Внедрил билингвальный адаптер селекторов, колонок и кнопок сброса фильтра — все 4 000 кодов автоматически обогатились датами и ушли на FTP.</p>
+      <details class="deep-drawer">
+        <summary>Причина и технический фикс</summary>
+        <div class="drawer-content">Портал переключил UI на китайскую локаль (CN), сломав английские селекторы, а при возврате на EN фильтр дат зависал на кнопке <code>Reset</code> вместо <code>Clear</code>. Добавлены двуязычные локаторы на всех шагах и проверка сброса дат.</div>
+      </details>
     </div>
     <div class="card">
       <div class="tag">INC-16 / Lock · Concurrency</div>
-      <h3>Конфликт ночных браузерных сессий и таймаут SPA-авторизации</h3>
-      <p>Два контура под одной учёткой выбивали сессии друг друга, а <code>wait_for_url(load)</code> зависал на корпоративном SPA. Развёл потоки через распределённый TTL-замок в <code>lock-redis</code> и заменил ожидание на поллинг URL — прогон стабильно забирает 22 000+ строк за минуты.</p>
+      <h3>Гонка ночных браузерных сессий и таймаут SPA</h3>
+      <p>Развёл параллельные RPA-контуры через распределённый TTL-замок в <code>lock-redis</code> и поллинг URL — ночной прогон стабильно забирает 22 000+ строк.</p>
+      <details class="deep-drawer">
+        <summary>Причина и технический фикс</summary>
+        <div class="drawer-content">Два контура под одной учёткой выбивали сессии друг друга, а <code>wait_for_url(load)</code> вис на SPA. Поднят <code>lock-redis (:6378)</code> с <code>SET NX EX 180</code>, heartbeat 60с и атомарным Lua-скриптом освобождения.</div>
+      </details>
     </div>
     <div class="card">
       <div class="tag">INC-17 / 22 · GitOps &amp; Runtime</div>
-      <h3>Вечный OutOfSync в ArgoCD, зомби-порт :9310 и самострел logrotate</h3>
-      <p>Вынес base64-секреты из Git в Vault (убрав вечный дрейф ArgoCD), удалил легаси K8s-дубль воркера, заменил <code>logrotate pkill -USR1</code> (убивавший сервис и читавший <code>*.bak</code>) на безопасный systemd-таймер архивации и добавил контроль <code>NRestarts</code>.</p>
+      <h3>Вечный OutOfSync в ArgoCD и самострел logrotate</h3>
+      <p>Вынес секреты из Git в Vault, убрал фантомный K8s-дубль воркера и заменил опасный <code>logrotate pkill</code> на безопасный systemd-таймер архивации.</p>
+      <details class="deep-drawer">
+        <summary>Причина и технический фикс</summary>
+        <div class="drawer-content">Файл <code>*.bak</code> в <code>/etc/logrotate.d/</code> продолжал исполняться и убивал процесс сигналом <code>USR1</code>, а старый Secret в Git конфликтовал с Vault. Всё приведено к чистому GitOps (<code>Synced</code>).</div>
+      </details>
     </div>
     <div class="card">
       <div class="tag">INC-13 / Network · IaC &amp; Proxy</div>
-      <h3>Гео-блок HashiCorp и пересечение Docker-подсети с прокси</h3>
-      <p><code>terraform init</code> падал на 451/403 от HashiCorp, а маршрут до европейского прокси рвался из-за Docker-сети <code>172.21.0.0/16</code>. Собрал локальное <code>filesystem_mirror</code> на провайдере <code>kubectl</code> (18 ресурсов под IaC) и вычистил конфликтующий bridge.</p>
+      <h3>Гео-блок HashiCorp и коллизия подсети 172.21.0.0/16</h3>
+      <p>Собрал локальное зеркало провайдеров Terraform (18 ресурсов под IaC) и удалил конфликтующий Docker-bridge, перекрывавший корпоративный прокси.</p>
+      <details class="deep-drawer">
+        <summary>Причина и технический фикс</summary>
+        <div class="drawer-content"><code>releases.hashicorp.com</code> блокировал скачивание по региону, а локальная сеть <code>utd_shared (172.21.0.0/16)</code> перехватывала пакеты к прокси. Настроено <code>filesystem_mirror</code> в <code>~/.terraformrc</code>.</div>
+      </details>
     </div>
   </div>
 
@@ -239,7 +260,7 @@ kubectl -n mlflow get pods   # mlflow-server 1/1 Running</code></pre>
     <div class="exp">
       <div class="exp-head">Honor · IT-инженер (DevOps / Platform / Data &amp; MLOps)</div>
       <div class="exp-meta">Март 2024 — настоящее время · 2 года 9 месяцев</div>
-      <p>Построение и эксплуатация серверной платформы с нуля (Linux, K3s, Docker, systemd, GitOps через ArgoCD и Vault), 6 продуктивных контуров (маркировка «Честный знак», ЭДО/УПД, Sellout ETL, Delivery Allocation, Price Monitoring, Mail Relay), векторная база знаний в Qdrant (RAG) + гибридный оркестратор самовосстановления, наблюдаемость (Prometheus/Grafana/Loki), оптимизация распределённой СУБД TBase и международная BI/ETL-аналитика (Россия, Турция, Беларусь, Узбекистан).</p>
+      <p>Построение и развитие серверной платформы с нуля (Linux, K3s, Docker, systemd, GitOps через ArgoCD и Vault), 6 продуктивных контуров (маркировка «Честный знак», ЭДО/УПД, Sellout ETL, Delivery Allocation, Price Monitoring, Mail Forwarder), векторная база знаний в Qdrant (RAG) + гибридный оркестратор самовосстановления, наблюдаемость (Prometheus/Grafana/Loki), оптимизация распределённой СУБД TBase и международная BI/ETL-аналитика (Россия, Турция, Беларусь, Узбекистан).</p>
     </div>
     <div class="exp">
       <div class="exp-head">ФГБУК «Государственный музей архитектуры им. А.В. Щусева» · Специалист по ИТ</div>
@@ -248,16 +269,16 @@ kubectl -n mlflow get pods   # mlflow-server 1/1 Running</code></pre>
     </div>
   </div>
 
-  <h2>Разделы инженерной базы</h2>
+  <h2>Подробнее: статьи, гайды и разделы</h2>
   <div class="grid">
-    <a class="card" href="infrastructure.html"><div class="tag">K3s · ArgoCD · Vault · Qdrant</div><h3>Архитектура платформы</h3><p>5 слоёв инфраструктуры, эволюция от bash-скриптов до GitOps, RAG-базы знаний и автовосстановления.</p></a>
-    <a class="card" href="integrations.html"><div class="tag">ЧЗ · ЭДО · Lock-Redis · MTProto</div><h3>6 интеграционных контуров</h3><p>Контракты, идемпотентность, чанкинг 29 999 кодов, распределённые TTL-замки и билингвальные парсеры.</p></a>
-    <a class="card" href="incidents.html"><div class="tag">STAR · Postmortems</div><h3>Каталог инцидентов</h3><p>Реальные расследования: от симптома и ложных гипотез до корневой причины и автоматической защиты.</p></a>
-    <a class="card" href="database.html"><div class="tag">TBase · PG16 · Redis Streams</div><h3>Слой данных и очередей</h3><p>Шардирование в распределённой TBase, ключи дистрибуции, стримы событий и изоляция окружений.</p></a>
-    <a class="card" href="mlops.html"><div class="tag">Qdrant · bge-m3 · MLflow</div><h3>MLOps и AIOps в бою</h3><p>Живой RAG-контур на 779 векторов, гибридный диспетчер autoheal, MLflow-сервер и тестируемый ML-пайплайн.</p></a>
-    <a class="card" href="articles.html"><div class="tag">Longreads · 17-Step Guide</div><h3>Статьи и гайд развёртывания</h3><p>7 подробных текстов, включая пошаговое руководство по подъёму всей платформы на чистом железе.</p></a>
-    <a class="card" href="playbook.html"><div class="tag">Terraform · Ansible · CI</div><h3>Playbook и шаблоны кода</h3><p>Готовые обезличенные фрагменты GitLab CI, Terraform, Ansible и чек-листов траблшутинга.</p></a>
-    <a class="card" href="business.html"><div class="tag">ROI · SLA · Throughput</div><h3>Бизнес-эффект в цифрах</h3><p>Как скорость конвейера и нулевые потери кодов защищают таможенные сроки и признание выручки.</p></a>
+    <a class="card" href="articles.html"><div class="tag">Лонгриды · 17-шаговый гайд</div><h3>Статьи по результатам работ</h3><p>Подробные разборы архитектуры Qdrant RAG, Autoheal, замков Lock-Redis, шардирования TBase и пошаговый гайд развёртывания платформы с нуля.</p></a>
+    <a class="card" href="infrastructure.html"><div class="tag">K3s · ArgoCD · Vault · Terraform</div><h3>Топология и стек платформы</h3><p>Устройство вычислительного узла (112 CPU / 376 GiB RAM), слои исполнения, секреты и мониторинг.</p></a>
+    <a class="card" href="integrations.html"><div class="tag">6 контуров в продакшене</div><h3>Каталог интеграций</h3><p>Контракты, идемпотентность, чанкинг 29 999 кодов, распределённые TTL-замки и билингвальные парсеры.</p></a>
+    <a class="card" href="incidents.html"><div class="tag">Postmortems · STAR</div><h3>Полный журнал инцидентов</h3><p>Разборы реальных сбоев с симптомами, проверенными гипотезами, корневыми причинами и защитными гейтами.</p></a>
+    <a class="card" href="mlops.html"><div class="tag">Qdrant · bge-m3 · MLflow</div><h3>MLOps и AIOps</h3><p>Векторный поиск по 779 чанкам, эмбеддинги cortex, гибридный диспетчер autoheal и тестируемый ML-пайплайн.</p></a>
+    <a class="card" href="database.html"><div class="tag">TBase · PG16 · Redis</div><h3>Слой данных и очередей</h3><p>Шардирование в распределённой TBase, ключи дистрибуции, стримы событий и изоляция схем.</p></a>
+    <a class="card" href="playbook.html"><div class="tag">IaC · CI/CD · Runbooks</div><h3>Playbook и шаблоны кода</h3><p>Готовые обезличенные фрагменты GitLab CI, Terraform, Ansible и чек-листов диагностики.</p></a>
+    <a class="card" href="business.html"><div class="tag">SLA · Скорость · Выручка</div><h3>Бизнес-эффект в цифрах</h3><p>Как автоматизация контуров убирает простои на таможне и ускоряет признание выручки.</p></a>
   </div>
 
   <section id="contact">

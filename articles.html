@@ -25,6 +25,111 @@
   </section>
 
   <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">AIOps &amp; RAG · ~15 мин</div>
+    <h2 style="margin-top:.2rem">Векторная база знаний в Qdrant и гибридный Autoheal-оркестратор: как превратить постмортемы в самовосстанавливающийся контур</h2>
+
+    <h3>Проблема: документация мертва, если она не подключена к алертам</h3>
+    <p>Когда на платформе работает 6 продуктивных контуров (маркировка, ЭДО/УПД, аллокация поставок, прайс-мониторинг, почтовый релей и инвентарь продаж), количество документации, постмортемов и операционных чек-листов переваливает за десятки файлов. В момент ночного сбоя инженер не должен вспоминать, в каком именно <code>INCIDENTS.md</code> описан редкий код ошибки или какими флагами запускается скрипт лечения. Документация должна сама приходить в алерт и — там, где это безопасно — запускать проверенный фикс.</p>
+
+    <div class="slide-card">
+      <div class="slide-title"><span>Архитектурный слайд: Конвейер RAG + Safe Autoheal</span><span>779 векторов · 1024d Cosine</span></div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fs-num">01 · Индексация</div><div class="fs-name">index_rag.py</div><div class="fs-desc">Нарезка MD по секциям (900/100 симв.) + детерминированный UUIDv5</div></div>
+        <div class="flow-step"><div class="fs-num">02 · Векторизация</div><div class="fs-name">BAAI/bge-m3</div><div class="fs-desc">Локальный сервис cortex (:6335) на CPU без внешних облачных API</div></div>
+        <div class="flow-step"><div class="fs-num">03 · Хранилище</div><div class="fs-name">Qdrant :6333</div><div class="fs-desc">Коллекция infra-knowledge, фильтр по service и source_type</div></div>
+        <div class="flow-step"><div class="fs-num">04 · Оркестрация</div><div class="fs-name">autoheal.py :9310</div><div class="fs-desc">Pre-check → Dry-Run → Backup → Whitelist Apply → Verify</div></div>
+      </div>
+    </div>
+
+    <h3>Выбор векторного хранилища и модели эмбеддингов</h3>
+    <p>На этапе R&amp;D сравнивались четыре варианта: <code>pgvector</code> поверх существующей СУБД, локальный <code>Chroma/LanceDB</code>, <code>FAISS</code> и выделенный <strong>Qdrant</strong>. Поскольку основная бизнес-СУБД — распределённая TBase (на базе PostgreSQL 10), установка свежих индексов <code>pgvector (HNSW)</code> на ней невозможна, а <code>FAISS</code> не даёт удобной фильтрации по метаданным и персистентности «из коробки». Выбрали <strong>Qdrant в Docker</strong> с привязкой к <code>127.0.0.1:6333</code>, хранением на диске и веб-дашбордом за <code>nginx basic-auth (:8085/dashboard)</code>. Для векторизации русского и английского технического текста с кодом на CPU лучше всего показала себя модель <code>BAAI/bge-m3</code> (размерность 1024, косинусное расстояние).</p>
+
+    <h3>Как устроена идемпотентная индексация корпуса</h3>
+    <p>Скрипт <code>index_rag.py</code> ежедневно в 06:10 MSK обходит документацию всех 6 сервисов, инфраструктурные карты и скиллы. Вместо слепого разбиения по токенам текст режется по заголовкам <code># / ## / ###</code>, а длинные секции делятся по абзацам с окном <code>900</code> символов и перекрытием <code>100</code>. Идентификатор точки считается детерминированно: <code>uuid5(NAMESPACE_URL, f"{doc}|{section}|{chunk_idx}")</code> — повторный прогон обновляет существующие векторы (<code>upsert</code>) без дублей.</p>
+
+    <pre><code># Фрагмент модуля rag_context.py (stdlib-only, безопасный фолбэк)
+def rag_context(query: str, limit: int = 3, timeout: int = 5) -> str:
+    try:
+        vec = _embed([query])[0]  # локальный вызов cortex :6335/embed
+        body = json.dumps({"query": vec, "limit": limit, "with_payload": True}).encode()
+        req = urllib.request.Request(f"{QDRANT_URL}/collections/infra-knowledge/points/query",
+                                     data=body, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            pts = (json.loads(r.read()).get("result") or {}).get("points") or []
+        return "\n".join(f"- [{p['score']:.3f}] {p['payload']['service']}: {p['payload']['text'][:240]}" for p in pts)
+    except Exception:
+        return ""  # деградация RAG никогда не блокирует отправку алерта</code></pre>
+
+    <h3>Семь барьеров безопасности (Safe Autoheal Architecture)</h3>
+    <p>Главный риск любого AI/Autoheal в продакшене — галлюцинация или разрушительное действие. Поэтому оркестратор построен по жёсткому принципу разделения: <strong>контекст и классификация — гибкие, исполнение — строго детерминированное</strong>:</p>
+    <ul>
+      <li><strong>Никакого произвольного shell из модели:</strong> исполняться могут только заранее написанные и проверенные скрипты <code>/opt/ops-alerts/runbooks/*.sh</code>.</li>
+      <li><strong>Обязательная проверка прекондиции:</strong> перед запуском runbook оркестратор перепроверяет состояние через <code>kubectl / systemctl</code>.</li>
+      <li><strong>Цепочка <code>dry-run → backup → apply → verify → rollback</code>:</strong> по умолчанию все runbook-и работают в режиме <code>dry-run</code>; реальное применение разрешено только для белого списка (очистка зависших джобов, синхронизация известных конфигов) при явном флаге <code>AUTOHEAL_APPLY=1</code>.</li>
+      <li><strong>Наблюдаемость самого оркестратора:</strong> экспортёр на порту <code>:9310</code> отдаёт в Prometheus метрики <code>autoheal_problems_total</code>, <code>autoheal_known_total</code>, <code>autoheal_runbooks_ok_total</code>.</li>
+    </ul>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Concurrency &amp; RPA · ~12 мин</div>
+    <h2 style="margin-top:.2rem">Межпроцессные распределённые замки (Lock-Redis) и билингвальная защита RPA-экспортёров в Kubernetes</h2>
+
+    <h3>Задача: два контура, одна учётная запись и смена языка портала</h3>
+    <p>Часовой контур выгрузки дат производства кодов маркировки и ночной Kubernetes CronJob аллокации поставок (<code>delivery-allocation</code>) работают с одним зарубежным корпоративным порталом. Когда ночной прогон затягивался или пересекался с часовым экспортом, вторая браузерная сессия инвалидировала куки первой — оба задания падали. Вдобавок в ноябре портал без предупреждения переключил интерфейс с английского на китайский, остановив выгрузку 4 000 кодов.</p>
+
+    <div class="slide-card">
+      <div class="slide-title"><span>Слайд: Архитектура распределённого замка Lock-Redis</span><span>TTL 180s · Heartbeat 60s</span></div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fs-num">Захват замка</div><div class="fs-name">SET key token NX EX 180</div><div class="fs-desc">Атомарная запись уникального токена сессии в выделенный lock-redis :6378</div></div>
+        <div class="flow-step"><div class="fs-num">Продление</div><div class="fs-name">Heartbeat 60s</div><div class="fs-desc">Фоновый поток продлевает TTL, пока браузерный воркер жив</div></div>
+        <div class="flow-step"><div class="fs-num">Освобождение</div><div class="fs-name">Атомарный Lua EVAL</div><div class="fs-desc">Удаляет ключ только при совпадении токена владельца</div></div>
+        <div class="flow-step"><div class="fs-num">Резерв</div><div class="fs-name">Фолбэк O_EXCL</div><div class="fs-desc">Файловый замок с проверкой возраста маркера при недоступности Redis</div></div>
+      </div>
+    </div>
+
+    <h3>Почему выделили отдельный Lock-Redis и как исключили вечный клинч</h3>
+    <p>Использовать общий продуктивный Redis для межконтурных замков не стали, чтобы изолировать блокировки сессий от бизнес-стримов. Подняли отдельный контейнер <code>lock-redis (127.0.0.1:6378)</code> с обязательной парольной авторизацией. Если под в Kubernetes внезапно умирает по <code>OOMKilled</code>, фоновый heartbeat прекращается, и через 180 секунд замок исчезает сам — очередь никогда не зависает навечно.</p>
+
+    <pre><code># Атомарное освобождение замка только владельцем (Lua-скрипт в Redis)
+RELEASE_LUA = """
+if redis.call('get', KEYS[1]) == ARGV[1] then
+    return redis.call('del', KEYS[1])
+else
+    return 0
+end
+"""</code></pre>
+
+    <h3>Билингвальный адаптер селекторов (EN / CN)</h3>
+    <p>После инцидента <code>INC-040</code> (когда смена языка портала привела к росту <code>QR_STUCK_NOPD</code> до 4 000 кодов) и <code>INC-040b</code> (когда при возврате на английский перестала нажиматься кнопка сброса дат, потому что в EN она называется <code>Reset</code>, а не <code>Clear</code>) мы перевели все RPA-шаги на двуязычные словари локаторов и двуязычный маппинг колонок Excel. Теперь смена локали на стороне зарубежного портала проходит для конвейера полностью прозрачно.</p>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:2rem">
+    <div class="tag">Database &amp; Hardening · ~14 мин</div>
+    <h2 style="margin-top:.2rem">Шард-локальная идемпотентность в СУБД TBase и ликвидация архитектурного техдолга</h2>
+
+    <h3>Ловушки распределённой СУБД TBase (PostgreSQL 10)</h3>
+    <p>Бизнес-данные живут в корпоративном кластере <strong>TBase</strong> (распределённый форк PostgreSQL 10, <code>max_connections=2500</code>). На практике стандартные приёмы одиночного PostgreSQL здесь ломаются в трёх местах:</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Ловушка TBase</th><th>Что происходило</th><th>Как решили в продакшене</th></tr>
+        <tr><td>Дефолтный ключ дистрибуции</td><td>Удаление старой версии файла в прайс-мониторинге рассылало запрос по всем узлам и вызывало кросс-шардовые таймауты</td><td>Пересоздали таблицу с <code>DISTRIBUTE BY SHARD(file_md5)</code> — теперь идемпотентный <code>DELETE + INSERT</code> бьёт ровно в один шард (56 697 строк из 783 файлов без дублей)</td></tr>
+        <tr><td>Ограничение <code>UNIQUE</code> индекса</td><td><code>Unique index of distributed table must include the distribution column</code></td><td>Включили ключ дистрибуции в составной ключ уникальности и перенесли дедупликацию на входной provenance-ключ</td></tr>
+        <tr><td>Параметры в <code>SET</code> и <code>CTAS</code></td><td><code>SET statement_timeout = <section class="hero">
+    <h1>Статьи</h1>
+    <p>Разборы того, что реально было: решения, trade-off'ы, код и уроки. Без канцелярита.</p>
+  </section></code> и параметризованный <code>CTAS</code> возвращают синтаксическую ошибку</td><td>Перевели таймауты на <code>SELECT set_config('statement_timeout', %s, false)</code> и явные DDL-схемы</td></tr>
+      </table>
+    </div>
+
+    <h3>Устранение Split-Brain рантаймов, ArgoCD OutOfSync и гео-блока Terraform</h3>
+    <ul>
+      <li><strong>Ликвидация вечного OutOfSync в ArgoCD:</strong> манифесты в Git содержали старый объект <code>Secret</code> в base64, тогда как живой кластер уже читал секреты из Vault. Убрали секреты из Git-манифестов, настроили таймер <code>vault-unseal.timer</code> (проверка каждые 2 минуты) и вернули приложениям чистый статус <code>Synced / Healthy</code>.</li>
+      <li><strong>Устранение Split-Brain воркеров и самострела <code>logrotate</code>:</strong> удалили 8-недельный K8s-дубль <code>utd-worker</code>, конфликтовавший с основным systemd-конвейером; убрали из <code>/etc/logrotate.d/</code> бэкап-файл <code>*.bak</code> (который logrotate продолжал выполнять и убивал себя через <code>pkill -USR1 -f</code>), заменив его на безопасный <code>systemd timer</code> архивации.</li>
+      <li><strong>Обход гео-блока HashiCorp и развязка прокси:</strong> настроили локальное зеркало провайдеров <code>~/.terraform.d/mirror</code> в <code>~/.terraformrc</code> (18 ресурсов кластера под управлением Terraform без внешних запросов к заблокированному <code>releases.hashicorp.com</code>) и удалили конфликтующую Docker-подсеть <code>172.21.0.0/16</code>, перекрывавшую маршрут до европейского прокси.</li>
+    </ul>
+  </article>
+
+  <article class="card" style="display:block;margin-bottom:2rem">
     <div class="tag">Инфраструктура · ~10 мин</div>
     <h2 style="margin-top:.2rem">От legacy-сервера к управляемой платформе</h2>
 
