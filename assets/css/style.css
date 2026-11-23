@@ -585,3 +585,92 @@ details.deep-drawer .drawer-content {
     grid-template-columns: 1fr;
   }
 }
+/* === v6: Золотые акценты — ключевые моменты, элегантность === */
+:root {
+  --gold: #d4af37;
+  --gold-2: #f0d78c;
+  --gold-deep: #a87f1f;
+  --gold-grad: linear-gradient(135deg, #b8860b 0%, #d4af37 45%, #f2d478 100%);
+  --gold-glow: rgba(212,175,55,.16);
+  --gold-ink: #241a02;
+}
+:root[data-theme="light"] {
+  --gold: #9a7410;
+  --gold-2: #8a6a0d;
+  --gold-deep: #7c5e0e;
+  --gold-grad: linear-gradient(135deg, #8a6a0d 0%, #a87f1f 60%, #c9a227 100%);
+  --gold-glow: rgba(154,116,16,.13);
+  --gold-ink: #f7f1dd;
+}
+/* мягкое золотое свечение фона */
+body::before {
+  background:
+    radial-gradient(900px 500px at 12% -10%, var(--glow), transparent 60%),
+    radial-gradient(800px 500px at 90% 0%, rgba(16,185,129,.10), transparent 55%),
+    radial-gradient(760px 460px at 55% 6%, var(--gold-glow), transparent 62%);
+}
+/* Имя в hero — главный момент */
+.hero h1 {
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* CTA-кнопка (резюме) */
+.btn {
+  background: var(--gold-grad);
+  color: var(--gold-ink);
+  box-shadow: 0 12px 28px -14px var(--gold-glow), 0 4px 14px -8px rgba(0,0,0,.5);
+}
+.btn:hover { color: var(--gold-ink); filter: brightness(1.05); }
+/* Ключевые цифры и показатели */
+.stat b, .stat-box b {
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px var(--gold-glow));
+}
+.stat-box { border-top-color: var(--gold); }
+.stat-box:hover { border-color: var(--gold); }
+.stat .stat-tag, .stat-box .stat-tag { color: var(--gold); }
+/* Маркеры секций */
+main h2::before { background: var(--gold-grad); }
+/* Бейдж hero и pulse-точка */
+.hero .badge {
+  border-color: var(--gold);
+  color: var(--gold-2);
+  background: linear-gradient(180deg, var(--card), var(--bg-soft));
+}
+.pulse-dot { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+/* Аватар */
+.avatar { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow), var(--shadow); }
+/* Таймлайн */
+.timeline .step::before { background: var(--gold); box-shadow: 0 0 0 4px var(--gold-glow); }
+/* Теги, иконки, мета, ключевые строчки */
+.card .tag, .card .icon { color: var(--gold); }
+.exp-meta { color: var(--gold); }
+.star .sl { color: var(--gold); }
+.card:hover { border-color: var(--gold); }
+.chip:hover { border-color: var(--gold); }
+/* Вкладки контуров */
+.tab-btn.active { background: var(--gold-grad); color: var(--gold-ink); }
+.tab-btn:hover { border-color: var(--gold); }
+/* Bento-карта и презентационные слайды */
+.bento-layer { border-left-color: var(--gold); }
+.bento-layer-head { color: var(--gold); }
+.bento-pill b { color: var(--gold); }
+.slide-title { color: var(--gold); }
+.flow-step .fs-num { color: var(--gold); }
+.kv-item .kv-k { color: var(--gold); }
+.arch-card-head span.live { color: var(--gold); }
+/* Раскрывающиеся блоки "Подробнее" */
+details.deep-drawer > summary { color: var(--gold-2); }
+details.deep-drawer:hover { border-color: var(--gold); }
+details.deep-drawer[open] > summary::after { color: var(--gold); border-color: var(--gold); }
+/* Навигация: активная страница и подчёркивание */
+nav.links a::after { background: var(--gold-grad); }
+nav.links a.active { color: var(--gold-2); }
+footer a:hover { color: var(--gold); }
+/* Активная вкладка-ссылка меню "Ещё" */
+.more-menu a:hover { color: var(--gold); }
