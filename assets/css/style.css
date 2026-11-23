@@ -675,7 +675,7 @@ footer a:hover { color: var(--gold); }
 /* Активная вкладка-ссылка меню "Ещё" */
 .more-menu a:hover { color: var(--gold); }
 
-/* === v7: контраст (как Rainbow CSV) + защита от переполнения карточек === */
+/* === v7.1: контраст, но адаптивно - обычный текст переносится естественно === */
 :root {
   --text: #eef7f1;
   --muted: #a6c0b2;
@@ -689,7 +689,6 @@ footer a:hover { color: var(--gold); }
   --tok-p: #c9a7ff;
   --tok-f: #7fd6ff;
   --tok-v: #ffb86b;
-  --tok-kv: #f2d478;
 }
 :root[data-theme="light"] {
   --text: #081710;
@@ -704,20 +703,21 @@ footer a:hover { color: var(--gold); }
   --tok-p: #6c3fc9;
   --tok-f: #0366d6;
   --tok-v: #b85c00;
-  --tok-kv: #7a5a00;
 }
-/* Код: тёмный фон и заметная рамка, чтобы не сливался с текстом */
+/* Код: контрастный фон без ломки вёрстки; длинные строки — горизонтальный скролл */
 pre {
   background: var(--code-bg);
   border: 1px solid var(--code-border);
   border-left: 3px solid var(--gold);
   color: var(--text);
   font-size: .9rem;
+  white-space: pre;
+  overflow-x: auto;
 }
-pre code { color: var(--text); }
+pre code { color: var(--text); white-space: pre; }
 code {
-  background: var(--code-bg);
-  border: 1px solid var(--code-border);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
   color: var(--tok-s);
 }
 /* Радужные токены кода (Rainbow CSV-подобный контраст) */
@@ -728,15 +728,21 @@ code {
 .tok-p  { color: var(--tok-p); }
 .tok-f  { color: var(--tok-f); }
 .tok-v  { color: var(--tok-v); }
-/* Защита от выезда содержимого за границы карточек */
+/* Адаптивность: естественный перенос обычного текста (ничего не ломаем) */
+h1, h2, h3, h4, p, li, dd, dt, th, td, figcaption, .exp-head, .exp-meta,
+.card, .star, .stat-box, .stat, .kv-item, .tab-pane, .exp, .arch-card,
+.bento-layer, .flow-step, .slide-card, .more-menu, .badge, .chip, .note {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+/* Защита от выезда за границы карточек: min-width без разрыва слов */
 .card, .star, .stat-box, .stat, .kv-item, .tab-pane, .exp, .arch-card,
 .bento-layer, .flow-step, .slide-card, .more-menu, .badge, .chip, .note {
   min-width: 0;
-  overflow-wrap: anywhere;
-  word-break: break-word;
 }
 .grid > *, .stats-6 > *, .stats > *, .kv-list > *, .flow-steps > *,
 .tab-pane-grid > * { min-width: 0; }
+/* Перенос длинных неразрывных токенов — только в коде и ячейках таблиц */
+code, th, td { overflow-wrap: break-word; }
 .card pre, .star pre, .tab-pane pre, .slide-card pre { max-width: 100%; }
-.card img, .star img, .tab-pane img { max-width: 100%; height: auto; }
-th, td { overflow-wrap: anywhere; word-break: break-word; }
+.card img, .star img, .tab-pane img, .kv-item img { max-width: 100%; height: auto; }
