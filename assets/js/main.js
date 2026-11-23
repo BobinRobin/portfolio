@@ -129,3 +129,55 @@ function currentFile(){ return location.pathname.split('/').pop() || 'index.html
     });
   });
 })();
+//
+
+// Rainbow-подсветка кода (контраст как в Rainbow CSV): ключевые слова, строки, числа,
+// комментарии, пути, флаги, переменные - каждый тип своим цветом.
+(function(){
+  var blocks = document.querySelectorAll('pre code');
+  if(!blocks.length) return;
+  var KEYWORDS = new Set([
+    'CURL','PYTHON','PYTHON3','SUDO','KUBECTL','GIT','CD','EXPORT','DOCKER','HELM','SYSTEMCTL',
+    'GREP','AWK','SED','TAR','SCP','SSH','CREATE','SELECT','INSERT','UPDATE','DELETE','FROM','WHERE',
+    'AND','OR','NOT','JOIN','DISTRIBUTE','BY','SHARD','KEY','TABLE','INDEX','VALUES','DEFAULT','SET',
+    'CONFIG','DOCKER-COMPOSE','BASH','SH','CHMOD','CHOWN','CP','MV','RM','MKDIR','TOUCH','CAT','ECHO',
+    'PIP','UV','ARGO','ARGOCD','TERRAFORM','VAULT','K3S','K3SCTL','NPM','RESTART','ENABLE','DISABLE',
+    'DAEMON-RELOAD','STATUS','LOG','LOGS','GET','APPLY','EXEC','PORT-FORWARD','RUN','PULL',
+    'LIMIT','AS','CASE','WHEN','THEN','ELSE','END','DESCRIBE','JQ','PS','DF','DU','FIND','LS'
+  ]);
+  function esc(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function tokenize(text){
+    var re = new RegExp(
+      '(#[^\\n]*|(?<!:)\\/\\/[^\\n]*|--[ \\t][^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)' +  // 1 комментарий
+      '|("(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')' +                      // 2 строка
+      '|(\\b\\d+(?:\\.\\d+)?\\b)' +                                              // 3 число
+      '|(\\$\\{[^}]*\\}|\\$[A-Za-z_][A-Za-z0-9_]*|\\{\\{[^}]*\\}\\})' +          // 4 переменная
+      '|(--?[A-Za-z][A-Za-z0-9-]*)' +                                            // 5 флаг
+      '|((?:\\/~|\\.{1,2}\\/|\\b[a-z]:\\\\)[^\\s\'"]*|(?<=\\s)\\/[^\\s\'"]*)' +  // 6 путь
+      '|(\\b[A-Za-z_][A-Za-z0-9_.-]*\\b)',                                       // 7 слово
+      'g');
+    var out = '', last = 0, m;
+    while((m = re.exec(text))){
+      out += esc(text.slice(last, m.index));
+      var cls;
+      if(m[1]) cls = 'tok-c';
+      else if(m[2]) cls = 'tok-s';
+      else if(m[3]) cls = 'tok-n';
+      else if(m[4]) cls = 'tok-v';
+      else if(m[5]) cls = 'tok-f';
+      else if(m[6]) cls = 'tok-p';
+      else if(m[7]) cls = KEYWORDS.has(m[7].toUpperCase()) ? 'tok-k' : '';
+      out += cls ? ('<span class="'+cls+'">'+esc(m[0])+'</span>') : esc(m[0]);
+      last = m.index + m[0].length;
+    }
+    out += esc(text.slice(last));
+    return out;
+  }
+  blocks.forEach(function(code){
+    if(code.getAttribute('data-rainbow')) return;
+    code.innerHTML = tokenize(code.textContent);
+    code.setAttribute('data-rainbow','1');
+  });
+})();

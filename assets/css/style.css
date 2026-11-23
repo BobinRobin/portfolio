@@ -674,3 +674,69 @@ nav.links a.active { color: var(--gold-2); }
 footer a:hover { color: var(--gold); }
 /* Активная вкладка-ссылка меню "Ещё" */
 .more-menu a:hover { color: var(--gold); }
+
+/* === v7: контраст (как Rainbow CSV) + защита от переполнения карточек === */
+:root {
+  --text: #eef7f1;
+  --muted: #a6c0b2;
+  --border: #2b4738;
+  --code-bg: #040b07;
+  --code-border: #21402f;
+  --tok-k: #ffd76d;
+  --tok-s: #7ee2a8;
+  --tok-n: #ff9e9e;
+  --tok-c: #6f9181;
+  --tok-p: #c9a7ff;
+  --tok-f: #7fd6ff;
+  --tok-v: #ffb86b;
+  --tok-kv: #f2d478;
+}
+:root[data-theme="light"] {
+  --text: #081710;
+  --muted: #3c5c4c;
+  --border: #a9c6b6;
+  --code-bg: #f0f6f2;
+  --code-border: #c3d9cc;
+  --tok-k: #8a5a00;
+  --tok-s: #0b7a3e;
+  --tok-n: #b3261e;
+  --tok-c: #647d70;
+  --tok-p: #6c3fc9;
+  --tok-f: #0366d6;
+  --tok-v: #b85c00;
+  --tok-kv: #7a5a00;
+}
+/* Код: тёмный фон и заметная рамка, чтобы не сливался с текстом */
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--gold);
+  color: var(--text);
+  font-size: .9rem;
+}
+pre code { color: var(--text); }
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  color: var(--tok-s);
+}
+/* Радужные токены кода (Rainbow CSV-подобный контраст) */
+.tok-k  { color: var(--tok-k); font-weight: 600; }
+.tok-s  { color: var(--tok-s); }
+.tok-n  { color: var(--tok-n); }
+.tok-c  { color: var(--tok-c); font-style: italic; }
+.tok-p  { color: var(--tok-p); }
+.tok-f  { color: var(--tok-f); }
+.tok-v  { color: var(--tok-v); }
+/* Защита от выезда содержимого за границы карточек */
+.card, .star, .stat-box, .stat, .kv-item, .tab-pane, .exp, .arch-card,
+.bento-layer, .flow-step, .slide-card, .more-menu, .badge, .chip, .note {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.grid > *, .stats-6 > *, .stats > *, .kv-list > *, .flow-steps > *,
+.tab-pane-grid > * { min-width: 0; }
+.card pre, .star pre, .tab-pane pre, .slide-card pre { max-width: 100%; }
+.card img, .star img, .tab-pane img { max-width: 100%; height: auto; }
+th, td { overflow-wrap: anywhere; word-break: break-word; }
